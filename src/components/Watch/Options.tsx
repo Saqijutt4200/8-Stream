@@ -23,13 +23,7 @@ const Options = () => {
               className="px-1 bg-gray-900 text-center  hover:bg-gray-600 rounded-lg"
               value="8stream"
             >
-              8 Stream
-            </option>
-            <option
-              className="px-1 bg-gray-900 text-center  hover:bg-gray-600 rounded-lg "
-              value="consumet"
-            >
-              Consumet
+              vidsrc
             </option>
           </select>
         </div>
@@ -37,7 +31,7 @@ const Options = () => {
       <p className="text-white text-xs font-medium flex  items-center gap-1">
         <IoIosInformationCircleOutline className="text-[#F9CC0B] text-sm" />
         {api === "8stream"
-          ? "8stream provide multi lang"
+          ? "vidsrc provide multi lang"
           : "Consumet provide eng and subs"}
       </p>
     </div>
