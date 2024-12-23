@@ -90,35 +90,15 @@ export default function Player({
         },
       },
     });
-    const handleJumpBack = () => {
-      art.currentTime = Math.max(0, art.currentTime - 10);
-    };
 
-    // Jump Forward 10 seconds
-    const handleJumpForward = () => {
-      art.currentTime = Math.min(art.duration, art.currentTime + 10);
-    };
-
-    // Add Jump Back and Jump Forward buttons
-    art.controls.add({
-      name: "jumpBack",
-      position: "left",
-      html: `<button class="jump-button">Jump Back</button>`,
-      onClick: handleJumpBack,
-    });
-
-    art.controls.add({
-      name: "jumpForward",
-      position: "right",
-      html: `<button class="jump-button">Jump Forward</button>`,
-      onClick: handleJumpForward,
-    });
     art.on("ready", () => {
       art.play();
     });
+
     if (getInstance && typeof getInstance === "function") {
       getInstance(art);
     }
+
     art.events.proxy(document, "keypress", (event: any) => {
       // Check if the focus is on an input field or textarea
       const isInputFocused =
@@ -160,18 +140,43 @@ export default function Player({
         },
       });
     }
+
     art.controls.update({
       name: "volume",
       position: "right",
     });
+
+    // Add Jump Back (10 seconds) button
+    art.controls.add({
+      name: "jumpBack",
+      position: "left",
+      html: `<div class="jump-button">Jump Back 10s</div>`,
+      onClick: () => {
+        const currentTime = art.video.currentTime;
+        art.video.currentTime = Math.max(0, currentTime - 10); // Jump back 10 seconds
+      },
+    });
+
+    // Add Jump Forward (10 seconds) button
+    art.controls.add({
+      name: "jumpForward",
+      position: "right",
+      html: `<div class="jump-button">Jump Forward 10s</div>`,
+      onClick: () => {
+        const currentTime = art.video.currentTime;
+        art.video.currentTime = currentTime + 10; // Jump forward 10 seconds
+      },
+    });
+
     console.log("controls", art.controls);
+
     return () => {
       if (art && art.destroy) {
         art.destroy(false);
         art?.hls?.destroy();
       }
     };
-  }, []);
+  }, [option, artRef, sub, getInstance]);
 
   return <div ref={artRef} {...rest}></div>;
-}
+      }
