@@ -23,45 +23,53 @@ export default function Player({
       settings: [
         {
           html: "Font size",
-          tooltip: "Adjust font size",
+          tooltip: "medium",
           name: "fontSize",
           selector: [
-            { html: "Small", value: "20px" },
-            { html: "Medium", value: "35px", default: true },
-            { html: "Large", value: "48px" },
+            {
+              html: "small",
+              value: "20px",
+            },
+            {
+              html: "medium",
+              default: true,
+              value: "35px",
+            },
+            {
+              html: "large",
+              value: "48px",
+            },
           ],
           onSelect: function (item) {
-            art.subtitle.style({ "font-size": item.value });
+            art.subtitle.style({
+              //@ts-ignore
+              "font-size": item.value,
+            });
             return item.html;
-          },
-        },
-        {
-          html: "Playback Speed",
-          tooltip: "Adjust speed",
-          name: "speed",
-          selector: [
-            { html: "0.5x", value: 0.5 },
-            { html: "1x (Normal)", value: 1, default: true },
-            { html: "1.5x", value: 1.5 },
-            { html: "2x", value: 2 },
-          ],
-          onSelect: function (item) {
-            art.playbackRate = item.value;
-            return `${item.html}`;
           },
         },
       ],
       container: artRef.current!,
       plugins: [
         artplayerPluginHlsQuality({
+          // Show quality in control
           control: true,
+
+          // Get the resolution text from level
           getResolution: (level) => {
-            if (level.height <= 240) return "240P";
-            if (level.height <= 360) return "360P";
-            if (level.height <= 480) return "480P";
-            if (level.height <= 720) return "720P";
-            if (level.height <= 1080) return "1080P";
-            return level.height + "P";
+            if (level.height <= 240) {
+              return "240P";
+            } else if (level.height > 240 && level.height <= 360) {
+              return "360P";
+            } else if (level.height > 360 && level.height <= 480) {
+              return "480P";
+            } else if (level.height > 480 && level.height <= 720) {
+              return "720P";
+            } else if (level.height > 720 && level.height <= 1080) {
+              return "1080P";
+            } else {
+              return level.height + "P";
+            }
           },
         }),
       ],
@@ -82,56 +90,63 @@ export default function Player({
         },
       },
     });
-
-    // Custom Controls
-    art.controls.add({
-      name: "PiP",
-      position: "right",
-      html: "Picture-in-Picture",
-      onClick: () => {
-        if (document.pictureInPictureElement) {
-          document.exitPictureInPicture();
-        } else {
-          art.video.requestPictureInPicture();
-        }
-      },
+    art.on("ready", () => {
+      art.play();
     });
-
-    // Handle playback resume
-    const lastPlayed = localStorage.getItem("lastPlayed");
-    if (lastPlayed) {
-      art.currentTime = parseFloat(lastPlayed);
+    if (getInstance && typeof getInstance === "function") {
+      getInstance(art);
     }
-    art.on("timeupdate", () => {
-      localStorage.setItem("lastPlayed", art.currentTime.toString());
+    art.events.proxy(document, "keypress", (event: any) => {
+      // Check if the focus is on an input field or textarea
+      const isInputFocused =
+        document?.activeElement?.tagName === "INPUT" ||
+        document?.activeElement?.tagName === "TEXTAREA";
+
+      if (!isInputFocused && event?.code === "Space") {
+        event.preventDefault();
+        art.playing ? art.pause() : art.play();
+      } else if (!isInputFocused && event?.code === "KeyF") {
+        event.preventDefault();
+        art.fullscreen = !art.fullscreen;
+      }
     });
 
-    // Subtitle settings
+    art.controls.remove("playAndPause");
     if (sub?.length > 0) {
       art.controls.add({
         name: "subtitle",
         position: "right",
-        html: `Subtitle`,
+        html: `subtitle`,
         selector: [
-          { default: true, html: `Off`, value: "" },
-          ...sub.map((item: any) => ({
-            html: item.lang,
-            value: item.url,
-          })),
+          {
+            default: true,
+            html: `off`,
+            value: "",
+          },
+          ...sub.map((item: any, i: number) => {
+            return {
+              html: `<div>${item.lang}</div>`,
+              value: item?.url,
+            };
+          }),
         ],
-        onSelect: function (item) {
+        onSelect: function (item, $dom) {
+          // @ts-ignore
           art.subtitle.switch(item.value);
           return item.html;
         },
       });
     }
-
-    if (getInstance) getInstance(art);
-
-    // Cleanup on component unmount
+    art.controls.update({
+      name: "volume",
+      position: "right",
+    });
+    console.log("controls", art.controls);
     return () => {
-      art.destroy(false);
-      art.hls?.destroy();
+      if (art && art.destroy) {
+        art.destroy(false);
+        art?.hls?.destroy();
+      }
     };
   }, []);
 
