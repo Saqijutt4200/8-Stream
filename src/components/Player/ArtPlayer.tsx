@@ -91,6 +91,32 @@ export default function Player({
       },
     });
 
+    // Jump back control
+    art.controls.add({
+      name: "jumpBack",
+      position: "left",
+      html: `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <path d="M17 10l-6 6-6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg> 10s`,
+      click: () => {
+        art.currentTime = Math.max(art.currentTime - 10, 0);
+      },
+    });
+
+    // Jump forward control
+    art.controls.add({
+      name: "jumpForward",
+      position: "left",
+      html: `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <path d="M7 10l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg> 10s`,
+      click: () => {
+        art.currentTime = Math.min(art.currentTime + 10, art.duration);
+      },
+    });
+
     art.on("ready", () => {
       art.play();
     });
@@ -100,7 +126,6 @@ export default function Player({
     }
 
     art.events.proxy(document, "keypress", (event: any) => {
-      // Check if the focus is on an input field or textarea
       const isInputFocused =
         document?.activeElement?.tagName === "INPUT" ||
         document?.activeElement?.tagName === "TEXTAREA";
@@ -146,28 +171,6 @@ export default function Player({
       position: "right",
     });
 
-    // Add Jump Back (10 seconds) button
-    art.controls.add({
-      name: "jumpBack",
-      position: "left",
-      html: `<div class="jump-button">Jump Back 10s</div>`,
-      onClick: () => {
-        const currentTime = art.video.currentTime;
-        art.video.currentTime = Math.max(0, currentTime - 10); // Jump back 10 seconds
-      },
-    });
-
-    // Add Jump Forward (10 seconds) button
-    art.controls.add({
-      name: "jumpForward",
-      position: "right",
-      html: `<div class="jump-button">Jump Forward 10s</div>`,
-      onClick: () => {
-        const currentTime = art.video.currentTime;
-        art.video.currentTime = currentTime + 10; // Jump forward 10 seconds
-      },
-    });
-
     console.log("controls", art.controls);
 
     return () => {
@@ -176,7 +179,7 @@ export default function Player({
         art?.hls?.destroy();
       }
     };
-  }, [option, artRef, sub, getInstance]);
+  }, []);
 
   return <div ref={artRef} {...rest}></div>;
-      }
+          }
