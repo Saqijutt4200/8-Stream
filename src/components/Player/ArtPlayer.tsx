@@ -90,33 +90,6 @@ export default function Player({
         },
       },
     });
-    art.controls.add({
-      name: "jumpBack",
-      position: "left",
-      html: `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-          <path fill="white" d="M15 18l-6-6 6-6"/>
-        </svg> 10s
-      `,
-      click: () => {
-        art.currentTime = Math.max(art.currentTime - 10, 0);
-      },
-    });
-    art.controls.add({
-      name: "jumpForward",
-      position: "left",
-      html: `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-          <path fill="white" d="M9 18l6-6-6-6"/>
-        </svg> 10s
-      `,
-      click: () => {
-        art.currentTime = Math.min(
-          art.currentTime + 10,
-          art.duration
-        );
-      },
-    });
     art.on("ready", () => {
       art.play();
     });
