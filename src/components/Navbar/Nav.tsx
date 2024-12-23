@@ -1,6 +1,4 @@
 import Link from "next/link";
-import logo from "../../assets/logo.svg";
-import Image from "next/image";
 import Search from "./Search";
 
 const Nav = () => {
