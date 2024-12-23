@@ -91,41 +91,45 @@ export default function Player({
       },
     });
 
-    // Jump back control
+    // Add jump back button with white SVG icon
     art.controls.add({
       name: "jumpBack",
       position: "left",
       html: `
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-          <path d="M17 10l-6 6-6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg> 10s`,
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+          <path fill="white" d="M15 18l-6-6 6-6"/>
+        </svg> 10s
+      `,
       click: () => {
         art.currentTime = Math.max(art.currentTime - 10, 0);
       },
     });
 
-    // Jump forward control
+    // Add jump forward button with white SVG icon
     art.controls.add({
       name: "jumpForward",
       position: "left",
       html: `
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-          <path d="M7 10l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg> 10s`,
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+          <path fill="white" d="M9 18l6-6-6-6"/>
+        </svg> 10s
+      `,
       click: () => {
-        art.currentTime = Math.min(art.currentTime + 10, art.duration);
+        art.currentTime = Math.min(
+          art.currentTime + 10,
+          art.duration
+        );
       },
     });
 
     art.on("ready", () => {
       art.play();
     });
-
     if (getInstance && typeof getInstance === "function") {
       getInstance(art);
     }
-
     art.events.proxy(document, "keypress", (event: any) => {
+      // Check if the focus is on an input field or textarea
       const isInputFocused =
         document?.activeElement?.tagName === "INPUT" ||
         document?.activeElement?.tagName === "TEXTAREA";
@@ -165,13 +169,10 @@ export default function Player({
         },
       });
     }
-
     art.controls.update({
       name: "volume",
       position: "right",
     });
-
-    console.log("controls", art.controls);
 
     return () => {
       if (art && art.destroy) {
@@ -182,4 +183,4 @@ export default function Player({
   }, []);
 
   return <div ref={artRef} {...rest}></div>;
-          }
+}
