@@ -56,7 +56,7 @@ export default async function Page() {
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getData();
   return {
-    title: "8 Stream",
+    title: "vidscr",
     description: "Watch Movies and TV Shows Online For Free",
     keywords: data.tendingMovies?.results?.map((item: any) => item?.title),
     category: "Entertainment",
