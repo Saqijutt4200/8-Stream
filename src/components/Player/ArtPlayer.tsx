@@ -1,3 +1,9 @@
+import { useEffect } from "react";
+import Artplayer from "artplayer";
+import { type Option } from "artplayer/types/option";
+import artplayerPluginHlsQuality from "artplayer-plugin-hls-quality";
+import Hls from "hls.js";
+
 export default function Player({
   option,
   getInstance,
@@ -46,7 +52,10 @@ export default function Player({
       container: artRef.current!,
       plugins: [
         artplayerPluginHlsQuality({
+          // Show quality in control
           control: true,
+
+          // Get the resolution text from level
           getResolution: (level) => {
             if (level.height <= 240) {
               return "240P";
@@ -81,8 +90,6 @@ export default function Player({
         },
       },
     });
-
-    // Add jump back and forward controls
     art.controls.add({
       name: "jumpBack",
       position: "left",
@@ -103,15 +110,14 @@ export default function Player({
         );
       },
     });
-
     art.on("ready", () => {
       art.play();
     });
     if (getInstance && typeof getInstance === "function") {
       getInstance(art);
     }
-
     art.events.proxy(document, "keypress", (event: any) => {
+      // Check if the focus is on an input field or textarea
       const isInputFocused =
         document?.activeElement?.tagName === "INPUT" ||
         document?.activeElement?.tagName === "TEXTAREA";
@@ -122,15 +128,6 @@ export default function Player({
       } else if (!isInputFocused && event?.code === "KeyF") {
         event.preventDefault();
         art.fullscreen = !art.fullscreen;
-      } else if (!isInputFocused && event?.code === "ArrowLeft") {
-        event.preventDefault();
-        art.currentTime = Math.max(art.currentTime - 10, 0);
-      } else if (!isInputFocused && event?.code === "ArrowRight") {
-        event.preventDefault();
-        art.currentTime = Math.min(
-          art.currentTime + 10,
-          art.duration
-        );
       }
     });
 
@@ -154,17 +151,17 @@ export default function Player({
           }),
         ],
         onSelect: function (item, $dom) {
+          // @ts-ignore
           art.subtitle.switch(item.value);
           return item.html;
         },
       });
     }
-
     art.controls.update({
       name: "volume",
       position: "right",
     });
-
+    console.log("controls", art.controls);
     return () => {
       if (art && art.destroy) {
         art.destroy(false);
