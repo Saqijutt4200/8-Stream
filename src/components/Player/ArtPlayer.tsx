@@ -90,8 +90,6 @@ export default function Player({
         },
       },
     });
-
-    // Add jump back button with white SVG icon
     art.controls.add({
       name: "jumpBack",
       position: "left",
@@ -104,8 +102,6 @@ export default function Player({
         art.currentTime = Math.max(art.currentTime - 10, 0);
       },
     });
-
-    // Add jump forward button with white SVG icon
     art.controls.add({
       name: "jumpForward",
       position: "left",
@@ -121,7 +117,6 @@ export default function Player({
         );
       },
     });
-
     art.on("ready", () => {
       art.play();
     });
@@ -173,7 +168,7 @@ export default function Player({
       name: "volume",
       position: "right",
     });
-
+    console.log("controls", art.controls);
     return () => {
       if (art && art.destroy) {
         art.destroy(false);
