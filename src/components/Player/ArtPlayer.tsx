@@ -90,25 +90,28 @@ export default function Player({
         },
       },
     });
+    const handleJumpBack = () => {
+      art.currentTime = Math.max(0, art.currentTime - 10);
+    };
+
+    // Jump Forward 10 seconds
+    const handleJumpForward = () => {
+      art.currentTime = Math.min(art.duration, art.currentTime + 10);
+    };
+
+    // Add Jump Back and Jump Forward buttons
     art.controls.add({
       name: "jumpBack",
       position: "left",
-      html: "⏪ 10s",
-      click: () => {
-        art.currentTime = Math.max(art.currentTime - 10, 0);
-      },
+      html: `<button class="jump-button">Jump Back</button>`,
+      onClick: handleJumpBack,
     });
 
     art.controls.add({
       name: "jumpForward",
-      position: "left",
-      html: "⏩ 10s",
-      click: () => {
-        art.currentTime = Math.min(
-          art.currentTime + 10,
-          art.duration
-        );
-      },
+      position: "right",
+      html: `<button class="jump-button">Jump Forward</button>`,
+      onClick: handleJumpForward,
     });
     art.on("ready", () => {
       art.play();
