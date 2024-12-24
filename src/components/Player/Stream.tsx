@@ -31,6 +31,7 @@ const Stream = ({
     async function get8Stream() {
       if (params.type === "movie") {
         const data = await playMovie(params.imdb, currentLang);
+        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
@@ -54,6 +55,7 @@ const Stream = ({
           parseInt(episode as string),
           currentLang
         );
+        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
           setAvailableLang(data?.availableLang);
@@ -79,6 +81,7 @@ const Stream = ({
         parseInt(episode as string),
         parseInt(season as string)
       );
+      console.log(data);
       if (data?.success && data?.data?.sources?.length > 0) {
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
@@ -101,14 +104,6 @@ const Stream = ({
       getConsumet();
     }
   }, [currentLang]);
-
-  const handleSeek = (seconds: number) => {
-    if (art) {
-      const currentTime = art.video.currentTime;
-      art.video.currentTime = currentTime + seconds;
-    }
-  };
-
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
@@ -138,6 +133,7 @@ const Stream = ({
                     }),
                   ],
                   onSelect: function (item, $dom) {
+                    // @ts-ignore
                     setCurrentLang(item.value);
                     return item.html;
                   },
@@ -151,6 +147,7 @@ const Stream = ({
                 escape: false,
                 style: {
                   color: "#fff",
+                  // @ts-ignore
                   "font-size": "35px",
                   "font-family": "sans-serif",
                   "text-shadow":
@@ -165,6 +162,7 @@ const Stream = ({
                 "--art-bottom-gap": "25px",
                 "--art-control-icon-scale": 1.7,
                 "--art-padding": "10px 30px",
+                // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
               },
@@ -178,20 +176,6 @@ const Stream = ({
             <span className="loader"></span>
           </div>
         )}
-      </div>
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center">
-        <button
-          className="bg-black text-white px-4 py-2 rounded-lg mr-2"
-          onClick={() => handleSeek(-10)} // 10 seconds backward
-        >
-          Back 10s
-        </button>
-        <button
-          className="bg-black text-white px-4 py-2 rounded-lg"
-          onClick={() => handleSeek(10)} // 10 seconds forward
-        >
-          Forward 10s
-        </button>
       </div>
     </div>
   );
