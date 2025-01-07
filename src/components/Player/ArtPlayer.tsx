@@ -171,7 +171,7 @@ export default function Player({
     });
     });
 
-    art.controls.remove("playAndPause");
+    //art.controls.remove("playAndPause");
     if (sub?.length > 0) {
       art.controls.add({
         name: "subtitle",
