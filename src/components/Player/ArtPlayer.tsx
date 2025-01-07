@@ -56,6 +56,27 @@ export default function Player({
         },
       ],
       container: artRef.current!,
+      layers: [
+        {
+          name: "poster",
+          html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${posterUrl}">`,
+          tooltip: "Poster Tip",
+          style: {
+            position: "absolute",
+            top: 0,
+            right: 0,
+            height: "100%",
+            width: "100%",
+            overflow: "hidden"
+          },
+          click: function (...args) {
+            console.info("click", args);
+          },
+          mounted: function (...args) {
+            console.info("mounted", args);
+          },
+        },
+      ],
       plugins: [
         artplayerPluginHlsQuality({
           // Show quality in control
@@ -115,6 +136,39 @@ export default function Player({
         event.preventDefault();
         art.fullscreen = !art.fullscreen;
       }
+    });
+
+    art.on("play", () => {
+      art.layers.update({
+        name: "poster",
+          html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${posterUrl}">`,
+          tooltip: "Poster Tip",
+          style: {
+            position: "absolute",
+            display: "none",
+            top: 0,
+            right: 0,
+            height: "100%",
+            width: "100%",
+            overflow: "hidden",
+          },
+    });
+    });
+    art.on("pause", () => {
+      art.layers.update({
+        name: "poster",
+          html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${posterUrl}">`,
+          tooltip: "Poster Tip",
+          style: {
+            position: "absolute",
+            display: "block",
+            top: 0,
+            right: 0,
+            height: "100%",
+            width: "100%",
+            overflow: "hidden",
+          },
+    });
     });
 
     art.controls.remove("playAndPause");
