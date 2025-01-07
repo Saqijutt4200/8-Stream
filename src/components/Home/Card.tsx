@@ -1,12 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useDispatch } from "react-redux";
+import { setPosterUrl } from "../../redux/slices/posterUrl"
 
 const Card = ({ media }: { media: any }) => {
+  const dispatch = useDispatch();
+
+  const handleClick = () => {
+    const posterUrl = `https://image.tmdb.org/t/p/w300${media?.poster_path}`;
+    dispatch(setPosterUrl(posterUrl));
+  };
+
   return (
     <Link
-      href={`/watch/${media?.media_type ? media.media_type : "movie"}/${
+      href={`/${media?.media_type ? media.media_type : "movie"}/${
         media?.id
       }`}
+      onClick={handleClick}
     >
       <div className="flex flex-col justify-center items-center group">
         <div className="relative">

@@ -4,6 +4,8 @@ import { search } from "@/lib/api";
 import { debounce } from "lodash";
 import Link from "next/link";
 import { IoSearchSharp } from "react-icons/io5";
+import { useDispatch } from "react-redux";
+import { setPosterUrl } from "../../redux/slices/posterUrl"
 
 const Search = () => {
   const [query, setQuery] = useState("");
@@ -12,6 +14,16 @@ const Search = () => {
   const searchMovies = async () => {
     const res = await search(query);
     setResults(res);
+  };
+
+  const dispatch = useDispatch();
+
+  const handleClick = (result: any) => {
+    if (result?.poster_path) {
+      const posterUrl = `https://image.tmdb.org/t/p/w300${result.poster_path}`;
+      console.log("Dispatching URL:", posterUrl); // Debug log
+      dispatch(setPosterUrl(posterUrl));
+    }
   };
 
   useEffect(() => {
@@ -41,7 +53,7 @@ const Search = () => {
         >
           <div className="overflow-y-scroll max-h-[600px]">
             {results?.map((result: any) => (
-              <Link href={`/watch/${result?.media_type}/${result?.id}`}>
+              <Link href={`/${result?.media_type}/${result?.id}`} onClick={() => handleClick(result)}>
                 <div className="flex w-full justify-start hover:bg-white/20 items-center gap-2 bg-white/15 p-1 ">
                   <img
                     src={`https://image.tmdb.org/t/p/w300${result?.poster_path}`}

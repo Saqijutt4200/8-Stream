@@ -3,6 +3,8 @@ import Artplayer from "artplayer";
 import { type Option } from "artplayer/types/option";
 import artplayerPluginHlsQuality from "artplayer-plugin-hls-quality";
 import Hls from "hls.js";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 export default function Player({
   option,
@@ -17,7 +19,11 @@ export default function Player({
   sub?: any;
   [key: string]: any;
 }) {
+  const posterUrl = useSelector(
+    (state: RootState) => state.posterUrl.currentPosterUrl
+  );
   useEffect(() => {
+    console.log(posterUrl);
     const art = new Artplayer({
       ...option,
       settings: [

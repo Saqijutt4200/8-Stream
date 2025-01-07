@@ -3,6 +3,7 @@ import options from "./slices/options";
 import epModal from "./slices/epModal";
 import { persistReducer, persistStore } from "redux-persist";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
+import posterUrl from "./slices/posterUrl"
 
 const createNoopStorage = () => {
   return {
@@ -26,15 +27,17 @@ const storage =
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["api"],
+  whitelist: ["api", "posterUrl"],
 };
 
 const optionPersistedReducer = persistReducer(persistConfig, options);
+const posterUrlPersistedReducer = persistReducer(persistConfig, posterUrl);
 
 export const store = configureStore({
   reducer: {
     options: optionPersistedReducer,
     epModal,
+    posterUrl: posterUrlPersistedReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),
