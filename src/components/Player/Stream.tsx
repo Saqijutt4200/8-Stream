@@ -28,6 +28,9 @@ const Stream = ({
   const provider = useAppSelector((state) => state.options.api);
 
   useEffect(() => {
+
+    console.log("Params:", params);
+
     async function get8Stream() {
       if (params.type === "movie") {
         const data = await playMovie(params.imdb, currentLang);
@@ -180,7 +183,7 @@ const Stream = ({
       <div
         className="absolute top-0 right-0 m-5 cursor-pointer z-50"
         onClick={() => {
-          router.replace(`/watch/${params.type}/${params.id}}`);
+          router.replace(`/${params.type}/${params.id}`);
         }}
       >
         <CgClose className="text-white text-4xl" />

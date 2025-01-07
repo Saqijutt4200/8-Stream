@@ -95,7 +95,7 @@ const Seasons = ({
                       className="flex bg-white bg-opacity-10 backdrop-blur-md rounded-lg justify-start items-center gap-3 p-2 cursor-pointer hover:bg-opacity-20 bg group"
                       onClick={() => {
                         router.push(
-                          `/watch/${type}/${id.tmdb}/${id.imdb}?episode=${
+                          `/${type}/${id.tmdb}/${id.imdb}?episode=${
                             i + 1
                           }&season=${season}`
                         );

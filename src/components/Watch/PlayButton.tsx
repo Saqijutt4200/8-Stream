@@ -86,7 +86,7 @@ const PlayButton = ({
           disabled={loading}
           onClick={() => {
             if (type === "movie") {
-              router.push(`/watch/${type}/${tmdbId}/${imdbId}`);
+              router.push(`/${type}/${tmdbId}/${imdbId}`);
             } else {
               dispatch(toggleEpModal(true));
             }
