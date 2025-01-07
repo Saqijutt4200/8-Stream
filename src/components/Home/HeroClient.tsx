@@ -11,7 +11,7 @@ export const HeroClient = ({ hero, heroData }: { hero: any; heroData: any }) => 
 
   const handleClick = () => {
     if (hero?.poster_path) {
-      const posterUrl = `https://image.tmdb.org/t/p/w300${hero.poster_path}`;
+      const posterUrl = `https://image.tmdb.org/t/p/original${hero.poster_path}`;
       console.log("Dispatching Hero URL:", posterUrl);
       dispatch(setPosterUrl(posterUrl));
     }

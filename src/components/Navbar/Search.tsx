@@ -20,7 +20,7 @@ const Search = () => {
 
   const handleClick = (result: any) => {
     if (result?.poster_path) {
-      const posterUrl = `https://image.tmdb.org/t/p/w300${result.poster_path}`;
+      const posterUrl = `https://image.tmdb.org/t/p/original${result.poster_path}`;
       console.log("Dispatching URL:", posterUrl); // Debug log
       dispatch(setPosterUrl(posterUrl));
     }
