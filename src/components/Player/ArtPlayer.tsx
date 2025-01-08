@@ -23,6 +23,9 @@ export default function Player({
     (state: RootState) => state.posterUrl.currentPosterUrl
   );
   const [isSandboxed, setIsSandboxed] = useState(false);
+  
+  
+  
   useEffect(() => {
     const checkSandbox = () => {
       try {
@@ -64,6 +67,7 @@ export default function Player({
     }
     if (!sandboxed) {
       console.log(posterUrl);
+      const storedImageUrl = localStorage.getItem('currentPosterUrl');
       const art = new Artplayer({
         ...option,
         settings: [
@@ -99,7 +103,7 @@ export default function Player({
         layers: [
           {
             name: "poster",
-            html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${posterUrl}">`,
+            html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
             tooltip: "Poster Tip",
             style: {
               position: "absolute",
@@ -182,7 +186,7 @@ export default function Player({
       art.on("play", () => {
         art.layers.update({
           name: "poster",
-            html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${posterUrl}">`,
+            html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
             tooltip: "Poster Tip",
             style: {
               position: "absolute",
@@ -198,7 +202,7 @@ export default function Player({
       art.on("pause", () => {
         art.layers.update({
           name: "poster",
-            html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${posterUrl}">`,
+            html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
             tooltip: "Poster Tip",
             style: {
               position: "absolute",

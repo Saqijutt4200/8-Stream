@@ -24,10 +24,13 @@ const Stream = ({
   const [availableLang, setAvailableLang] = useState<any>([""]);
   const [currentLang, setCurrentLang] = useState<any>("");
   const [sub, setSub] = useState<any>([]);
+  
 
   const provider = useAppSelector((state) => state.options.api);
 
   useEffect(() => {
+
+    
 
     console.log("Params:", params);
 

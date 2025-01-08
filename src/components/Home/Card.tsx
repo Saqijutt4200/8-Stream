@@ -8,6 +8,7 @@ const Card = ({ media }: { media: any }) => {
 
   const handleClick = () => {
     const posterUrl = `https://image.tmdb.org/t/p/original${media?.poster_path}`;
+    localStorage.setItem('currentPosterUrl', posterUrl);
     dispatch(setPosterUrl(posterUrl));
   };
 
