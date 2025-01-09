@@ -237,11 +237,11 @@ export default function Player({
         } else if (!isInputFocused && event?.code === "ArrowLeft") {
           event.preventDefault();
           art.currentTime = Math.max(0, art.currentTime - 10);
-          showSkipAnimation("backward");
+          
         } else if (!isInputFocused && event?.code === "ArrowRight") {
           event.preventDefault();
           art.currentTime = Math.min(art.duration, art.currentTime + 10);
-          showSkipAnimation("forward");
+         
         }
       });
 
