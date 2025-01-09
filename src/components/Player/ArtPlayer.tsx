@@ -26,7 +26,12 @@ export default function Player({
   
   
   
+  
   useEffect(() => {
+
+    if (!artRef.current) {
+      return;
+    }
     const checkSandbox = () => {
       try {
         // Check if we're in an iframe
@@ -45,30 +50,21 @@ export default function Player({
 
     const sandboxed = checkSandbox();
     setIsSandboxed(sandboxed);
+    
 
-    if (isSandboxed) {
-      return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/95 z-50">
-          <div className="bg-red-600/20 border-2 border-red-600 rounded-lg p-8 max-w-xl mx-4">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="text-red-500 text-5xl">⚠️</div>
-              <h2 className="text-2xl font-bold text-white">Sandbox Mode Detected</h2>
-              <p className="text-gray-300">
-                This video player cannot be embedded in sandbox mode for security reasons.
-                Please visit our website directly to watch the content.
-              </p>
-              <div className="text-sm text-gray-400 mt-4">
-                Error Code: SANDBOX_RESTRICTED
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
+    
     if (!sandboxed) {
       console.log(posterUrl);
       const storedImageUrl = localStorage.getItem('currentPosterUrl');
+      const container = artRef.current;
+      
+      if (!(container instanceof Element)) {
+        console.error('Invalid container element for ArtPlayer');
+        return;
+      }
+
       const art = new Artplayer({
+        container,
         ...option,
         settings: [
           {
@@ -255,7 +251,28 @@ export default function Player({
       };
 
     }  
-  }, []);
+  }, [artRef.current]);
+
+  
+  if (isSandboxed) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black/95 z-50">
+        <div className="bg-red-600/20 border-2 border-red-600 rounded-lg p-8 max-w-xl mx-4">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="text-red-500 text-5xl">⚠️</div>
+            <h2 className="text-2xl font-bold text-white">Sandbox Mode Detected</h2>
+            <p className="text-gray-300">
+              This video player cannot be embedded in sandbox mode for security reasons.
+              Please visit our website directly to watch the content.
+            </p>
+            <div className="text-sm text-gray-400 mt-4">
+              Error Code: SANDBOX_RESTRICTED
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   //
 
