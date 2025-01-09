@@ -64,7 +64,6 @@ export default function Player({
       }
 
       const art = new Artplayer({
-        container,
         ...option,
         settings: [
           {
