@@ -37,6 +37,12 @@ const Seasons = ({
     }
     getSeasons();
   }, [id, season]);
+
+  const handleEpisodeClick = (episodeNumber: number, seasonNumber: number) => {
+    router.push(`/${type}/${id.tmdb}/${id.imdb}/${seasonNumber}-${episodeNumber}`);
+    dispatch(toggleEpModal(false));
+  };
+
   return (
     <AnimatePresence>
       {epModal && (
@@ -93,13 +99,7 @@ const Seasons = ({
                     <div
                       key={episode?.id}
                       className="flex bg-white bg-opacity-10 backdrop-blur-md rounded-lg justify-start items-center gap-3 p-2 cursor-pointer hover:bg-opacity-20 bg group"
-                      onClick={() => {
-                        router.push(
-                          `/${type}/${id.tmdb}/${id.imdb}?episode=${
-                            i + 1
-                          }&season=${season}`
-                        );
-                      }}
+                      onClick={() => handleEpisodeClick(i + 1, season)}
                     >
                       <div className="relative">
                         <Image

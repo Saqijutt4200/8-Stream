@@ -11,12 +11,12 @@ import { toast } from "react-toastify";
 const Stream = ({
   params,
 }: {
-  params: { imdb: string; type: string; id: string };
+  params: { imdb: string; type: string; id: string; seasonEpisode?: string; };
 }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const season = searchParams.get("season");
-  const episode = searchParams.get("episode");
+  //const season = searchParams.get("season");
+  //const episode = searchParams.get("episode");
   const dispatch = useAppDispatch();
   const [url, setUrl] = useState<string>("");
   const ref = React.useRef<any>();
@@ -24,6 +24,16 @@ const Stream = ({
   const [availableLang, setAvailableLang] = useState<any>([""]);
   const [currentLang, setCurrentLang] = useState<any>("");
   const [sub, setSub] = useState<any>([]);
+
+  let season: string | null = null;
+  let episode: string | null = null;
+
+  if (params.seasonEpisode) {
+    [season, episode] = params.seasonEpisode.split('-');
+  } else {
+    season = searchParams.get("season");
+    episode = searchParams.get("episode");
+  }
   
 
   const provider = useAppSelector((state) => state.options.api);
@@ -57,8 +67,8 @@ const Stream = ({
       } else {
         const data = await playEpisode(
           params.imdb,
-          parseInt(season as string),
-          parseInt(episode as string),
+          parseInt(season || "1"),
+          parseInt(episode || "1"),
           currentLang
         );
         // console.log(data);
@@ -84,8 +94,8 @@ const Stream = ({
       const data = await consumetPlay(
         params.id,
         params.type,
-        parseInt(episode as string),
-        parseInt(season as string)
+        parseInt(episode || "1"),
+        parseInt(season || "1")
       );
       console.log(data);
       if (data?.success && data?.data?.sources?.length > 0) {
@@ -109,7 +119,7 @@ const Stream = ({
     } else {
       getConsumet();
     }
-  }, [currentLang]);
+  }, [currentLang, season, episode]);
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
