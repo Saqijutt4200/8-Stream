@@ -1,3 +1,4 @@
+
 import Options from "@/components/Watch/Options";
 import Seasons from "@/components/Watch/Seasons";
 import Image from "next/image";

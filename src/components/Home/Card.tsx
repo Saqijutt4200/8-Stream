@@ -12,11 +12,15 @@ const Card = ({ media }: { media: any }) => {
     dispatch(setPosterUrl(posterUrl));
   };
 
+  const getMediaUrl = () => {
+    // Default to "movie" if media_type is not provided
+    const mediaType = media?.media_type || "movie";
+    return `/${mediaType}/${media.id}`;
+  };
+
   return (
     <Link
-      href={`/${media?.media_type ? media.media_type : "movie"}/${
-        media?.id
-      }`}
+      href={getMediaUrl()}
       onClick={handleClick}
     >
       <div className="flex flex-col justify-center items-center group">

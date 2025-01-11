@@ -62,7 +62,17 @@ const PlayButton = ({
       setError(false);
       getConsumet();
     }
-  }, [provider]);
+  }, [provider, dispatch, getSeasonList, imdbId, tmdbId, type]);
+
+  const handlePlay = () => {
+    if (type === "movie") {
+      // Direct movie route
+      router.push(`/movie/stream/${imdbId}`);
+    } else {
+      // For TV shows, show episode selection modal
+      dispatch(toggleEpModal(true)); 
+    }
+  };
 
   if (error) {
     return (
@@ -84,13 +94,7 @@ const PlayButton = ({
           className="flex justify-center items-center gap-3 cursor-pointer group bg-white rounded-lg 
         px-3 py-0 bg-opacity-20 duration-200 backdrop-blur-sm max-sm:w-[350px] max-sm:justify-between"
           disabled={loading}
-          onClick={() => {
-            if (type === "movie") {
-              router.push(`/${type}/${tmdbId}/${imdbId}`);
-            } else {
-              dispatch(toggleEpModal(true));
-            }
-          }}
+          onClick={handlePlay}
         >
           <p className="text-white text-4xl font-extrabold">Play</p>
           {loading ? (
