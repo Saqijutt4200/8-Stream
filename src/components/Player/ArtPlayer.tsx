@@ -250,16 +250,18 @@ export default function Player({
           }, 3000);
         };
 
-        // Add touch event listener
-        art.on('touchstart', () => {
-          showControls();
-        });
+         // Add touch event listener to the container element directly
+         const playerContainer = art.template.$container;
+         playerContainer.addEventListener('touchstart', () => {
+           showControls();
+         });
 
         // Clean up timeout on destroy
         art.on('destroy', () => {
           if (hideTimeout) {
             clearTimeout(hideTimeout);
           }
+          playerContainer.removeEventListener('touchstart', showControls);
         });
       }
 
