@@ -236,7 +236,8 @@ export default function Player({
         let hideTimeout: NodeJS.Timeout;
 
         const showControls = () => {
-          art.container.classList.add('mobile-controls-visible');
+          const playerContainer = art.template.$container;
+          playerContainer.classList.add('mobile-controls-visible');
           
           // Clear existing timeout if any
           if (hideTimeout) {
@@ -245,7 +246,7 @@ export default function Player({
 
           // Set new timeout to hide controls after 3 seconds
           hideTimeout = setTimeout(() => {
-            art.container.classList.remove('mobile-controls-visible');
+            playerContainer.classList.remove('mobile-controls-visible');
           }, 3000);
         };
 
