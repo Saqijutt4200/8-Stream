@@ -23,7 +23,17 @@ export default function Player({
     (state: RootState) => state.posterUrl.currentPosterUrl
   );
   const [isSandboxed, setIsSandboxed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // NEW: Effect to detect mobile devices
+  useEffect(() => {
+    const checkMobile = () => {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+    };
+    setIsMobile(checkMobile());
+  }, []);
   useEffect(() => {
     if (!artRef.current) {
       return;
@@ -62,19 +72,27 @@ export default function Player({
         .skip-button {
           opacity: 0;
           transition: opacity 0.3s;
-          transition: opacity 0.3s ease;
-          background: rgba(0, 0, 0, 0.6);
           border: none;
           border-radius: 50%;
           padding: 15px;
           cursor: pointer;
           z-index: 10;
+          pointer-events: none;
+          display: none;
         }
-        .art-video-player:hover .skip-button {
-          opacity: 1;
+
+        @media (max-width: 768px) {
+          .skip-button {
+            display: block;
+          }
+          
+          .art-video-player.mobile-controls-visible .skip-button {
+            opacity: 1;
+            pointer-events: auto;
+          }
         }
+
         .skip-button:hover {
-          background: rgba(0, 0, 0, 0.8);
           transform: scale(1.1);
           transition: all 0.2s ease;
         }
@@ -213,6 +231,36 @@ export default function Player({
           },
         },
       });
+
+      if (isMobile) {
+        let hideTimeout: NodeJS.Timeout;
+
+        const showControls = () => {
+          art.container.classList.add('mobile-controls-visible');
+          
+          // Clear existing timeout if any
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+          }
+
+          // Set new timeout to hide controls after 3 seconds
+          hideTimeout = setTimeout(() => {
+            art.container.classList.remove('mobile-controls-visible');
+          }, 3000);
+        };
+
+        // Add touch event listener
+        art.on('touchstart', () => {
+          showControls();
+        });
+
+        // Clean up timeout on destroy
+        art.on('destroy', () => {
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+          }
+        });
+      }
 
       art.on("ready", () => {
         art.play();
