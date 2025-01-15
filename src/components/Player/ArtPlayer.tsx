@@ -237,40 +237,49 @@ export default function Player({
         },
       });
 
+      let hideTimeout: NodeJS.Timeout;
+
+      const showControls = () => {
+        const playerContainer = art.template.$container;
+        playerContainer.classList.add('controls-visible');
+        
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+        }
+
+        hideTimeout = setTimeout(() => {
+          playerContainer.classList.remove('controls-visible');
+        }, 3000);
+      };
+
+       // Show controls on focus
+       art.on('focus', () => {
+        showControls();
+      });
+
       if (isMobile) {
-        let hideTimeout: NodeJS.Timeout;
         let lastTouchTime = 0;
 
-        const showControls = () => {
+        const handleTouch = () => {
           const currentTime = Date.now();
-          if (currentTime - lastTouchTime > 300) { // Debounce touch events
-            const playerContainer = art.template.$container;
-            playerContainer.classList.add('mobile-controls-visible');
-            
-            if (hideTimeout) {
-              clearTimeout(hideTimeout);
-            }
-
-            hideTimeout = setTimeout(() => {
-              playerContainer.classList.remove('mobile-controls-visible');
-            }, 3000);
-
+          if (currentTime - lastTouchTime > 300) {
+            showControls();
             lastTouchTime = currentTime;
           }
         };
 
-         // Add touch event listener to the container element directly
-         const playerContainer = art.template.$container;
-         playerContainer.addEventListener('touchstart', showControls);
+        const playerContainer = art.template.$container;
+        playerContainer.addEventListener('touchstart', handleTouch);
 
-        // Clean up timeout on destroy
+        // Clean up
         art.on('destroy', () => {
           if (hideTimeout) {
             clearTimeout(hideTimeout);
           }
-          playerContainer.removeEventListener('touchstart', showControls);
+          playerContainer.removeEventListener('touchstart', handleTouch);
         });
       }
+
 
       art.on("ready", () => {
         art.play();
