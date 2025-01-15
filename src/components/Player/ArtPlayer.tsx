@@ -73,6 +73,7 @@ export default function Player({
           opacity: 0;
           transition: opacity 0.3s;
           border: none;
+          background-color: rgba(0, 0, 0, 0.5);
           border-radius: 50%;
           padding: 15px;
           cursor: pointer;
@@ -80,8 +81,11 @@ export default function Player({
           pointer-events: none;
           display: none;
         }
+        .skip-button svg {
+          fill: white;
+        }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
           .skip-button {
             display: block;
           }
@@ -94,6 +98,7 @@ export default function Player({
 
         .skip-button:hover {
           transform: scale(1.1);
+          background-color: rgba(0, 0, 0, 0.7);
           transition: all 0.2s ease;
         }
       `;
@@ -234,27 +239,29 @@ export default function Player({
 
       if (isMobile) {
         let hideTimeout: NodeJS.Timeout;
+        let lastTouchTime = 0;
 
         const showControls = () => {
-          const playerContainer = art.template.$container;
-          playerContainer.classList.add('mobile-controls-visible');
-          
-          // Clear existing timeout if any
-          if (hideTimeout) {
-            clearTimeout(hideTimeout);
-          }
+          const currentTime = Date.now();
+          if (currentTime - lastTouchTime > 300) { // Debounce touch events
+            const playerContainer = art.template.$container;
+            playerContainer.classList.add('mobile-controls-visible');
+            
+            if (hideTimeout) {
+              clearTimeout(hideTimeout);
+            }
 
-          // Set new timeout to hide controls after 3 seconds
-          hideTimeout = setTimeout(() => {
-            playerContainer.classList.remove('mobile-controls-visible');
-          }, 3000);
+            hideTimeout = setTimeout(() => {
+              playerContainer.classList.remove('mobile-controls-visible');
+            }, 3000);
+
+            lastTouchTime = currentTime;
+          }
         };
 
          // Add touch event listener to the container element directly
          const playerContainer = art.template.$container;
-         playerContainer.addEventListener('touchstart', () => {
-           showControls();
-         });
+         playerContainer.addEventListener('touchstart', showControls);
 
         // Clean up timeout on destroy
         art.on('destroy', () => {
@@ -367,7 +374,7 @@ export default function Player({
         }
       };
     }
-  }, [artRef.current]);
+  }, [artRef.current, isMobile]);
 
   if (isSandboxed) {
     return (
