@@ -23,17 +23,9 @@ export default function Player({
     (state: RootState) => state.posterUrl.currentPosterUrl
   );
   const [isSandboxed, setIsSandboxed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  
 
   // NEW: Effect to detect mobile devices
-  useEffect(() => {
-    const checkMobile = () => {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      );
-    };
-    setIsMobile(checkMobile());
-  }, []);
   useEffect(() => {
     if (!artRef.current) {
       return;
@@ -79,21 +71,14 @@ export default function Player({
           cursor: pointer;
           z-index: 10;
           pointer-events: none;
-          display: none;
+          display: block;
         }
         .skip-button svg {
           fill: white;
         }
 
-        @media (max-width: 1024px) {
-          .skip-button {
-            display: block;
-          }
-          
-          .art-video-player.mobile-controls-visible .skip-button {
-            opacity: 1;
-            pointer-events: auto;
-          }
+        .art-video-player.controls-visible .skip-button {
+          opacity: 1;
         }
 
         .skip-button:hover {
@@ -257,29 +242,22 @@ export default function Player({
         showControls();
       });
 
-      if (isMobile) {
-        let lastTouchTime = 0;
+      // Show controls on mouse move or touch
+      const handleInteraction = () => {
+        showControls();
+      };
 
-        const handleTouch = () => {
-          const currentTime = Date.now();
-          if (currentTime - lastTouchTime > 300) {
-            showControls();
-            lastTouchTime = currentTime;
-          }
-        };
+      const playerContainer = art.template.$container;
+      playerContainer.addEventListener('mousemove', handleInteraction);
+      playerContainer.addEventListener('touchstart', handleInteraction);
 
-        const playerContainer = art.template.$container;
-        playerContainer.addEventListener('touchstart', handleTouch);
-
-        // Clean up
-        art.on('destroy', () => {
-          if (hideTimeout) {
-            clearTimeout(hideTimeout);
-          }
-          playerContainer.removeEventListener('touchstart', handleTouch);
-        });
-      }
-
+      art.on('destroy', () => {
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+        }
+        playerContainer.removeEventListener('mousemove', handleInteraction);
+        playerContainer.removeEventListener('touchstart', handleInteraction);
+      });
 
       art.on("ready", () => {
         art.play();
