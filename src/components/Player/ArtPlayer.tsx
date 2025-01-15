@@ -361,7 +361,7 @@ export default function Player({
         }
       };
     }
-  }, [artRef.current, isMobile]);
+  }, [artRef.current]);
 
   if (isSandboxed) {
     return (
