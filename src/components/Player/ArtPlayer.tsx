@@ -168,8 +168,9 @@ export default function Player({
 </svg>
               </button>
             `,
-            click: function () {
-              const button = event.target.closest('.skip-button');
+            click: function (this: any, event: MouseEvent) {
+              const target = event.target as HTMLElement;
+              const button = target.closest('.skip-button');
               if (button) {
                 const newTime = Math.max(0, art.currentTime - 10);
                 art.seek = newTime;
@@ -195,8 +196,9 @@ export default function Player({
 </svg>
               </button>
             `,
-            click: function () {
-              const button = event.target.closest('.skip-button');
+            click: function (this: any, event: MouseEvent) {
+              const target = event.target as HTMLElement;
+              const button = target.closest('.skip-button');
               if (button) {
                 const newTime = Math.min(art.duration, art.currentTime + 10);
                 art.seek = newTime;
