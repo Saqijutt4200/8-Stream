@@ -23,7 +23,7 @@ export default function Player({
     (state: RootState) => state.posterUrl.currentPosterUrl
   );
   const [isSandboxed, setIsSandboxed] = useState(false);
-  
+  const [showControls, setShowControls] = useState(false);
 
   // NEW: Effect to detect mobile devices
   useEffect(() => {
@@ -63,29 +63,42 @@ export default function Player({
       style.textContent = `
         .skip-button {
           opacity: 0;
-          transition: opacity 0.3s;
+          transition: all 0.3s ease;
           border: none;
-          background-color: rgba(0, 0, 0, 0.5);
+          background-color: rgba(28, 28, 28, 0.8);
           border-radius: 50%;
           padding: 15px;
           cursor: pointer;
           z-index: 10;
-          pointer-events: none;
-          display: block;
-        }
-        .skip-button svg {
-          fill: white;
-        }
-
-        .art-video-player.controls-visible .skip-button {
-          opacity: 1;
+          transform: scale(0.9);
         }
 
         .skip-button:hover {
-          transform: scale(1.1);
-          background-color: rgba(0, 0, 0, 0.7);
-          transition: all 0.2s ease;
+          background-color: rgba(48, 48, 48, 0.9);
+          transform: scale(1);
         }
+        .skip-button svg {
+          fill: white;
+          transition: fill 0.3s ease;
+        }
+        .skip-button:hover svg {
+          fill: #ffffff;
+        }
+
+        .art-video-player:hover .skip-button {
+          opacity: 1;
+        }
+
+        .skip-button.active {
+          animation: buttonPulse 0.3s ease-out;
+        }
+        @keyframes buttonPulse {
+          0% { transform: scale(0.9); }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+
+        
       `;
       document.head.appendChild(style);
 
@@ -148,7 +161,7 @@ export default function Player({
                 position: absolute;
                 left: 20%;
                 top: 50%;
-                transform: translate(-50%, -50%);
+                
               ">
               <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
 <path d="M 24 4 C 17.595652 4 11.890701 7.0253275 8.2285156 11.720703 L 7.9804688 10.316406 A 1.50015 1.50015 0 0 0 6.515625 9.0546875 A 1.50015 1.50015 0 0 0 5.0273438 10.835938 L 5.8945312 15.759766 A 1.50015 1.50015 0 0 0 7.6328125 16.976562 L 12.556641 16.109375 A 1.5003693 1.5003693 0 1 0 12.035156 13.154297 L 10.728516 13.384766 C 13.841475 9.4960454 18.619092 7 24 7 C 33.406292 7 41 14.593708 41 24 C 41 33.406292 33.406292 41 24 41 C 14.593708 41 7 33.406292 7 24 C 7 23.854658 7.0021894 23.708402 7.0058594 23.564453 A 1.5004834 1.5004834 0 0 0 4.0058594 23.488281 C 4.0015263 23.65833 4 23.829342 4 24 C 4 35.027708 12.972292 44 24 44 C 35.027708 44 44 35.027708 44 24 C 44 12.972292 35.027708 4 24 4 z M 27.5 17 C 25.019 17 23 19.019 23 21.5 L 23 26.5 C 23 28.981 25.019 31 27.5 31 C 29.981 31 32 28.981 32 26.5 L 32 21.5 C 32 19.019 29.981 17 27.5 17 z M 19.595703 17.001953 C 19.49775 17.010188 19.399938 17.0305 19.304688 17.0625 L 16.304688 18.0625 C 15.649688 18.2815 15.295672 18.989531 15.513672 19.644531 C 15.732672 20.298531 16.439703 20.651547 17.095703 20.435547 L 18.449219 19.984375 L 18.449219 29.75 C 18.449219 30.44 19.009219 31 19.699219 31 C 20.390219 31 20.949219 30.440047 20.949219 29.748047 L 20.949219 18.248047 C 20.949219 17.846047 20.757641 17.469375 20.431641 17.234375 C 20.187141 17.058125 19.889563 16.97725 19.595703 17.001953 z M 27.5 19.5 C 28.603 19.5 29.5 20.397 29.5 21.5 L 29.5 26.5 C 29.5 27.603 28.603 28.5 27.5 28.5 C 26.397 28.5 25.5 27.603 25.5 26.5 L 25.5 21.5 C 25.5 20.398 26.397 19.5 27.5 19.5 z"></path>
@@ -156,8 +169,15 @@ export default function Player({
               </button>
             `,
             click: function () {
-              const newTime = Math.max(0, art.currentTime - 10);
-              art.seek = newTime;
+              const button = event.target.closest('.skip-button');
+              if (button) {
+                const newTime = Math.max(0, art.currentTime - 10);
+                art.seek = newTime;
+                
+                // Add active class for animation
+                button.classList.add('active');
+                setTimeout(() => button.classList.remove('active'), 300);
+              }
             },
           },
           // Add skip forward button layer
@@ -168,7 +188,7 @@ export default function Player({
                 position: absolute;
                 right: 20%;
                 top: 50%;
-                transform: translate(50%, -50%);
+                
               ">
               <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
 <path d="M 24 4 C 12.972292 4 4 12.972292 4 24 C 4 35.027708 12.972292 44 24 44 C 35.027708 44 44 35.027708 44 24 C 44 23.829342 43.998541 23.658332 43.994141 23.488281 A 1.5004834 1.5004834 0 0 0 40.994141 23.564453 C 40.997849 23.708404 41 23.854658 41 24 C 41 33.406292 33.406292 41 24 41 C 14.593708 41 7 33.406292 7 24 C 7 14.593708 14.593708 7 24 7 C 29.380908 7 34.158525 9.4960454 37.271484 13.384766 L 35.964844 13.154297 A 1.5003693 1.5003693 0 0 0 35.443359 16.109375 L 40.367188 16.976562 A 1.50015 1.50015 0 0 0 42.105469 15.759766 L 42.972656 10.835938 A 1.50015 1.50015 0 0 0 41.439453 9.0566406 A 1.50015 1.50015 0 0 0 40.019531 10.316406 L 39.771484 11.720703 C 36.109299 7.0253275 30.404348 4 24 4 z M 27.5 17 C 25.019 17 23 19.019 23 21.5 L 23 26.5 C 23 28.981 25.019 31 27.5 31 C 29.981 31 32 28.981 32 26.5 L 32 21.5 C 32 19.019 29.981 17 27.5 17 z M 19.595703 17.001953 C 19.49775 17.010188 19.399938 17.0305 19.304688 17.0625 L 16.304688 18.0625 C 15.649688 18.2815 15.295672 18.989531 15.513672 19.644531 C 15.732672 20.298531 16.439703 20.651547 17.095703 20.435547 L 18.449219 19.984375 L 18.449219 29.75 C 18.449219 30.44 19.009219 31 19.699219 31 C 20.390219 31 20.949219 30.440047 20.949219 29.748047 L 20.949219 18.248047 C 20.949219 17.846047 20.757641 17.469375 20.431641 17.234375 C 20.187141 17.058125 19.889563 16.97725 19.595703 17.001953 z M 27.5 19.5 C 28.603 19.5 29.5 20.397 29.5 21.5 L 29.5 26.5 C 29.5 27.603 28.603 28.5 27.5 28.5 C 26.397 28.5 25.5 27.603 25.5 26.5 L 25.5 21.5 C 25.5 20.398 26.397 19.5 27.5 19.5 z"></path>
@@ -176,8 +196,15 @@ export default function Player({
               </button>
             `,
             click: function () {
-              const newTime = Math.max(0, art.currentTime + 10);
-              art.seek = newTime;
+              const button = event.target.closest('.skip-button');
+              if (button) {
+                const newTime = Math.min(art.duration, art.currentTime + 10);
+                art.seek = newTime;
+                
+                // Add active class for animation
+                button.classList.add('active');
+                setTimeout(() => button.classList.remove('active'), 300);
+              }
             },
           },
         ],
@@ -222,42 +249,7 @@ export default function Player({
         },
       });
 
-      let hideTimeout: NodeJS.Timeout;
-
-      const showControls = () => {
-        const playerContainer = art.template.$container;
-        playerContainer.classList.add('controls-visible');
-        
-        if (hideTimeout) {
-          clearTimeout(hideTimeout);
-        }
-
-        hideTimeout = setTimeout(() => {
-          playerContainer.classList.remove('controls-visible');
-        }, 3000);
-      };
-
-       // Show controls on focus
-       art.on('focus', () => {
-        showControls();
-      });
-
-      // Show controls on mouse move or touch
-      const handleInteraction = () => {
-        showControls();
-      };
-
-      const playerContainer = art.template.$container;
-      playerContainer.addEventListener('mousemove', handleInteraction);
-      playerContainer.addEventListener('touchstart', handleInteraction);
-
-      art.on('destroy', () => {
-        if (hideTimeout) {
-          clearTimeout(hideTimeout);
-        }
-        playerContainer.removeEventListener('mousemove', handleInteraction);
-        playerContainer.removeEventListener('touchstart', handleInteraction);
-      });
+      
 
       art.on("ready", () => {
         art.play();
