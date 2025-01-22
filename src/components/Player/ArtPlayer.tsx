@@ -172,8 +172,8 @@ export default function Player({
               const target = event.target as HTMLElement;
               const button = target.closest('.skip-button');
               if (button) {
-                const newTime = Math.max(0, art.currentTime - 10);
-                art.seek = newTime;
+                const newTime = Math.max(0, this.currentTime - 10);
+                this.seek = newTime;
                 
                 // Add active class for animation
                 button.classList.add('active');
@@ -200,8 +200,8 @@ export default function Player({
               const target = event.target as HTMLElement;
               const button = target.closest('.skip-button');
               if (button) {
-                const newTime = Math.min(art.duration, art.currentTime + 10);
-                art.seek = newTime;
+                const newTime = Math.min(this.duration, art.currentTime + 10);
+                this.seek = newTime;
                 
                 // Add active class for animation
                 button.classList.add('active');
