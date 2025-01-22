@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Artplayer from "artplayer";
 import { type Option } from "artplayer/types/option";
+import { type Component } from "artplayer/types/component";
 import artplayerPluginHlsQuality from "artplayer-plugin-hls-quality";
 import Hls from "hls.js";
 import { useSelector } from "react-redux";
@@ -168,7 +169,7 @@ export default function Player({
 </svg>
               </button>
             `,
-            click: function (this: any, event: MouseEvent) {
+            click: function (this: Artplayer, _: Component, event: Event) {
               const target = event.target as HTMLElement;
               const button = target.closest('.skip-button');
               if (button) {
@@ -196,7 +197,7 @@ export default function Player({
 </svg>
               </button>
             `,
-            click: function (this: any, event: MouseEvent) {
+            click: function (this: Artplayer, _: Component, event: Event) {
               const target = event.target as HTMLElement;
               const button = target.closest('.skip-button');
               if (button) {
