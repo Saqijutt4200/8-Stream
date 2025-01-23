@@ -11,7 +11,7 @@ import { RootState } from "@/redux/store";
 // Extend Window interface to support custom property
 declare global {
   interface Window {
-    touchTimeout?: number;
+    touchTimeout?: NodeJS.Timeout;
   }
 }
 
