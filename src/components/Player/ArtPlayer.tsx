@@ -7,6 +7,14 @@ import Hls from "hls.js";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
+
+// Extend Window interface to support custom property
+declare global {
+  interface Window {
+    touchTimeout?: number;
+  }
+}
+
 export default function Player({
   option,
   getInstance,
