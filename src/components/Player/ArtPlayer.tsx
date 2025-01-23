@@ -73,6 +73,22 @@ export default function Player({
           z-index: 10;
           transform: scale(0.9);
         }
+        /* Desktop hover behavior */
+    @media (hover: hover) and (pointer: fine) {
+      .art-video-player:hover .skip-button {
+        opacity: 1;
+      }
+    }
+    /* Mobile touch behavior */
+    @media (hover: none) and (pointer: coarse) {
+      .skip-button {
+        opacity: 0;
+      }
+      
+      .art-video-player.mobile-controls-visible .skip-button {
+        opacity: 1;
+      }
+    }
 
         .skip-button:hover {
           background-color: rgba(48, 48, 48, 0.9);
@@ -86,9 +102,7 @@ export default function Player({
           fill: #ffffff;
         }
 
-        .art-video-player:hover .skip-button {
-          opacity: 1;
-        }
+        
 
         .skip-button.active {
           animation: buttonPulse 0.3s ease-out;
@@ -252,6 +266,25 @@ export default function Player({
         },
       });
 
+      // ADDED: Mobile touch event handling
+      const touchHandler = () => {
+        if (!container) return;
+        container.classList.add('mobile-controls-visible');
+        
+        // Clear any existing timeout
+        if (window.touchTimeout) {
+          clearTimeout(window.touchTimeout);
+        }
+
+        // Hide controls after 3 seconds
+        window.touchTimeout = setTimeout(() => {
+          container.classList.remove('mobile-controls-visible');
+        }, 3000);
+      };
+
+      // ADDED: Add touch event listener
+      container.addEventListener('touchstart', touchHandler);
+
       
 
       art.on("ready", () => {
@@ -353,6 +386,10 @@ export default function Player({
         if (art && art.destroy) {
           art.destroy(false);
           art?.hls?.destroy();
+        }
+        container.removeEventListener('touchstart', touchHandler);
+        if (window.touchTimeout) {
+          clearTimeout(window.touchTimeout);
         }
       };
     }
