@@ -95,6 +95,7 @@ export default function Player({
       
       .art-video-player.mobile-controls-visible .skip-button {
         opacity: 1;
+        transform: scale(1);
       }
     }
 
