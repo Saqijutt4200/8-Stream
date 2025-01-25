@@ -11,7 +11,7 @@ import { RootState } from "@/redux/store";
 // Extend Window interface to support custom property
 declare global {
   interface Window {
-    touchTimeout?: NodeJS.Timeout;
+    controlsTimeout?: NodeJS.Timeout;
   }
 }
 
@@ -81,21 +81,18 @@ export default function Player({
           z-index: 10;
           transform: scale(0.9);
         }
-        /* Desktop hover behavior */
-    @media (hover: hover) and (pointer: fine) {
-      .art-video-player:hover .skip-button {
-        opacity: 1;
-      }
-    }
+        
     /* Mobile touch behavior */
     @media (hover: none) and (pointer: coarse) {
       .skip-button {
         opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
       }
       
       .art-video-player.mobile-controls-visible .skip-button {
         opacity: 1;
-        transform: scale(1);
+        pointer-events: auto;
       }
     }
 
@@ -281,18 +278,19 @@ export default function Player({
         container.classList.add('mobile-controls-visible');
         
         // Clear any existing timeout
-        if (window.touchTimeout) {
-          clearTimeout(window.touchTimeout);
+        if (window.controlsTimeout) {
+          clearTimeout(window.controlsTimeout);
         }
 
         // Hide controls after 3 seconds
-        window.touchTimeout = setTimeout(() => {
+        window.controlsTimeout = setTimeout(() => {
           container.classList.remove('mobile-controls-visible');
         }, 3000);
       };
 
       // ADDED: Add touch event listener
       container.addEventListener('touchstart', touchHandler);
+      container.addEventListener('click', touchHandler);
 
       
 
@@ -397,8 +395,9 @@ export default function Player({
           art?.hls?.destroy();
         }
         container.removeEventListener('touchstart', touchHandler);
-        if (window.touchTimeout) {
-          clearTimeout(window.touchTimeout);
+        container.removeEventListener('click', touchHandler);
+        if (window.controlsTimeout) {
+          clearTimeout(window.controlsTimeout);
         }
       };
     }
