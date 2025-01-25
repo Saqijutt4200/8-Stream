@@ -88,24 +88,6 @@ export default function Player({
       `;
       document.head.appendChild(style);
 
-      // Mobile-specific touch controls
-      art.events.proxy(art.template.$container, 'touchstart', () => {
-        const backwardButton = art.layers.find('skipBackward').$ref;
-        const forwardButton = art.layers.find('skipForward').$ref;
-        
-        // Show buttons
-        if (backwardButton && forwardButton) {
-          backwardButton.style.opacity = '1';
-          forwardButton.style.opacity = '1';
-          
-          // Hide buttons after 3 seconds
-          setTimeout(() => {
-            backwardButton.style.opacity = '0';
-            forwardButton.style.opacity = '0';
-          }, 3000);
-        }
-      });
-
       const art = new Artplayer({
         ...option,
         settings: [
@@ -253,6 +235,23 @@ export default function Player({
             }
           },
         },
+      });
+
+      art.events.proxy(art.template.$container, 'touchstart', () => {
+        const backwardButton = art.layers.find('skipBackward').$ref;
+        const forwardButton = art.layers.find('skipForward').$ref;
+        
+        // Show buttons
+        if (backwardButton && forwardButton) {
+          backwardButton.style.opacity = '1';
+          forwardButton.style.opacity = '1';
+          
+          // Hide buttons after 3 seconds
+          setTimeout(() => {
+            backwardButton.style.opacity = '0';
+            forwardButton.style.opacity = '0';
+          }, 3000);
+        }
       });
 
       
