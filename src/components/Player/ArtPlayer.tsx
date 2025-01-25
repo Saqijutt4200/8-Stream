@@ -23,8 +23,8 @@ export default function Player({
       container: artRef.current!,
       plugins: [
         artplayerPluginHlsQuality({
-          // Show quality in control
-          control: true,
+          // Do not show quality directly in the controls
+          control: false,
 
           // Get the resolution text from level
           getResolution: (level) => {
@@ -70,8 +70,8 @@ export default function Player({
       getInstance(art);
     }
 
+    // Handle keypress events for play/pause and fullscreen
     art.events.proxy(document, "keypress", (event: any) => {
-      // Check if the focus is on an input field or textarea
       const isInputFocused =
         document?.activeElement?.tagName === "INPUT" ||
         document?.activeElement?.tagName === "TEXTAREA";
@@ -85,27 +85,40 @@ export default function Player({
       }
     });
 
-    art.controls.remove("playAndPause");
+    // Add quality selector to the settings menu
+    art.controls.add({
+      name: "quality",
+      position: "settings",
+      html: `Quality`,
+      selector: art.plugins.hlsQuality.levels.map((level: any, index: number) => ({
+        html: level.resolution || `${level.height}P`,
+        value: index,
+        default: level.default,
+      })),
+      onSelect: (item: any) => {
+        art.plugins.hlsQuality.changeLevel(item.value);
+        return item.html;
+      },
+    });
 
+    // Handle subtitles if provided
     if (sub?.length > 0) {
       art.controls.add({
         name: "subtitle",
         position: "right",
-        html: `subtitle`,
+        html: `Subtitle`,
         selector: [
           {
             default: true,
-            html: `off`,
+            html: `Off`,
             value: "",
           },
-          ...sub.map((item: any, i: number) => {
-            return {
-              html: `<div>${item.lang}</div>`,
-              value: item?.url,
-            };
-          }),
+          ...sub.map((item: any) => ({
+            html: item.lang,
+            value: item.url,
+          })),
         ],
-        onSelect: function (item, $dom) {
+        onSelect: (item) => {
           // @ts-ignore
           art.subtitle.switch(item.value);
           return item.html;
@@ -113,12 +126,11 @@ export default function Player({
       });
     }
 
+    // Update volume control
     art.controls.update({
       name: "volume",
       position: "right",
     });
-
-    console.log("controls", art.controls);
 
     return () => {
       if (art && art.destroy) {
