@@ -238,22 +238,36 @@ export default function Player({
       });
 
       art.events.proxy(art.template.$container, 'touchstart', () => {
-        const backwardButton = art.layers.find('skipBackward');
-        const forwardButton = art.layers.find('skipForward');
-
+        art.layers.update({
+          name: 'skipBackward',
+          style: {
+            opacity: '1'
+          }
+        });
+      
+        art.layers.update({
+          name: 'skipForward',
+          style: {
+            opacity: '1'
+          }
+        });
         
-        
-        // Show buttons
-        if (backwardButton && backwardButton.$ref && forwardButton && forwardButton.$ref) {
-          backwardButton.$ref.style.opacity = '1';
-          forwardButton.$ref.style.opacity = '1';
-          
-          // Hide buttons after 3 seconds
-          setTimeout(() => {
-            backwardButton.$ref.style.opacity = '0';
-            forwardButton.$ref.style.opacity = '0';
-          }, 3000);
-        }
+        // Hide buttons after 3 seconds
+        setTimeout(() => {
+          art.layers.update({
+            name: 'skipBackward',
+            style: {
+              opacity: '0'
+            }
+          });
+      
+          art.layers.update({
+            name: 'skipForward',
+            style: {
+              opacity: '0'
+            }
+          });
+        }, 3000);
       });
 
       
@@ -290,15 +304,7 @@ export default function Player({
         }
       });
 
-      art.on('play', () => {
-        const backwardButton = art.layers.find('skipBackward').$ref;
-        const forwardButton = art.layers.find('skipForward').$ref;
-        
-        if (backwardButton && forwardButton) {
-          backwardButton.style.opacity = '0';
-          forwardButton.style.opacity = '0';
-        }
-      });
+      
       art.on("play", () => {
         art.layers.update({
           name: "poster",
