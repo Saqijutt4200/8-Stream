@@ -52,10 +52,7 @@ export default function Player({
       container: artRef.current!,
       plugins: [
         artplayerPluginHlsQuality({
-          // Show quality in control
           control: true,
-
-          // Get the resolution text from level
           getResolution: (level) => {
             if (level.height <= 240) {
               return "240P";
@@ -90,12 +87,15 @@ export default function Player({
         },
       },
     });
+
     art.on("ready", () => {
       art.play();
     });
+
     if (getInstance && typeof getInstance === "function") {
       getInstance(art);
     }
+
     art.events.proxy(document, "keypress", (event: any) => {
       // Check if the focus is on an input field or textarea
       const isInputFocused =
@@ -108,47 +108,46 @@ export default function Player({
       } else if (!isInputFocused && event?.code === "KeyF") {
         event.preventDefault();
         art.fullscreen = !art.fullscreen;
+      } else if (!isInputFocused && event?.code === "ArrowLeft") {
+        event.preventDefault();
+        art.seek(art.currentTime - 10); // Seek back 10 seconds
+      } else if (!isInputFocused && event?.code === "ArrowRight") {
+        event.preventDefault();
+        art.seek(art.currentTime + 10); // Seek forward 10 seconds
       }
     });
 
-    art.controls.remove("playAndPause");
-    if (sub?.length > 0) {
-      art.controls.add({
-        name: "subtitle",
-        position: "right",
-        html: `subtitle`,
-        selector: [
-          {
-            default: true,
-            html: `off`,
-            value: "",
-          },
-          ...sub.map((item: any, i: number) => {
-            return {
-              html: `<div>${item.lang}</div>`,
-              value: item?.url,
-            };
-          }),
-        ],
-        onSelect: function (item, $dom) {
-          // @ts-ignore
-          art.subtitle.switch(item.value);
-          return item.html;
-        },
-      });
-    }
+    // Add custom controls for back and forward 10s
+    art.controls.add({
+      name: "backward",
+      position: "left",
+      html: `<div>10s Back</div>`,
+      onClick: () => {
+        art.seek(art.currentTime - 10); // Seek back 10 seconds
+      },
+    });
+
+    art.controls.add({
+      name: "forward",
+      position: "right",
+      html: `<div>10s Forward</div>`,
+      onClick: () => {
+        art.seek(art.currentTime + 10); // Seek forward 10 seconds
+      },
+    });
+
     art.controls.update({
       name: "volume",
       position: "right",
     });
-    console.log("controls", art.controls);
+
     return () => {
       if (art && art.destroy) {
         art.destroy(false);
         art?.hls?.destroy();
       }
     };
-  }, []);
+  }, [option, getInstance, artRef, sub]);
 
   return <div ref={artRef} {...rest}></div>;
 }
