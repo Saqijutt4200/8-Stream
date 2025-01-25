@@ -238,21 +238,20 @@ export default function Player({
       });
 
       art.events.proxy(art.template.$container, 'touchstart', () => {
-        const backwardLayer = art.layers.find((layer: any)=>layer.name === 'skipBackward');
-        const forwardLayer = art.layers.find((layer: any)=>layer.name === 'skipForward');
+        const backwardButton = art.layers.find('skipBackward');
+        const forwardButton = art.layers.find('skipForward');
 
-        const backwardButton = backwardLayer?.$ref;
-        const forwardButton = forwardLayer?.$ref;
+        
         
         // Show buttons
-        if (backwardButton && forwardButton) {
-          backwardButton.style.opacity = '1';
-          forwardButton.style.opacity = '1';
+        if (backwardButton && backwardButton.$ref && forwardButton && forwardButton.$ref) {
+          backwardButton.$ref.style.opacity = '1';
+          forwardButton.$ref.style.opacity = '1';
           
           // Hide buttons after 3 seconds
           setTimeout(() => {
-            backwardButton.style.opacity = '0';
-            forwardButton.style.opacity = '0';
+            backwardButton.$ref.style.opacity = '0';
+            forwardButton.$ref.style.opacity = '0';
           }, 3000);
         }
       });
