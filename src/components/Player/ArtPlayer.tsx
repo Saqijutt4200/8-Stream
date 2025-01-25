@@ -20,78 +20,13 @@ export default function Player({
   useEffect(() => {
     const art = new Artplayer({
       ...option,
-      settings: [
-        {
-          html: "Font size",
-          tooltip: "medium",
-          name: "fontSize",
-          selector: [
-            {
-              html: "small",
-              value: "20px",
-            },
-            {
-              html: "medium",
-              default: true,
-              value: "35px",
-            },
-            {
-              html: "large",
-              value: "48px",
-            },
-          ],
-          onSelect: function (item) {
-            art.subtitle.style({
-              //@ts-ignore
-              "font-size": item.value,
-            });
-            return item.html;
-          },
-        },
-        {
-          html: "Quality",
-          tooltip: "Select video quality",
-          name: "quality",
-          selector: [
-            {
-              html: "240P",
-              value: "240",
-            },
-            {
-              html: "360P",
-              value: "360",
-            },
-            {
-              html: "480P",
-              value: "480",
-            },
-            {
-              html: "720P",
-              value: "720",
-            },
-            {
-              html: "1080P",
-              value: "1080",
-            },
-          ],
-          onSelect: function (item) {
-            const hls = art.hls;
-            if (hls) {
-              const levelIndex = hls.levels.findIndex(
-                (level) => level.height === parseInt(item.value)
-              );
-              if (levelIndex !== -1) {
-                hls.currentLevel = levelIndex;
-              }
-            }
-            return item.html;
-          },
-        },
-      ],
       container: artRef.current!,
       plugins: [
         artplayerPluginHlsQuality({
+          // Show quality in control
           control: true,
+
+          // Get the resolution text from level
           getResolution: (level) => {
             if (level.height <= 240) {
               return "240P";
@@ -136,6 +71,7 @@ export default function Player({
     }
 
     art.events.proxy(document, "keypress", (event: any) => {
+      // Check if the focus is on an input field or textarea
       const isInputFocused =
         document?.activeElement?.tagName === "INPUT" ||
         document?.activeElement?.tagName === "TEXTAREA";
@@ -162,12 +98,15 @@ export default function Player({
             html: `off`,
             value: "",
           },
-          ...sub.map((item: any) => ({
-            html: `<div>${item.lang}</div>`,
-            value: item?.url,
-          })),
+          ...sub.map((item: any, i: number) => {
+            return {
+              html: `<div>${item.lang}</div>`,
+              value: item?.url,
+            };
+          }),
         ],
-        onSelect: function (item) {
+        onSelect: function (item, $dom) {
+          // @ts-ignore
           art.subtitle.switch(item.value);
           return item.html;
         },
@@ -178,6 +117,8 @@ export default function Player({
       name: "volume",
       position: "right",
     });
+
+    console.log("controls", art.controls);
 
     return () => {
       if (art && art.destroy) {
