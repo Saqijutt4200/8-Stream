@@ -237,7 +237,7 @@ export default function Player({
         },
       });
 
-      art.events.proxy(art.template.$container, 'touchstart', () => {
+      art.proxy(art.template.$container, 'touchstart', () => {
         art.layers.update({
           name: 'skipBackward',
           style: {
