@@ -238,8 +238,8 @@ export default function Player({
       });
 
       art.events.proxy(art.template.$container, 'touchstart', () => {
-        const backwardButton = art.layers.find('skipBackward').$ref;
-        const forwardButton = art.layers.find('skipForward').$ref;
+        const backwardButton = art.layers.find((layer)=>layer.name == 'skipBackward').$ref;
+        const forwardButton = art.layers.find((layer)=>layer.name == 'skipForward').$ref;
         
         // Show buttons
         if (backwardButton && forwardButton) {
