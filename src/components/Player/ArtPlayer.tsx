@@ -80,48 +80,31 @@ export default function Player({
           cursor: pointer;
           z-index: 10;
           transform: scale(0.9);
+          position: absolute;
+          top: 50%;
         }
         
-    /* Mobile touch behavior */
-    @media (hover: none) and (pointer: coarse) {
-      .skip-button {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-      }
-      
-      .art-video-player.mobile-controls-visible .skip-button {
-        opacity: 1;
-        pointer-events: auto;
-      }
-    }
-
-        .skip-button:hover {
-          background-color: rgba(48, 48, 48, 0.9);
-          transform: scale(1);
-        }
-        .skip-button svg {
-          fill: white;
-          transition: fill 0.3s ease;
-        }
-        .skip-button:hover svg {
-          fill: #ffffff;
-        }
-
-        
-
-        .skip-button.active {
-          animation: buttonPulse 0.3s ease-out;
-        }
-        @keyframes buttonPulse {
-          0% { transform: scale(0.9); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-
-        
+    
       `;
       document.head.appendChild(style);
+
+      // Mobile-specific touch controls
+      art.events.proxy(art.template.$container, 'touchstart', () => {
+        const backwardButton = art.layers.find('skipBackward').$ref;
+        const forwardButton = art.layers.find('skipForward').$ref;
+        
+        // Show buttons
+        if (backwardButton && forwardButton) {
+          backwardButton.style.opacity = '1';
+          forwardButton.style.opacity = '1';
+          
+          // Hide buttons after 3 seconds
+          setTimeout(() => {
+            backwardButton.style.opacity = '0';
+            forwardButton.style.opacity = '0';
+          }, 3000);
+        }
+      });
 
       const art = new Artplayer({
         ...option,
@@ -272,26 +255,7 @@ export default function Player({
         },
       });
 
-      // ADDED: Mobile touch event handling
-      const touchHandler = () => {
-        if (!container) return;
-        container.classList.add('mobile-controls-visible');
-        
-        // Clear any existing timeout
-        if (window.controlsTimeout) {
-          clearTimeout(window.controlsTimeout);
-        }
-
-        // Hide controls after 3 seconds
-        window.controlsTimeout = setTimeout(() => {
-          container.classList.remove('mobile-controls-visible');
-        }, 3000);
-      };
-
-      // ADDED: Add touch event listener
-      container.addEventListener('touchstart', touchHandler);
-      container.addEventListener('click', touchHandler);
-
+      
       
 
       art.on("ready", () => {
@@ -325,6 +289,15 @@ export default function Player({
         }
       });
 
+      art.on('play', () => {
+        const backwardButton = art.layers.find('skipBackward').$ref;
+        const forwardButton = art.layers.find('skipForward').$ref;
+        
+        if (backwardButton && forwardButton) {
+          backwardButton.style.opacity = '0';
+          forwardButton.style.opacity = '0';
+        }
+      });
       art.on("play", () => {
         art.layers.update({
           name: "poster",
@@ -394,11 +367,7 @@ export default function Player({
           art.destroy(false);
           art?.hls?.destroy();
         }
-        container.removeEventListener('touchstart', touchHandler);
-        container.removeEventListener('click', touchHandler);
-        if (window.controlsTimeout) {
-          clearTimeout(window.controlsTimeout);
-        }
+        
       };
     }
   }, [artRef.current]);
