@@ -85,10 +85,8 @@ export default function Player({
       }
     });
 
-    // Remove play and pause control
     art.controls.remove("playAndPause");
 
-    // Add custom subtitle selector
     if (sub?.length > 0) {
       art.controls.add({
         name: "subtitle",
@@ -100,23 +98,20 @@ export default function Player({
             html: `off`,
             value: "",
           },
-          ...sub.map((item: any) => {
+          ...sub.map((item: any, i: number) => {
             return {
               html: `<div>${item.lang}</div>`,
               value: item?.url,
             };
           }),
         ],
-        onSelect: function (item) {
+        onSelect: function (item, $dom) {
           // @ts-ignore
           art.subtitle.switch(item.value);
           return item.html;
         },
       });
     }
-
-    // Remove subtitle offset from settings
-    art.controls.remove("subtitleOffset");
 
     art.controls.update({
       name: "volume",
