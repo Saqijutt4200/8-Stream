@@ -110,9 +110,16 @@ export default function Player({
               },
             ],
             onSelect: function (item) {
+               // Define the level type
+               interface HLSLevel {
+                height: number;
+                width: number;
+                bitrate: number;
+                url: string;
+            }
               // Get quality levels from HLS
-              const levels = art.hls.levels;
-              const selectedLevel = levels.findIndex((level) => {
+              const levels = art.hls.levels as HLSLevel[];
+              const selectedLevel = levels.findIndex((level: HLSLevel) => {
                 if (item.value === "480p" && level.height <= 480) return true;
                 if (
                   item.value === "720p" &&
@@ -247,9 +254,9 @@ export default function Player({
               art.hls = hls;
               art.on("destroy", () => hls.destroy());
                // Add event listener for level loading
-               hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+               hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
                 // Update quality selector based on available levels
-                const qualityLevels = hls.levels.map(level => ({
+                const qualityLevels = hls.levels.map((level: HLSLevel) => ({
                     html: `${level.height}P`,
                     value: level.height,
                 }));
