@@ -91,7 +91,7 @@ export default function Player({
       const art = new Artplayer({
         ...option,
         settings: [
-          {
+          {/*{
             html: "Font size",
             tooltip: "medium",
             name: "fontSize",
@@ -117,7 +117,7 @@ export default function Player({
               });
               return item.html;
             },
-          },
+          },*/}
         ],
         container: artRef.current!,
         layers: [
