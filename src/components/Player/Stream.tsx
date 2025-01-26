@@ -157,7 +157,7 @@ const Stream = ({
               ],
               playbackRate: true,
               fullscreen: true,
-              subtitleOffset: true,
+              
               subtitle: {
                 type: "vtt",
                 escape: false,
