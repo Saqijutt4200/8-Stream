@@ -7,6 +7,15 @@ import Hls from "hls.js";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
+
+ // Define the level type
+ interface HLSLevel {
+  height: number;
+  width: number;
+  bitrate: number;
+  url: string;
+}
+
 // Extend Window interface to support custom property
 declare global {
   interface Window {
@@ -110,13 +119,7 @@ export default function Player({
               },
             ],
             onSelect: function (item) {
-               // Define the level type
-               interface HLSLevel {
-                height: number;
-                width: number;
-                bitrate: number;
-                url: string;
-            }
+             
               // Get quality levels from HLS
               const levels = art.hls.levels as HLSLevel[];
               const selectedLevel = levels.findIndex((level: HLSLevel) => {
@@ -253,20 +256,20 @@ export default function Player({
               hls.attachMedia(video);
               art.hls = hls;
               art.on("destroy", () => hls.destroy());
-               // Add event listener for level loading
-               hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
+              // Add event listener for level loading
+              hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
                 // Update quality selector based on available levels
-                const qualityLevels = hls.levels.map((level: HLSLevel) => ({
-                    html: `${level.height}P`,
-                    value: level.height,
+                const qualityLevels = hls.levels.map((level) => ({
+                  html: `${level.height}P`,
+                  value: level.height,
                 }));
-                
+
                 // Update the quality selector options
                 art.setting.update({
-                    name: 'quality',
-                    selector: qualityLevels,
+                  name: "quality",
+                  selector: qualityLevels,
                 });
-            });
+              });
             } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
               video.src = url;
             } else {
