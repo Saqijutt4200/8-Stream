@@ -193,14 +193,14 @@ const Stream = ({
           </div>
         )}
       </div>
-      <div
+      {/*<div
         className="absolute top-0 right-0 m-5 cursor-pointer z-50"
         onClick={() => {
           router.replace(`/`);
         }}
       >
         <CgClose className="text-white text-4xl" />
-      </div>
+      </div>*/}
     </div>
   );
 };
