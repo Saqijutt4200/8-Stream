@@ -71,7 +71,7 @@ export default function Player({
       const style = document.createElement("style");
       style.textContent = `
         .skip-button {
-          opacity: 0;
+          
           transition: all 0.3s ease;
           border: none;
           background-color: rgba(28, 28, 28, 0.8);
