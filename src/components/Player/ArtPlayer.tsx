@@ -242,8 +242,8 @@ export default function Player({
         art.layers.update({
           name: 'skipBackward',
           style: {
-            opacity: '0';
-            transform: scale(1);
+            opacity: '0',
+            transform: 'scale(1)'
           }
         });
       
