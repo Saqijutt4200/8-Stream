@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Artplayer from "artplayer";
 import { type Option } from "artplayer/types/option";
+import artplayerPluginHlsQuality from "artplayer-plugin-hls-quality";
 import Hls from "hls.js";
 
 export default function Player({
@@ -20,6 +21,29 @@ export default function Player({
     const art = new Artplayer({
       ...option,
       container: artRef.current!,
+      plugins: [
+        artplayerPluginHlsQuality({
+          // Show quality in control
+          control: true,
+
+          // Get the resolution text from level
+          getResolution: (level) => {
+            if (level.height <= 240) {
+              return "240P";
+            } else if (level.height > 240 && level.height <= 360) {
+              return "360P";
+            } else if (level.height > 360 && level.height <= 480) {
+              return "480P";
+            } else if (level.height > 480 && level.height <= 720) {
+              return "720P";
+            } else if (level.height > 720 && level.height <= 1080) {
+              return "1080P";
+            } else {
+              return level.height + "P";
+            }
+          },
+        }),
+      ],
       customType: {
         m3u8: function playM3u8(video, url, art) {
           if (Hls.isSupported()) {
@@ -28,28 +52,6 @@ export default function Player({
             hls.loadSource(url);
             hls.attachMedia(video);
             art.hls = hls;
-
-            // Add quality levels when HLS loads
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-              const levels = hls.levels.map((level, index) => ({
-                html: `${level.height}P`,
-                value: index,
-                default: index === hls.firstLevel,
-              }));
-
-              // Add quality to the settings menu
-              art.controls.add({
-                name: "quality",
-                position: "settings",
-                html: "Quality",
-                selector: levels,
-                onSelect: (item) => {
-                  hls.currentLevel = item.value;
-                  return item.html;
-                },
-              });
-            });
-
             art.on("destroy", () => hls.destroy());
           } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
             video.src = url;
@@ -68,26 +70,55 @@ export default function Player({
       getInstance(art);
     }
 
-    // Add subtitles if provided
+    art.events.proxy(document, "keypress", (event: any) => {
+      // Check if the focus is on an input field or textarea
+      const isInputFocused =
+        document?.activeElement?.tagName === "INPUT" ||
+        document?.activeElement?.tagName === "TEXTAREA";
+
+      if (!isInputFocused && event?.code === "Space") {
+        event.preventDefault();
+        art.playing ? art.pause() : art.play();
+      } else if (!isInputFocused && event?.code === "KeyF") {
+        event.preventDefault();
+        art.fullscreen = !art.fullscreen;
+      }
+    });
+
+    art.controls.remove("playAndPause");
+
     if (sub?.length > 0) {
       art.controls.add({
         name: "subtitle",
-        position: "settings",
-        html: "Subtitle",
+        position: "right",
+        html: `subtitle`,
         selector: [
-          { html: "Off", value: "", default: true },
-          ...sub.map((item: any) => ({
-            html: item.lang,
-            value: item.url,
-          })),
+          {
+            default: true,
+            html: `off`,
+            value: "",
+          },
+          ...sub.map((item: any, i: number) => {
+            return {
+              html: `<div>${item.lang}</div>`,
+              value: item?.url,
+            };
+          }),
         ],
-        onSelect: (item) => {
+        onSelect: function (item, $dom) {
           // @ts-ignore
           art.subtitle.switch(item.value);
           return item.html;
         },
       });
     }
+
+    art.controls.update({
+      name: "volume",
+      position: "right",
+    });
+
+    console.log("controls", art.controls);
 
     return () => {
       if (art && art.destroy) {
