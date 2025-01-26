@@ -7,7 +7,6 @@ import Hls from "hls.js";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
-
 // Extend Window interface to support custom property
 declare global {
   interface Window {
@@ -92,6 +91,46 @@ export default function Player({
         ...option,
         settings: [
           {
+            html: "Quality",
+            tooltip: "Quality",
+            name: "quality",
+            selector: [
+              {
+                html: "480P",
+                value: "480p",
+              },
+              {
+                html: "720P",
+                value: "720p",
+              },
+              {
+                html: "1080P",
+                default: true,
+                value: "1080p",
+              },
+            ],
+            onSelect: function (item) {
+              // Get quality levels from HLS
+              const levels = art.hls.levels;
+              const selectedLevel = levels.findIndex((level) => {
+                if (item.value === "480p" && level.height <= 480) return true;
+                if (
+                  item.value === "720p" &&
+                  level.height <= 720 &&
+                  level.height > 480
+                )
+                  return true;
+                if (item.value === "1080p" && level.height > 720) return true;
+                return false;
+              });
+
+              if (selectedLevel !== -1) {
+                art.hls.currentLevel = selectedLevel;
+              }
+              return item.html;
+            },
+          },
+          {
             html: "Font size",
             tooltip: "medium",
             name: "fontSize",
@@ -157,14 +196,14 @@ export default function Player({
             `,
             click: function (this: Artplayer, _: Component, event: Event) {
               const target = event.target as HTMLElement;
-              const button = target.closest('.skip-button');
+              const button = target.closest(".skip-button");
               if (button) {
                 const newTime = Math.max(0, this.currentTime - 10);
                 this.seek = newTime;
-                
+
                 // Add active class for animation
-                button.classList.add('active');
-                setTimeout(() => button.classList.remove('active'), 300);
+                button.classList.add("active");
+                setTimeout(() => button.classList.remove("active"), 300);
               }
             },
           },
@@ -185,41 +224,19 @@ export default function Player({
             `,
             click: function (this: Artplayer, _: Component, event: Event) {
               const target = event.target as HTMLElement;
-              const button = target.closest('.skip-button');
+              const button = target.closest(".skip-button");
               if (button) {
                 const newTime = Math.min(this.duration, art.currentTime + 10);
                 this.seek = newTime;
-                
+
                 // Add active class for animation
-                button.classList.add('active');
-                setTimeout(() => button.classList.remove('active'), 300);
+                button.classList.add("active");
+                setTimeout(() => button.classList.remove("active"), 300);
               }
             },
           },
         ],
-        plugins: [
-          artplayerPluginHlsQuality({
-            // Show quality in control
-            control: true,
-
-            // Get the resolution text from level
-            getResolution: (level) => {
-              if (level.height <= 240) {
-                return "240P";
-              } else if (level.height > 240 && level.height <= 360) {
-                return "360P";
-              } else if (level.height > 360 && level.height <= 480) {
-                return "480P";
-              } else if (level.height > 480 && level.height <= 720) {
-                return "720P";
-              } else if (level.height > 720 && level.height <= 1080) {
-                return "1080P";
-              } else {
-                return level.height + "P";
-              }
-            },
-          }),
-        ],
+        plugins: [],
         customType: {
           m3u8: function playM3u8(video, url, art) {
             if (Hls.isSupported()) {
@@ -229,6 +246,20 @@ export default function Player({
               hls.attachMedia(video);
               art.hls = hls;
               art.on("destroy", () => hls.destroy());
+               // Add event listener for level loading
+               hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                // Update quality selector based on available levels
+                const qualityLevels = hls.levels.map(level => ({
+                    html: `${level.height}P`,
+                    value: level.height,
+                }));
+                
+                // Update the quality selector options
+                art.setting.update({
+                    name: 'quality',
+                    selector: qualityLevels,
+                });
+            });
             } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
               video.src = url;
             } else {
@@ -238,10 +269,10 @@ export default function Player({
         },
       });
 
-      art.proxy(art.template.$container, 'touchstart', () => {
+      art.proxy(art.template.$container, "touchstart", () => {
         art.layers.update({
           name: "skipBackward",
-            html: `
+          html: `
               <button type="button" class="skip-button" style="
                 position: absolute;
                 left: 20%;
@@ -255,10 +286,10 @@ export default function Player({
               </button>
             `,
         });
-      
+
         art.layers.update({
           name: "skipForward",
-            html: `
+          html: `
               <button type="button" class="skip-button" style="
                 position: absolute;
                 right: 20%;
@@ -272,7 +303,7 @@ export default function Player({
               </button>
             `,
         });
-        
+
         // Hide buttons after 3 seconds
         setTimeout(() => {
           art.layers.update({
@@ -291,7 +322,7 @@ export default function Player({
               </button>
             `,
           });
-      
+
           art.layers.update({
             name: "skipForward",
             html: `
@@ -310,9 +341,6 @@ export default function Player({
           });
         }, 3000);
       });
-
-      
-      
 
       art.on("ready", () => {
         art.play();
@@ -337,15 +365,12 @@ export default function Player({
         } else if (!isInputFocused && event?.code === "ArrowLeft") {
           event.preventDefault();
           art.currentTime = Math.max(0, art.currentTime - 10);
-          
         } else if (!isInputFocused && event?.code === "ArrowRight") {
           event.preventDefault();
           art.currentTime = Math.min(art.duration, art.currentTime + 10);
-         
         }
       });
 
-      
       art.on("play", () => {
         art.layers.update({
           name: "poster",
@@ -415,7 +440,6 @@ export default function Player({
           art.destroy(false);
           art?.hls?.destroy();
         }
-        
       };
     }
   }, [artRef.current]);
