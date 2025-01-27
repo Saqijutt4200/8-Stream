@@ -140,33 +140,7 @@ export default function Player({
               return item.html;
             },
           },
-          {
-            html: "Font size",
-            tooltip: "medium",
-            name: "fontSize",
-            selector: [
-              {
-                html: "small",
-                value: "20px",
-              },
-              {
-                html: "medium",
-                default: true,
-                value: "35px",
-              },
-              {
-                html: "large",
-                value: "48px",
-              },
-            ],
-            onSelect: function (item) {
-              art.subtitle.style({
-                //@ts-ignore
-                "font-size": item.value,
-              });
-              return item.html;
-            },
-          },
+         
         ],
         container: artRef.current!,
         layers: [
@@ -195,7 +169,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 left: 20%;
-                top: 50%;
+                top: 40%;
                 opacity: 0;
                 
               ">
@@ -224,7 +198,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 right: 20%;
-                top: 50%;
+                top: 40%;
                 opacity: 0;
               ">
               <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
@@ -251,32 +225,81 @@ export default function Player({
           m3u8: function playM3u8(video, url, art) {
             if (Hls.isSupported()) {
               if (art.hls) art.hls.destroy();
-              const hls = new Hls();
-              hls.loadSource(url);
-              hls.attachMedia(video);
-              art.hls = hls;
-              art.on("destroy", () => hls.destroy());
-              // Add event listener for level loading
-              hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
-                // Update quality selector based on available levels
-                const qualityLevels = hls.levels.map((level) => ({
-                  html: `${level.height}P`,
-                  value: level.height,
-                }));
-
-                // Update the quality selector options
-                art.setting.update({
-                  name: "quality",
-                  selector: qualityLevels,
-                });
+              const hls = new Hls({
+                debug: true, // Enable debug logs
               });
+              
+              // Add error handling
+              hls.on(Hls.Events.ERROR, function (event, data) {
+                if (data.fatal) {
+                  console.error('HLS error:', data);
+                  switch (data.type) {
+                    case Hls.ErrorTypes.NETWORK_ERROR:
+                      console.log("Network error - attempting to recover...");
+                      hls.startLoad();
+                      break;
+                    case Hls.ErrorTypes.MEDIA_ERROR:
+                      console.log("Media error - attempting to recover...");
+                      hls.recoverMediaError();
+                      break;
+                    default:
+                      // Cannot recover
+                      hls.destroy();
+                      art.notice.show = `Playback error: ${data.type}`;
+                      break;
+                  }
+                }
+              });
+        
+              // Add loading state handler
+              hls.on(Hls.Events.MANIFEST_LOADING, () => {
+                console.log('Loading manifest from URL:', url);
+              });
+        
+              hls.on(Hls.Events.MANIFEST_LOADED, () => {
+                console.log('Manifest loaded successfully');
+              });
+        
+              try {
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                art.hls = hls;
+                
+                // Add event listener for level loading
+                hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
+                  console.log('Available levels:', hls.levels);
+                  
+                  if (hls.levels.length > 0) {
+                    const qualityLevels = hls.levels.map(level => ({
+                      html: `${level.height}P`,
+                      value: level.height,
+                    }));
+                    
+                    // Update the quality selector options
+                    art.setting.update({
+                      name: 'quality',
+                      selector: qualityLevels,
+                    });
+                  }
+                });
+        
+                art.on("destroy", () => {
+                  console.log("Destroying HLS instance");
+                  hls.destroy();
+                });
+        
+              } catch (error) {
+                console.error('Error setting up HLS:', error);
+                art.notice.show = 'Failed to load video source';
+              }
             } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+              // Fallback for Safari
               video.src = url;
             } else {
               art.notice.show = "Unsupported playback format: m3u8";
             }
           },
-        },
+        }
       });
 
       art.proxy(art.template.$container, "touchstart", () => {
@@ -286,7 +309,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 left: 20%;
-                top: 50%;
+                top: 40%;
                 opacity: 1;
                 
               ">
@@ -303,7 +326,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 right: 20%;
-                top: 50%;
+                top: 40%;
                 opacity: 1;
                 
               ">
@@ -322,7 +345,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 left: 20%;
-                top: 50%;
+                top: 40%;
                 opacity: 0;
                 
               ">
@@ -339,7 +362,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 right: 20%;
-                top: 50%;
+                top: 40%;
                 opacity: 0;
                 
               ">
