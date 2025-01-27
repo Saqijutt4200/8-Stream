@@ -106,6 +106,7 @@ export default function Player({
             selector: [
               {
                 html: "480P",
+                default: true,
                 value: "480p",
               },
               {
@@ -114,29 +115,23 @@ export default function Player({
               },
               {
                 html: "1080P",
-                default: true,
+                
                 value: "1080p",
               },
             ],
             onSelect: function (item) {
-             
               // Get quality levels from HLS
-              const levels = art.hls.levels as HLSLevel[];
-              const selectedLevel = levels.findIndex((level: HLSLevel) => {
-                if (item.value === "480p" && level.height <= 480) return true;
-                if (
-                  item.value === "720p" &&
-                  level.height <= 720 &&
-                  level.height > 480
-                )
-                  return true;
-                if (item.value === "1080p" && level.height > 720) return true;
-                return false;
-              });
-
-              if (selectedLevel !== -1) {
-                art.hls.currentLevel = selectedLevel;
-              }
+              const levels = art.hls.levels;
+              if (!levels || levels.length === 0) return item.html;
+        
+              // Find the closest matching quality level
+              const selectedLevel = levels.reduce((prev, curr, index) => {
+                const prevDiff = Math.abs(prev.height - item.value);
+                const currDiff = Math.abs(curr.height - item.value);
+                return currDiff < prevDiff ? { ...curr, index } : prev;
+              }, { ...levels[0], index: 0 });
+        
+              art.hls.currentLevel = selectedLevel.index;
               return item.html;
             },
           },
@@ -270,15 +265,36 @@ export default function Player({
                   console.log('Available levels:', hls.levels);
                   
                   if (hls.levels.length > 0) {
-                    const qualityLevels = hls.levels.map(level => ({
-                      html: `${level.height}P`,
-                      value: level.height,
-                    }));
+                    const standardQualities = [
+                      { height: 1080, html: "1080P" },
+                      { height: 720, html: "720P" },
+                      { height: 480, html: "480P" },
+                      { height: 360, html: "360P" },
+                      { height: 240, html: "240P" }
+                    ];
+                    // Filter available qualities to closest matching standard qualities
+    const availableQualities = standardQualities
+    .filter(sq => {
+      // Only include qualities that have a reasonably close match
+      return hls.levels.some(level => 
+        Math.abs(level.height - sq.height) < 100
+      );
+    })
+    .map(sq => ({
+      html: sq.html,
+      value: sq.height,
+      default: sq.height === 1080 // Set 1080P as default if available
+    }));
+
+  // If 1080P is not available, set the highest available quality as default
+  if (!availableQualities.some(q => q.default)) {
+    availableQualities[0].default = true;
+  }
                     
                     // Update the quality selector options
                     art.setting.update({
                       name: 'quality',
-                      selector: qualityLevels,
+                      selector: availableQualities,
                     });
                   }
                 });
