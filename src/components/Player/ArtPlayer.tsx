@@ -14,7 +14,14 @@ import { RootState } from "@/redux/store";
   width: number;
   bitrate: number;
   url: string;
+  index?: number;
 }
+
+interface QualityLevel {
+  height: number;
+  html: string;
+}
+
 
 // Extend Window interface to support custom property
 declare global {
@@ -125,7 +132,7 @@ export default function Player({
               if (!levels || levels.length === 0) return item.html;
         
               // Find the closest matching quality level
-              const selectedLevel = levels.reduce((prev, curr, index) => {
+              const selectedLevel = levels.reduce((prev: HLSLevel, curr: HLSLevel, index: number) => {
                 const prevDiff = Math.abs(prev.height - item.value);
                 const currDiff = Math.abs(curr.height - item.value);
                 return currDiff < prevDiff ? { ...curr, index } : prev;
@@ -265,7 +272,7 @@ export default function Player({
                   console.log('Available levels:', hls.levels);
                   
                   if (hls.levels.length > 0) {
-                    const standardQualities = [
+                    const standardQualities: QualityLevel[] = [
                       { height: 1080, html: "1080P" },
                       { height: 720, html: "720P" },
                       { height: 480, html: "480P" },
