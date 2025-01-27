@@ -169,7 +169,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 left: 20%;
-                top: 40%;
+                top: 45%;
                 opacity: 0;
                 
               ">
@@ -198,7 +198,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 right: 20%;
-                top: 40%;
+                top: 45%;
                 opacity: 0;
               ">
               <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
@@ -309,7 +309,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 left: 20%;
-                top: 40%;
+                top: 45%;
                 opacity: 1;
                 
               ">
@@ -326,7 +326,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 right: 20%;
-                top: 40%;
+                top: 45%;
                 opacity: 1;
                 
               ">
@@ -345,7 +345,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 left: 20%;
-                top: 40%;
+                top: 45%;
                 opacity: 0;
                 
               ">
@@ -362,7 +362,7 @@ export default function Player({
               <button type="button" class="skip-button" style="
                 position: absolute;
                 right: 20%;
-                top: 40%;
+                top: 45%;
                 opacity: 0;
                 
               ">
