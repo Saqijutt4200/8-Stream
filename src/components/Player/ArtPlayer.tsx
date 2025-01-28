@@ -307,7 +307,7 @@ export default function Player({
             },
             mounted: function(layer) {
               // Add hover effects
-              const selector = layer.querySelector('.language-selector');
+              const selector = layer.querySelector('.language-selector') as HTMLElement;
               if (selector) {
                 selector.addEventListener('mouseenter', () => {
                   selector.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
@@ -323,11 +323,12 @@ export default function Player({
                 // Add hover effect for options
                 const options = selector.querySelectorAll('.lang-option');
                 options.forEach(option => {
-                  option.addEventListener('mouseenter', () => {
-                    (option as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  const optionElement = option as HTMLElement;
+                  optionElement.addEventListener('mouseenter', () => {
+                    optionElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
                   });
-                  option.addEventListener('mouseleave', () => {
-                    (option as HTMLElement).style.backgroundColor = 'transparent';
+                  optionElement.addEventListener('mouseleave', () => {
+                    optionElement.style.backgroundColor = 'transparent';
                   });
                 });
               }
