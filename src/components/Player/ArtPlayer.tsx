@@ -282,7 +282,7 @@ export default function Player({
               const option = target.closest('.lang-option');
               
               if (selector) {
-                const options = selector.querySelector('.lang-options');
+                const options = selector.querySelector('.lang-options') as HTMLElement;
                 if (options) {
                   const isHidden = options.style.display === 'none';
                   options.style.display = isHidden ? 'block' : 'none';
@@ -294,11 +294,11 @@ export default function Player({
                 if (value) {
                   //setCurrentLang(value);
                   onLanguageChange(value);
-                  const currentLang = selector?.querySelector('.current-lang span');
+                  const currentLang = selector?.querySelector('.current-lang span') as HTMLElement;
                   if (currentLang) {
                     currentLang.textContent = value;
                   }
-                  const options = selector?.querySelector('.lang-options');
+                  const options = selector?.querySelector('.lang-options') as HTMLElement;
                   if (options) {
                     options.style.display = 'none';
                   }
@@ -314,7 +314,7 @@ export default function Player({
                 });
                 selector.addEventListener('mouseleave', () => {
                   selector.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-                  const options = selector.querySelector('.lang-options');
+                  const options = selector.querySelector('.lang-options') as HTMLElement;
                   if (options) {
                     options.style.display = 'none';
                   }
