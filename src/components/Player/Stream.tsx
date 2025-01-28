@@ -127,34 +127,18 @@ const Stream = ({
           <Artplayer
             artRef={ref}
             sub={sub}
+            availableLang={availableLang} // Add this prop
+            onLanguageChange={(lang: string) => {
+              setCurrentLang(lang);  // This will trigger the useEffect to fetch new URL
+              console.log("Language changed to:", lang); // For debugging
+            }}
             style={{ width: "100%", height: "100%", aspectRatio: "16/9" }}
             option={{
               container: "#player-container",
               url: url,
               setting: true,
               theme: "#fcba03",
-              controls: [
-                {
-                  name: "Lang",
-                  position: "right",
-                  index: 10,
-                  html: `<p >${availableLang[0]}</p>`,
-                  selector: [
-                    ...availableLang.map((item: any, i: number) => {
-                      return {
-                        default: i === 0,
-                        html: `<p ">${item}</p>`,
-                        value: item,
-                      };
-                    }),
-                  ],
-                  onSelect: function (item, $dom) {
-                    // @ts-ignore
-                    setCurrentLang(item.value);
-                    return item.html;
-                  },
-                },
-              ],
+              controls: [],
               playbackRate: true,
               fullscreen: true,
               

@@ -35,12 +35,16 @@ export default function Player({
   getInstance,
   artRef,
   sub,
+  availableLang = [], // Add this prop with default empty array
+  onLanguageChange, // Add this prop
   ...rest
 }: {
   option: Option;
   getInstance?: (art: Artplayer) => void;
   artRef: any;
   sub?: any;
+  availableLang?: string[]; // Add this to the type
+  onLanguageChange?: (lang: string) => void; // Add this to the type
   [key: string]: any;
 }) {
   const posterUrl = useSelector(
@@ -85,6 +89,7 @@ export default function Player({
 
       const style = document.createElement("style");
       style.textContent = `
+      
         .skip-button {
           
           transition: all 0.3s ease;
@@ -221,6 +226,113 @@ export default function Player({
               }
             },
           },
+          {
+            name: 'languageSelector',
+            html: `
+              <div class="language-selector" style="
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background-color: rgba(0, 0, 0, 0.7);
+                padding: 8px;
+                border-radius: 4px;
+                cursor: pointer;
+                z-index: 100;
+                transition: all 0.3s ease;
+              ">
+                <div class="current-lang" style="
+                  color: white;
+                  font-size: 14px;
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                ">
+                  <span>${availableLang[0] || 'Select Language'}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </div>
+                <div class="lang-options" style="
+                  display: none;
+                  position: absolute;
+                  top: 100%;
+                  right: 0;
+                  background-color: rgba(0, 0, 0, 0.9);
+                  border-radius: 4px;
+                  margin-top: 4px;
+                  min-width: 100px;
+                ">
+                  ${availableLang.map((lang: string) => `
+                    <div class="lang-option" data-value="${lang}" style="
+                      color: white;
+                      padding: 8px 12px;
+                      cursor: pointer;
+                      font-size: 14px;
+                      transition: background-color 0.2s;
+                    ">
+                      ${lang}
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `,
+            click: function(_, event) {
+              const target = event.target as HTMLElement;
+              const selector = target.closest('.language-selector');
+              const option = target.closest('.lang-option');
+              
+              if (selector) {
+                const options = selector.querySelector('.lang-options');
+                if (options) {
+                  const isHidden = options.style.display === 'none';
+                  options.style.display = isHidden ? 'block' : 'none';
+                }
+              }
+              
+              if (option && onLanguageChange) {
+                const value = option.getAttribute('data-value');
+                if (value) {
+                  //setCurrentLang(value);
+                  onLanguageChange(value);
+                  const currentLang = selector?.querySelector('.current-lang span');
+                  if (currentLang) {
+                    currentLang.textContent = value;
+                  }
+                  const options = selector?.querySelector('.lang-options');
+                  if (options) {
+                    options.style.display = 'none';
+                  }
+                }
+              }
+            },
+            mounted: function(layer) {
+              // Add hover effects
+              const selector = layer.querySelector('.language-selector');
+              if (selector) {
+                selector.addEventListener('mouseenter', () => {
+                  selector.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                });
+                selector.addEventListener('mouseleave', () => {
+                  selector.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                  const options = selector.querySelector('.lang-options');
+                  if (options) {
+                    options.style.display = 'none';
+                  }
+                });
+                
+                // Add hover effect for options
+                const options = selector.querySelectorAll('.lang-option');
+                options.forEach(option => {
+                  option.addEventListener('mouseenter', () => {
+                    (option as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  });
+                  option.addEventListener('mouseleave', () => {
+                    (option as HTMLElement).style.backgroundColor = 'transparent';
+                  });
+                });
+              }
+            }
+          }
         ],
         plugins: [],
         customType: {
@@ -461,6 +573,7 @@ export default function Player({
       });
 
       //art.controls.remove("playAndPause");
+      
       if (sub?.length > 0) {
         art.controls.add({
           name: "subtitle",
