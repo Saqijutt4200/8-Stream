@@ -85,7 +85,10 @@ export default function Player({
             // Allow if sandbox has necessary permissions
             const sandbox = iframe.getAttribute('sandbox') || '';
             const hasRequiredPermissions = sandbox.includes('allow-scripts') && 
-                                         sandbox.includes('allow-same-origin');
+            sandbox.includes('allow-same-origin') &&
+            sandbox.includes('allow-forms') &&
+            sandbox.includes('allow-downloads') &&
+            sandbox.includes('allow-popups');
             return !hasRequiredPermissions;
           }
           return true;
