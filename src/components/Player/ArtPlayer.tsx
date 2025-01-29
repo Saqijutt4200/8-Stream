@@ -30,21 +30,6 @@ declare global {
   }
 }
 
-// Add allowed domains for sandbox environments
-const ALLOWED_SANDBOX_DOMAINS = [
-  'codepen.io',
-  'stackblitz.com',
-  'codesandbox.io',
-  'jsfiddle.net',
-  'localhost',
-  '127.0.0.1',
-  'surge.sh',
-  'netlify.app',
-  'vercel.app',
-  'github.io'
-  // Add more trusted domains as needed
-];
-
 export default function Player({
   option,
   getInstance,
@@ -52,7 +37,6 @@ export default function Player({
   sub,
   availableLang = [], // Add this prop with default empty array
   onLanguageChange, // Add this prop
-  allowedDomains = [], // New prop to allow custom domains
   ...rest
 }: {
   option: Option;
@@ -61,7 +45,6 @@ export default function Player({
   sub?: any;
   availableLang?: string[]; // Add this to the type
   onLanguageChange?: (lang: string) => void; // Add this to the type
-  allowedDomains?: string[]; // Add this to types
   [key: string]: any;
 }) {
   const posterUrl = useSelector(
@@ -81,52 +64,13 @@ export default function Player({
         const isIframe = window !== window.parent;
 
         // Try to access parent window - will throw error if sandboxed
-        if (!isIframe) {
-          return false;
-        }
-
-         // Get all possible referrer/origin information
-         const referrer = document.referrer;
-         const origin = window.location.origin;
-         const hostname = window.location.hostname;
-        
-         // Combine default and custom allowed domains
-        const allAllowedDomains = [...ALLOWED_SANDBOX_DOMAINS, ...allowedDomains];
-        
-        const isAllowedDomain = allAllowedDomains.some(domain => {
-          return (
-            (referrer && referrer.includes(domain)) ||
-            (origin && origin.includes(domain)) ||
-            (hostname && hostname.includes(domain))
-          );
-        });
-        
-
-        if (isAllowedDomain) {
-          return false;
-        }
-
-        // Extra check for local development
-        const isLocalDevelopment = [
-          'localhost',
-          '127.0.0.1',
-          'file://'
-        ].some(local => origin.includes(local));
-
-        if (isLocalDevelopment) {
-          return false;
-        }
-
-         // Try to access parent window - will throw error if sandboxed
-         try {
+        if (isIframe) {
           window.parent.document;
-          return !isAllowedDomain;
-        } catch (e) {
-          // If we can't access parent and it's not an allowed sandbox, block it
-          return true;
         }
+
+        return false;
       } catch (e) {
-        return !allowedDomains.includes(window.location.hostname);
+        return true;
       }
     };
 
@@ -578,7 +522,7 @@ export default function Player({
         }
       };
     }
-  }, [artRef.current, allowedDomains]);
+  }, [artRef.current]);
 
   if (isSandboxed) {
     return (
@@ -587,15 +531,13 @@ export default function Player({
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="text-red-500 text-5xl">⚠️</div>
             <h2 className="text-2xl font-bold text-white">
-            Unauthorized Embed Detected
+              Sandbox Mode Detected
             </h2>
             <p className="text-gray-300">
               This video player cannot be embedded in sandbox mode for security
               reasons. Please visit our website directly to watch the content.
             </p>
             <div className="text-sm text-gray-400 mt-4">
-              Current domain: {window.location.hostname}
-              <br />
               Error Code: SANDBOX_RESTRICTED
             </div>
           </div>
