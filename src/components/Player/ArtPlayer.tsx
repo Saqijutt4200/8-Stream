@@ -60,41 +60,24 @@ export default function Player({
     }
     const checkSandbox = () => {
       try {
-        // Check if we're in an iframe
+        // Special case for CodePen
+        if (window.location.hostname.includes('cdpn.io') || 
+            window.location.hostname.includes('codepen.io')) {
+          console.log('CodePen detected, allowing player');
+          return false;
+        }
+    
+        // Rest of the sandbox checks...
         const isIframe = window !== window.parent;
-        
-        // If not in an iframe, we're not sandboxed
         if (!isIframe) return false;
     
-        // Check if we're running on CodePen or similar platforms
-        const isEmbedPlatform = window.location.hostname.includes('codepen.io') || 
-                               window.location.hostname.includes('stackblitz.com') ||
-                               window.location.hostname.includes('codesandbox.io');
-    
-        // If on an embed platform, allow it regardless of sandbox status
-        if (isEmbedPlatform) return false;
-    
         try {
-          // Try to access parent window
           window.parent.document;
           return false;
         } catch (e) {
-          // If we can't access parent window, check if it's due to sandbox attribute
-          const iframe = window.frameElement;
-          if (iframe && iframe.hasAttribute('sandbox')) {
-            // Allow if sandbox has necessary permissions
-            const sandbox = iframe.getAttribute('sandbox') || '';
-            const hasRequiredPermissions = sandbox.includes('allow-scripts') && 
-            sandbox.includes('allow-same-origin') &&
-            sandbox.includes('allow-forms') &&
-            sandbox.includes('allow-downloads') &&
-            sandbox.includes('allow-popups');
-            return !hasRequiredPermissions;
-          }
           return true;
         }
       } catch (e) {
-        // If we can't even check, assume it's not sandboxed
         return false;
       }
     };
