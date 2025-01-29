@@ -30,6 +30,15 @@ declare global {
   }
 }
 
+// Add allowed domains for sandbox environments
+const ALLOWED_SANDBOX_DOMAINS = [
+  'codepen.io',
+  'stackblitz.com',
+  'codesandbox.io',
+  'jsfiddle.net',
+  // Add more trusted domains as needed
+];
+
 export default function Player({
   option,
   getInstance,
@@ -64,11 +73,30 @@ export default function Player({
         const isIframe = window !== window.parent;
 
         // Try to access parent window - will throw error if sandboxed
-        if (isIframe) {
-          window.parent.document;
+        if (!isIframe) {
+          return false;
         }
 
-        return false;
+        // Get the referrer domain
+        const referrer = document.referrer;
+        const referrerDomain = new URL(referrer).hostname;
+        
+        // Check if the referrer is from an allowed sandbox domain
+        const isAllowedSandbox = ALLOWED_SANDBOX_DOMAINS.some(domain => 
+          referrerDomain.includes(domain)
+        );
+
+        if (isAllowedSandbox) {
+          return false;
+        }
+         // Try to access parent window - will throw error if sandboxed
+         try {
+          window.parent.document;
+          return false;
+        } catch (e) {
+          // If we can't access parent and it's not an allowed sandbox, block it
+          return true;
+        }
       } catch (e) {
         return true;
       }
@@ -531,7 +559,7 @@ export default function Player({
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="text-red-500 text-5xl">⚠️</div>
             <h2 className="text-2xl font-bold text-white">
-              Sandbox Mode Detected
+            Unauthorized Embed Detected
             </h2>
             <p className="text-gray-300">
               This video player cannot be embedded in sandbox mode for security
