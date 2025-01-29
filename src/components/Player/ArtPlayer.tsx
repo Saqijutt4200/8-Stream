@@ -36,6 +36,12 @@ const ALLOWED_SANDBOX_DOMAINS = [
   'stackblitz.com',
   'codesandbox.io',
   'jsfiddle.net',
+  'localhost',
+  '127.0.0.1',
+  'surge.sh',
+  'netlify.app',
+  'vercel.app',
+  'github.io'
   // Add more trusted domains as needed
 ];
 
@@ -46,6 +52,7 @@ export default function Player({
   sub,
   availableLang = [], // Add this prop with default empty array
   onLanguageChange, // Add this prop
+  allowedDomains = [], // New prop to allow custom domains
   ...rest
 }: {
   option: Option;
@@ -54,6 +61,7 @@ export default function Player({
   sub?: any;
   availableLang?: string[]; // Add this to the type
   onLanguageChange?: (lang: string) => void; // Add this to the type
+  allowedDomains?: string[]; // Add this to types
   [key: string]: any;
 }) {
   const posterUrl = useSelector(
@@ -77,28 +85,48 @@ export default function Player({
           return false;
         }
 
-        // Get the referrer domain
-        const referrer = document.referrer;
-        const referrerDomain = new URL(referrer).hostname;
+         // Get all possible referrer/origin information
+         const referrer = document.referrer;
+         const origin = window.location.origin;
+         const hostname = window.location.hostname;
         
-        // Check if the referrer is from an allowed sandbox domain
-        const isAllowedSandbox = ALLOWED_SANDBOX_DOMAINS.some(domain => 
-          referrerDomain.includes(domain)
-        );
+         // Combine default and custom allowed domains
+        const allAllowedDomains = [...ALLOWED_SANDBOX_DOMAINS, ...allowedDomains];
+        
+        const isAllowedDomain = allAllowedDomains.some(domain => {
+          return (
+            (referrer && referrer.includes(domain)) ||
+            (origin && origin.includes(domain)) ||
+            (hostname && hostname.includes(domain))
+          );
+        });
+        
 
-        if (isAllowedSandbox) {
+        if (isAllowedDomain) {
           return false;
         }
+
+        // Extra check for local development
+        const isLocalDevelopment = [
+          'localhost',
+          '127.0.0.1',
+          'file://'
+        ].some(local => origin.includes(local));
+
+        if (isLocalDevelopment) {
+          return false;
+        }
+
          // Try to access parent window - will throw error if sandboxed
          try {
           window.parent.document;
-          return false;
+          return !isAllowedDomain;
         } catch (e) {
           // If we can't access parent and it's not an allowed sandbox, block it
           return true;
         }
       } catch (e) {
-        return true;
+        return !allowedDomains.includes(window.location.hostname);
       }
     };
 
@@ -550,7 +578,7 @@ export default function Player({
         }
       };
     }
-  }, [artRef.current]);
+  }, [artRef.current, allowedDomains]);
 
   if (isSandboxed) {
     return (
@@ -566,6 +594,8 @@ export default function Player({
               reasons. Please visit our website directly to watch the content.
             </p>
             <div className="text-sm text-gray-400 mt-4">
+              Current domain: {window.location.hostname}
+              <br />
               Error Code: SANDBOX_RESTRICTED
             </div>
           </div>
