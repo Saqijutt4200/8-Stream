@@ -159,12 +159,13 @@ const Stream = ({
               cssVar: {
                 "--art-indicator-scale": 1.5,
                 "--art-indicator-size": "15px",
-                "--art-bottom-gap": "25px",
+                "--art-bottom-gap": "0px",
                 "--art-control-icon-scale": 1.7,
                 "--art-padding": "10px 30px",
                 // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
+                
               },
             }}
             getInstance={(art: any) => {
