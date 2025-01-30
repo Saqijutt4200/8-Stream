@@ -60,14 +60,23 @@ export default function Player({
     }
     const checkSandbox = () => {
       try {
-        // Special case for CodePen
-        if (window.location.hostname.includes('cdpn.io') || 
-            window.location.hostname.includes('codepen.io')) {
-          console.log('CodePen detected, allowing player');
+        // Get the current URL
+        const currentUrl = window.location.href;
+        console.log('Current URL:', currentUrl);
+    
+        // Check if we're inside a CodePen iframe
+        const isCodePen = window.location.hostname.includes('cdpn.io') ||
+                         window.parent.location.hostname.includes('codepen.io') ||
+                         document.referrer.includes('codepen.io');
+        
+        console.log('Is CodePen:', isCodePen);
+        
+        // If it's CodePen, always allow
+        if (isCodePen) {
           return false;
         }
     
-        // Rest of the sandbox checks...
+        // Regular sandbox checks only if not CodePen
         const isIframe = window !== window.parent;
         if (!isIframe) return false;
     
@@ -75,9 +84,12 @@ export default function Player({
           window.parent.document;
           return false;
         } catch (e) {
-          return true;
+          // Only block if not in CodePen
+          return !isCodePen;
         }
       } catch (e) {
+        console.log('Sandbox check error:', e);
+        // If we can't determine, default to allowing
         return false;
       }
     };
