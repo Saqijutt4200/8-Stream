@@ -50,7 +50,7 @@ export default function Player({
   const posterUrl = useSelector(
     (state: RootState) => state.posterUrl.currentPosterUrl
   );
-  const [isSandboxed, setIsSandboxed] = useState(false);
+  const [isSandboxed, setIsSandboxed] = useState<false | JSX.Element>(false);
   const [showControls, setShowControls] = useState(false);
 
   // NEW: Effect to detect mobile devices
@@ -67,8 +67,29 @@ export default function Player({
     
         // Try to access frameElement
         if (window.frameElement) {
-          // Only return true if there's actually a sandbox attribute
-          return window.frameElement.hasAttribute('sandbox');
+          // Only return sandbox UI if there's actually a sandbox attribute
+          if (window.frameElement.hasAttribute('sandbox')) {
+            return (
+              <div className="fixed inset-0 flex items-center justify-center bg-black/95 z-50">
+                <div className="bg-red-600/20 border-2 border-red-600 rounded-lg p-8 max-w-xl mx-4">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="text-red-500 text-5xl">⚠️</div>
+                    <h2 className="text-2xl font-bold text-white">
+                      Sandbox Mode Detected
+                    </h2>
+                    <p className="text-gray-300">
+                      This video player cannot be embedded in sandbox mode for security
+                      reasons. Please visit our website directly to watch the content.
+                    </p>
+                    <div className="text-sm text-gray-400 mt-4">
+                      Error Code: SANDBOX_RESTRICTED
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+          return false;
         }
     
         // For cross-origin iframes, try to access parent location
