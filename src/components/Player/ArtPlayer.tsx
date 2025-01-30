@@ -60,31 +60,24 @@ export default function Player({
     }
     const checkSandbox = () => {
       try {
-        // First check if we're in an iframe
-        const isIframe = window !== window.parent;
-        if (!isIframe) return false;  // Not in iframe, so not sandboxed
+        // If we can access frameElement, check for sandbox
+        if (window.frameElement) {
+          // If there's a sandbox attribute, block it
+          return window.frameElement.hasAttribute('sandbox');
+        }
         
-        try {
-          // Try to get the iframe element
-          const iframe = window.frameElement;
-          
-          // If it has a sandbox attribute, block it
-          if (iframe && iframe.hasAttribute('sandbox')) {
-            console.log('Sandbox attribute detected - blocking embed');
-            return true;
-          }
-          
-          // No sandbox attribute, allow it
-          return false;
-          
-        } catch (e) {
-          // If we can't access frameElement, assume it's sandboxed
-          console.log('Cannot access frameElement - assuming sandboxed');
+        // If we can't access frameElement but we're in an iframe,
+        // assume it's sandboxed for safety
+        if (window !== window.parent) {
           return true;
         }
+        
+        // Not in an iframe at all
+        return false;
       } catch (e) {
-        console.log('Error in sandbox check:', e);
-        return true;  // Error case - safer to assume it's sandboxed
+        // If we get a security error trying to access frameElement,
+        // it means we're probably sandboxed
+        return true;
       }
     };
 
