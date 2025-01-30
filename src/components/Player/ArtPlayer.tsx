@@ -60,29 +60,25 @@ export default function Player({
     }
     const detectSandbox = () => {
       try {
-        // If we're not in an iframe at all, we're definitely not sandboxed
-        if (window === window.parent) {
-          return false;
+        // Check if we're in an iframe
+        if (window !== window.parent) {
+          // Try to access frameElement
+          const frame = window.frameElement;
+          if (frame && frame.hasAttribute('sandbox')) {
+            return true;
+          }
+          
+          // Additional check for cross-origin iframes
+          try {
+            window.parent.location.href;
+            return false;
+          } catch (e) {
+            return true;
+          }
         }
-    
-        // Try to access frameElement
-        if (window.frameElement) {
-          // Only return true if there's actually a sandbox attribute
-          return window.frameElement.hasAttribute('sandbox');
-        }
-    
-        // For cross-origin iframes, try to access parent location
-        try {
-          window.parent.location.href;
-          return false; // If we can access parent, we're not sandboxed
-        } catch (e) {
-          // For cross-origin iframes without sandbox, we still want to allow them
-          // Only block if we specifically detect a sandbox attribute
-          return false;
-        }
-      } catch (e) {
-        // If we can't determine sandbox status, allow the embed
         return false;
+      } catch (e) {
+        return true;
       }
     };
 
