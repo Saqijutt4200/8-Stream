@@ -22,6 +22,13 @@ interface QualityLevel {
   html: string;
 }
 
+// Add type declaration for sandbox detection
+declare global {
+  interface Document {
+    sandbox?: DOMTokenList;
+  }
+}
+
 
 // Extend Window interface to support custom property
 declare global {
@@ -59,8 +66,19 @@ export default function Player({
     // Simplified sandbox detection using document.sandbox
     const detectSandbox = () => {
       try {
-        // Check if any sandbox restrictions are applied
-        return document.sandbox && document.sandbox.length > 0;
+        // Modern browser detection
+        if ('sandbox' in document) {
+          return document.sandbox?.length > 0;
+        }
+        
+        // Fallback for older browsers
+        try {
+          window.parent.document;
+          return false;
+        } catch (e) {
+          return window.self !== window.top && 
+            !('allow-scripts' in (window.frameElement?.getAttribute('sandbox') || ''));
+        }
       } catch (e) {
         return false;
       }
