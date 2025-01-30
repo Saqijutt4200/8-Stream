@@ -60,37 +60,31 @@ export default function Player({
     }
     const checkSandbox = () => {
       try {
-        // Get the current URL
-        const currentUrl = window.location.href;
-        console.log('Current URL:', currentUrl);
-    
-        // Check if we're inside a CodePen iframe
-        const isCodePen = window.location.hostname.includes('cdpn.io') ||
-                         window.parent.location.hostname.includes('codepen.io') ||
-                         document.referrer.includes('codepen.io');
-        
-        console.log('Is CodePen:', isCodePen);
-        
-        // If it's CodePen, always allow
-        if (isCodePen) {
-          return false;
-        }
-    
-        // Regular sandbox checks only if not CodePen
+        // First check if we're in an iframe
         const isIframe = window !== window.parent;
-        if (!isIframe) return false;
-    
+        if (!isIframe) return false;  // Not in iframe, so not sandboxed
+        
         try {
-          window.parent.document;
+          // Try to get the iframe element
+          const iframe = window.frameElement;
+          
+          // If it has a sandbox attribute, block it
+          if (iframe && iframe.hasAttribute('sandbox')) {
+            console.log('Sandbox attribute detected - blocking embed');
+            return true;
+          }
+          
+          // No sandbox attribute, allow it
           return false;
+          
         } catch (e) {
-          // Only block if not in CodePen
-          return !isCodePen;
+          // If we can't access frameElement, assume it's sandboxed
+          console.log('Cannot access frameElement - assuming sandboxed');
+          return true;
         }
       } catch (e) {
-        console.log('Sandbox check error:', e);
-        // If we can't determine, default to allowing
-        return false;
+        console.log('Error in sandbox check:', e);
+        return true;  // Error case - safer to assume it's sandboxed
       }
     };
 
