@@ -79,7 +79,7 @@ export default function Player({
           // Check if the iframe is sandboxed and does not allow scripts
           const sandboxAttribute = window.frameElement?.getAttribute('sandbox') || '';
           return window.self !== window.top && 
-            !sandboxAttribute.includes('allow-scripts');
+            sandboxAttribute.length > 0;
         }
       } catch (e) {
         return false;
