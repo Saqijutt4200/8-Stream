@@ -67,8 +67,8 @@ export default function Player({
     const detectSandbox = () => {
       try {
         // Modern browser detection
-        if ('sandbox' in document) {
-          return document.sandbox?.length > 0;
+        if ('sandbox' in document && document.sandbox) {
+          return document.sandbox.length > 0;
         }
         
         // Fallback for older browsers
