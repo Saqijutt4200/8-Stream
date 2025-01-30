@@ -56,33 +56,12 @@ export default function Player({
   // NEW: Effect to detect mobile devices
   useEffect(() => {
     
+    // Simplified sandbox detection using document.sandbox
     const detectSandbox = () => {
       try {
-        // If we're not in an iframe at all, we're definitely not sandboxed
-        if (window === window.parent) {
-          return false;
-        }
-    
-        // Try to access frameElement
-        if (window.frameElement) {
-          // Only return sandbox UI if there's actually a sandbox attribute
-          if (window.frameElement.hasAttribute('sandbox')) {
-            return true;
-          }
-          return false;
-        }
-    
-        // For cross-origin iframes, try to access parent location
-        try {
-          window.parent.location.href;
-          return false; // If we can access parent, we're not sandboxed
-        } catch (e) {
-          // For cross-origin iframes without sandbox, we still want to allow them
-          // Only block if we specifically detect a sandbox attribute
-          return false;
-        }
+        // Check if any sandbox restrictions are applied
+        return document.sandbox && document.sandbox.length > 0;
       } catch (e) {
-        // If we can't determine sandbox status, allow the embed
         return false;
       }
     };
