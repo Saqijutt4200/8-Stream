@@ -58,30 +58,34 @@ export default function Player({
     if (!artRef.current) {
       return;
     }
-    const checkSandbox = () => {
+    const detectSandbox = () => {
       try {
-        // If we can access frameElement, check for sandbox
-        if (window.frameElement) {
-          // If there's a sandbox attribute, block it
-          return window.frameElement.hasAttribute('sandbox');
-        }
-        
-        // If we can't access frameElement but we're in an iframe,
-        // assume it's sandboxed for safety
+        // Check if we're in an iframe
         if (window !== window.parent) {
-          return true;
+          // Try to access frameElement
+          const frame = window.frameElement;
+          if (frame && frame.hasAttribute('sandbox')) {
+            return true;
+          }
+          
+          // Additional check for cross-origin iframes
+          try {
+            // This will throw if cross-origin
+            window.parent.location.href;
+            return false;
+          } catch (e) {
+            // If we can't access parent, assume it's sandboxed for security
+            return true;
+          }
         }
-        
-        // Not in an iframe at all
         return false;
       } catch (e) {
-        // If we get a security error trying to access frameElement,
-        // it means we're probably sandboxed
+        // If we get a security error accessing frameElement, we're likely sandboxed
         return true;
       }
     };
 
-    const sandboxed = checkSandbox();
+    const sandboxed = detectSandbox();
     setIsSandboxed(sandboxed);
 
     if (!sandboxed) {
