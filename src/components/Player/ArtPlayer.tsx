@@ -65,35 +65,27 @@ export default function Player({
     // Replace the existing detectSandbox function with this updated version
     const detectSandbox = (): boolean => {
       try {
-        // Check if we're in an iframe
-        if (window !== window.parent) {
-          // Get the current frame element
+        // First check: Are we in an iframe?
+        const isInIframe = window !== window.parent;
+        
+        if (isInIframe) {
+          // We are in an iframe, check for sandbox attribute
           const currentFrame = window.frameElement as HTMLIFrameElement | null;
-
+          
           if (currentFrame) {
-            // First check: if no sandbox attribute, allow video (return false)
-            if (currentFrame.hasAttribute("sandbox")) {
-              console.log("No sandbox attribute - allowing video");
-              return true;
-            } else{
-              return false
-            }
-          }
-
-          // Cross-origin iframe detection remains unchanged
-          try {
-            window.parent.location.href;
-            return false; // Can access parent, likely not sandboxed
-          } catch (e) {
-            console.log("Cross-origin iframe detected");
-            return true;
+            // Check if sandbox attribute exists (regardless of its values)
+            const hasSandbox = currentFrame.hasAttribute('sandbox');
+            console.log('Iframe detected with sandbox:', hasSandbox);
+            return hasSandbox; // true = show sandbox message, false = play video
           }
         }
-
-        return false; // Not in an iframe
+        
+        // Not in iframe or other cases - play video
+        return false;
+        
       } catch (error) {
-        console.error("Sandbox detection error:", error);
-        return false; // Default to non-sandboxed if detection fails
+        console.error('Sandbox detection error:', error);
+        return false; // Default to allowing video on errors
       }
     };
 
