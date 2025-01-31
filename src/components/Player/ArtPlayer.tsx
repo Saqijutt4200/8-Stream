@@ -65,20 +65,21 @@ export default function Player({
     
     // Simplified sandbox detection using document.sandbox
     // Enhanced sandbox detection function
-const detectSandbox = () => {
+const detectSandbox = (): boolean => {
   try {
     // Check if we're in an iframe
     if (window !== window.parent) {
       // Check for sandbox attribute on the iframe
-      const currentFrame = window.frameElement;
+      const currentFrame = window.frameElement as HTMLIFrameElement | null;
       
       if (currentFrame) {
         // Explicit sandbox attribute check
         const isSandboxed = currentFrame.hasAttribute('sandbox');
         
         // Additional sandbox content restriction check
-        const sandboxValue = currentFrame.getAttribute('sandbox');
-        const hasRestrictiveContent = sandboxValue && 
+        const sandboxValue = currentFrame.getAttribute('sandbox') || '';
+        const hasRestrictiveContent = 
+          sandboxValue.length > 0 && 
           (sandboxValue.includes('allow-scripts') === false ||
            sandboxValue.includes('allow-same-origin') === false);
         
@@ -107,7 +108,7 @@ const detectSandbox = () => {
 };
 
     const sandboxed = detectSandbox();
-    setIsSandboxed(sandboxed);
+    setIsSandboxed(Boolean(sandboxed));
     console.log(`Final sandbox status: ${sandboxed}`);
 
     if (!sandboxed) {
