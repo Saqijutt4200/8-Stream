@@ -65,36 +65,60 @@ export default function Player({
     
     // Simplified sandbox detection using document.sandbox
     // Enhanced sandbox detection function
+// Replace the existing detectSandbox function with this updated version
 const detectSandbox = (): boolean => {
   try {
     // Check if we're in an iframe
     if (window !== window.parent) {
-      // Check for sandbox attribute on the iframe
+      // Get the current frame element
       const currentFrame = window.frameElement as HTMLIFrameElement | null;
       
       if (currentFrame) {
-        // Explicit sandbox attribute check
-        const isSandboxed = currentFrame.hasAttribute('sandbox');
+        // First check: if no sandbox attribute, allow video (return false)
+        if (!currentFrame.hasAttribute('sandbox')) {
+          console.log('No sandbox attribute - allowing video');
+          return false;
+        }
         
-        // Additional sandbox content restriction check
+        // Get sandbox value for permission checking
         const sandboxValue = currentFrame.getAttribute('sandbox') || '';
-        const hasRestrictiveContent = 
-          sandboxValue.length > 0 && 
-          (sandboxValue.includes('allow-scripts') === false ||
-           sandboxValue.includes('allow-same-origin') === false);
+        const permissions = sandboxValue.split(' ');
         
-        console.log(`Sandbox detected: ${isSandboxed}`);
-        console.log(`Restrictive sandbox: ${hasRestrictiveContent}`);
+        // MODIFIED LOGIC STARTS HERE
+        // Case 1: Only "allow-scripts" - show sandbox message
+        if (permissions.length === 1 && permissions.includes('allow-scripts')) {
+          console.log('Only allow-scripts detected - showing sandbox message');
+          return true;
+        }
         
-        return isSandboxed || hasRestrictiveContent;
+        // Case 2: "allow-scripts allow-same-origin" - show sandbox message
+        if (permissions.length === 2 && 
+            permissions.includes('allow-scripts') && 
+            permissions.includes('allow-same-origin')) {
+          console.log('allow-scripts and allow-same-origin detected - showing sandbox message');
+          return true;
+        }
+        
+        // Case 3: "allow-scripts allow-same-origin allow-presentation" - show sandbox message
+        if (permissions.length === 3 && 
+            permissions.includes('allow-scripts') && 
+            permissions.includes('allow-same-origin') && 
+            permissions.includes('allow-presentation')) {
+          console.log('Full sandbox permissions detected - showing sandbox message');
+          return true;
+        }
+        
+        // Any other sandbox configuration - show sandbox message
+        console.log('Other sandbox configuration detected - showing sandbox message');
+        return true;
+        // MODIFIED LOGIC ENDS HERE
       }
       
-      // Cross-origin iframe detection
+      // Cross-origin iframe detection remains unchanged
       try {
         window.parent.location.href;
         return false; // Can access parent, likely not sandboxed
       } catch (e) {
-        // Cross-origin restrictions might indicate sandbox
         console.log('Cross-origin iframe detected');
         return true;
       }
