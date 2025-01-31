@@ -64,40 +64,47 @@ export default function Player({
   useEffect(() => {
     
     // Simplified sandbox detection using document.sandbox
-    const detectSandbox = () => {
-      try {
-        console.log("Checking sandbox status...");
-        // If we're not in an iframe at all, we're definitely not sandboxed
-        if (window === window.parent) {
-          console.log("Not in iframe - sandbox status: false");
-          return false;
-        }
-    
-        // Try to access frameElement
-        if (window.frameElement) {
-          const hasSandbox = window.frameElement.hasAttribute('sandbox');
-      console.log(`Frame element detected - sandbox status: ${hasSandbox}`);
-      return hasSandbox;
-        }
-    
-        // For cross-origin iframes, try to access parent location
-        try {
-          window.parent.location.href;
-          console.log("Can access parent location - sandbox status: false");
-          return false; // If we can access parent, we're not sandboxed
-        } catch (e) {
-          // For cross-origin iframes without sandbox, we still want to allow them
-          // Only block if we specifically detect a sandbox attribute
-          console.log("Cross-origin iframe detected - sandbox status: false");
-          return false;
-        }
-      } catch (e) {
-        // If we can't determine sandbox status, allow the embed
-        console.log("Error detecting sandbox status:", e);
-        console.log("Defaulting to sandbox status: false");
-        return false;
+    // Enhanced sandbox detection function
+const detectSandbox = () => {
+  try {
+    // Check if we're in an iframe
+    if (window !== window.parent) {
+      // Check for sandbox attribute on the iframe
+      const currentFrame = window.frameElement;
+      
+      if (currentFrame) {
+        // Explicit sandbox attribute check
+        const isSandboxed = currentFrame.hasAttribute('sandbox');
+        
+        // Additional sandbox content restriction check
+        const sandboxValue = currentFrame.getAttribute('sandbox');
+        const hasRestrictiveContent = sandboxValue && 
+          (sandboxValue.includes('allow-scripts') === false ||
+           sandboxValue.includes('allow-same-origin') === false);
+        
+        console.log(`Sandbox detected: ${isSandboxed}`);
+        console.log(`Restrictive sandbox: ${hasRestrictiveContent}`);
+        
+        return isSandboxed || hasRestrictiveContent;
       }
-    };
+      
+      // Cross-origin iframe detection
+      try {
+        window.parent.location.href;
+        return false; // Can access parent, likely not sandboxed
+      } catch (e) {
+        // Cross-origin restrictions might indicate sandbox
+        console.log('Cross-origin iframe detected');
+        return true;
+      }
+    }
+    
+    return false; // Not in an iframe
+  } catch (error) {
+    console.error('Sandbox detection error:', error);
+    return false; // Default to non-sandboxed if detection fails
+  }
+};
 
     const sandboxed = detectSandbox();
     setIsSandboxed(sandboxed);
