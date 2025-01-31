@@ -7,9 +7,8 @@ import Hls from "hls.js";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
-
- // Define the level type
- interface HLSLevel {
+// Define the level type
+interface HLSLevel {
   height: number;
   width: number;
   bitrate: number;
@@ -28,7 +27,6 @@ declare global {
     sandbox?: DOMTokenList;
   }
 }
-
 
 // Extend Window interface to support custom property
 declare global {
@@ -62,74 +60,42 @@ export default function Player({
 
   // NEW: Effect to detect mobile devices
   useEffect(() => {
-    
     // Simplified sandbox detection using document.sandbox
     // Enhanced sandbox detection function
-// Replace the existing detectSandbox function with this updated version
-const detectSandbox = (): boolean => {
-  try {
-    // Check if we're in an iframe
-    if (window !== window.parent) {
-      // Get the current frame element
-      const currentFrame = window.frameElement as HTMLIFrameElement | null;
-      
-      if (currentFrame) {
-        // First check: if no sandbox attribute, allow video (return false)
-        if (!currentFrame.hasAttribute('sandbox')) {
-          console.log('No sandbox attribute - allowing video');
-          return false;
-        }
-        
-        // Get sandbox value for permission checking
-        const sandboxValue = currentFrame.getAttribute('sandbox') || '';
-        const permissions = sandboxValue.split(' ');
-        
-        // MODIFIED LOGIC STARTS HERE
-        // Case 1: Only "allow-scripts" - show sandbox message
-        if (permissions.length === 1 && permissions.includes('allow-scripts')) {
-          console.log('Only allow-scripts detected - showing sandbox message');
-          return true;
-        }
-        
-        // Case 2: "allow-scripts allow-same-origin" - show sandbox message
-        if (permissions.length === 2 && 
-            permissions.includes('allow-scripts') && 
-            permissions.includes('allow-same-origin')) {
-          console.log('allow-scripts and allow-same-origin detected - showing sandbox message');
-          return true;
-        }
-        
-        // Case 3: "allow-scripts allow-same-origin allow-presentation" - show sandbox message
-        if (permissions.length === 3 && 
-            permissions.includes('allow-scripts') && 
-            permissions.includes('allow-same-origin') && 
-            permissions.includes('allow-presentation')) {
-          console.log('Full sandbox permissions detected - showing sandbox message');
-          return true;
-        }
-        
-        // Any other sandbox configuration - show sandbox message
-        console.log('Other sandbox configuration detected - showing sandbox message');
-        return true;
-        // MODIFIED LOGIC ENDS HERE
-      }
-      
-      // Cross-origin iframe detection remains unchanged
+    // Replace the existing detectSandbox function with this updated version
+    const detectSandbox = (): boolean => {
       try {
-        window.parent.location.href;
-        return false; // Can access parent, likely not sandboxed
-      } catch (e) {
-        console.log('Cross-origin iframe detected');
-        return true;
+        // Check if we're in an iframe
+        if (window !== window.parent) {
+          // Get the current frame element
+          const currentFrame = window.frameElement as HTMLIFrameElement | null;
+
+          if (currentFrame) {
+            // First check: if no sandbox attribute, allow video (return false)
+            if (currentFrame.hasAttribute("sandbox")) {
+              console.log("No sandbox attribute - allowing video");
+              return true;
+            } else{
+              return false
+            }
+          }
+
+          // Cross-origin iframe detection remains unchanged
+          try {
+            window.parent.location.href;
+            return false; // Can access parent, likely not sandboxed
+          } catch (e) {
+            console.log("Cross-origin iframe detected");
+            return true;
+          }
+        }
+
+        return false; // Not in an iframe
+      } catch (error) {
+        console.error("Sandbox detection error:", error);
+        return false; // Default to non-sandboxed if detection fails
       }
-    }
-    
-    return false; // Not in an iframe
-  } catch (error) {
-    console.error('Sandbox detection error:', error);
-    return false; // Default to non-sandboxed if detection fails
-  }
-};
+    };
 
     const sandboxed = detectSandbox();
     setIsSandboxed(Boolean(sandboxed));
@@ -221,7 +187,7 @@ const detectSandbox = (): boolean => {
               },
               {
                 html: "1080P",
-                
+
                 value: "1080p",
               },
             ],
@@ -229,19 +195,21 @@ const detectSandbox = (): boolean => {
               // Get quality levels from HLS
               const levels = art.hls.levels;
               if (!levels || levels.length === 0) return item.html;
-        
+
               // Find the closest matching quality level
-              const selectedLevel = levels.reduce((prev: HLSLevel, curr: HLSLevel, index: number) => {
-                const prevDiff = Math.abs(prev.height - item.value);
-                const currDiff = Math.abs(curr.height - item.value);
-                return currDiff < prevDiff ? { ...curr, index } : prev;
-              }, { ...levels[0], index: 0 });
-        
+              const selectedLevel = levels.reduce(
+                (prev: HLSLevel, curr: HLSLevel, index: number) => {
+                  const prevDiff = Math.abs(prev.height - item.value);
+                  const currDiff = Math.abs(curr.height - item.value);
+                  return currDiff < prevDiff ? { ...curr, index } : prev;
+                },
+                { ...levels[0], index: 0 }
+              );
+
               art.hls.currentLevel = selectedLevel.index;
               return item.html;
             },
           },
-         
         ],
         container: artRef.current!,
         layers: [
@@ -264,9 +232,9 @@ const detectSandbox = (): boolean => {
               console.info("mounted", args);
             },
           },
-          
+
           {
-            name: 'languageSelector',
+            name: "languageSelector",
             html: `
               <div class="language-selector" style="
                 position: absolute;
@@ -286,7 +254,7 @@ const detectSandbox = (): boolean => {
                   align-items: center;
                   gap: 4px;
                 ">
-                  <span>${availableLang[0] || 'Select Language'}</span>
+                  <span>${availableLang[0] || "Select Language"}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9l6 6 6-6"/>
                   </svg>
@@ -301,7 +269,9 @@ const detectSandbox = (): boolean => {
                   margin-top: 4px;
                   min-width: 100px;
                 ">
-                  ${availableLang.map((lang: string) => `
+                  ${availableLang
+                    .map(
+                      (lang: string) => `
                     <div class="lang-option" data-value="${lang}" style="
                       color: white;
                       padding: 8px 12px;
@@ -311,68 +281,81 @@ const detectSandbox = (): boolean => {
                     ">
                       ${lang}
                     </div>
-                  `).join('')}
+                  `
+                    )
+                    .join("")}
                 </div>
               </div>
             `,
-            click: function(_, event) {
+            click: function (_, event) {
               const target = event.target as HTMLElement;
-              const selector = target.closest('.language-selector');
-              const option = target.closest('.lang-option');
-              
+              const selector = target.closest(".language-selector");
+              const option = target.closest(".lang-option");
+
               if (selector) {
-                const options = selector.querySelector('.lang-options') as HTMLElement;
+                const options = selector.querySelector(
+                  ".lang-options"
+                ) as HTMLElement;
                 if (options) {
-                  const isHidden = options.style.display === 'none';
-                  options.style.display = isHidden ? 'block' : 'none';
+                  const isHidden = options.style.display === "none";
+                  options.style.display = isHidden ? "block" : "none";
                 }
               }
-              
+
               if (option && onLanguageChange) {
-                const value = option.getAttribute('data-value');
+                const value = option.getAttribute("data-value");
                 if (value) {
                   //setCurrentLang(value);
                   onLanguageChange(value);
-                  const currentLang = selector?.querySelector('.current-lang span') as HTMLElement;
+                  const currentLang = selector?.querySelector(
+                    ".current-lang span"
+                  ) as HTMLElement;
                   if (currentLang) {
                     currentLang.textContent = value;
                   }
-                  const options = selector?.querySelector('.lang-options') as HTMLElement;
+                  const options = selector?.querySelector(
+                    ".lang-options"
+                  ) as HTMLElement;
                   if (options) {
-                    options.style.display = 'none';
+                    options.style.display = "none";
                   }
                 }
               }
             },
-            mounted: function(layer) {
+            mounted: function (layer) {
               // Add hover effects
-              const selector = layer.querySelector('.language-selector') as HTMLElement;
+              const selector = layer.querySelector(
+                ".language-selector"
+              ) as HTMLElement;
               if (selector) {
-                selector.addEventListener('mouseenter', () => {
-                  selector.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                selector.addEventListener("mouseenter", () => {
+                  selector.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
                 });
-                selector.addEventListener('mouseleave', () => {
-                  selector.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-                  const options = selector.querySelector('.lang-options') as HTMLElement;
+                selector.addEventListener("mouseleave", () => {
+                  selector.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                  const options = selector.querySelector(
+                    ".lang-options"
+                  ) as HTMLElement;
                   if (options) {
-                    options.style.display = 'none';
+                    options.style.display = "none";
                   }
                 });
-                
+
                 // Add hover effect for options
-                const options = selector.querySelectorAll('.lang-option');
-                options.forEach(option => {
+                const options = selector.querySelectorAll(".lang-option");
+                options.forEach((option) => {
                   const optionElement = option as HTMLElement;
-                  optionElement.addEventListener('mouseenter', () => {
-                    optionElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  optionElement.addEventListener("mouseenter", () => {
+                    optionElement.style.backgroundColor =
+                      "rgba(255, 255, 255, 0.1)";
                   });
-                  optionElement.addEventListener('mouseleave', () => {
-                    optionElement.style.backgroundColor = 'transparent';
+                  optionElement.addEventListener("mouseleave", () => {
+                    optionElement.style.backgroundColor = "transparent";
                   });
                 });
               }
-            }
-          }
+            },
+          },
         ],
         plugins: [],
         customType: {
@@ -382,11 +365,11 @@ const detectSandbox = (): boolean => {
               const hls = new Hls({
                 debug: true, // Enable debug logs
               });
-              
+
               // Add error handling
               hls.on(Hls.Events.ERROR, function (event, data) {
                 if (data.fatal) {
-                  console.error('HLS error:', data);
+                  console.error("HLS error:", data);
                   switch (data.type) {
                     case Hls.ErrorTypes.NETWORK_ERROR:
                       console.log("Network error - attempting to recover...");
@@ -404,68 +387,67 @@ const detectSandbox = (): boolean => {
                   }
                 }
               });
-        
+
               // Add loading state handler
               hls.on(Hls.Events.MANIFEST_LOADING, () => {
-                console.log('Loading manifest from URL:', url);
+                console.log("Loading manifest from URL:", url);
               });
-        
+
               hls.on(Hls.Events.MANIFEST_LOADED, () => {
-                console.log('Manifest loaded successfully');
+                console.log("Manifest loaded successfully");
               });
-        
+
               try {
                 hls.loadSource(url);
                 hls.attachMedia(video);
                 art.hls = hls;
-                
+
                 // Add event listener for level loading
                 hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
-                  console.log('Available levels:', hls.levels);
-                  
+                  console.log("Available levels:", hls.levels);
+
                   if (hls.levels.length > 0) {
                     const standardQualities: QualityLevel[] = [
                       { height: 1080, html: "1080P" },
                       { height: 720, html: "720P" },
                       { height: 480, html: "480P" },
                       { height: 360, html: "360P" },
-                      { height: 240, html: "240P" }
+                      { height: 240, html: "240P" },
                     ];
                     // Filter available qualities to closest matching standard qualities
-    const availableQualities = standardQualities
-    .filter(sq => {
-      // Only include qualities that have a reasonably close match
-      return hls.levels.some(level => 
-        Math.abs(level.height - sq.height) < 100
-      );
-    })
-    .map(sq => ({
-      html: sq.html,
-      value: sq.height,
-      default: sq.height === 1080 // Set 1080P as default if available
-    }));
+                    const availableQualities = standardQualities
+                      .filter((sq) => {
+                        // Only include qualities that have a reasonably close match
+                        return hls.levels.some(
+                          (level) => Math.abs(level.height - sq.height) < 100
+                        );
+                      })
+                      .map((sq) => ({
+                        html: sq.html,
+                        value: sq.height,
+                        default: sq.height === 1080, // Set 1080P as default if available
+                      }));
 
-  // If 1080P is not available, set the highest available quality as default
-  if (!availableQualities.some(q => q.default)) {
-    availableQualities[0].default = true;
-  }
-                    
+                    // If 1080P is not available, set the highest available quality as default
+                    if (!availableQualities.some((q) => q.default)) {
+                      availableQualities[0].default = true;
+                    }
+
                     // Update the quality selector options
                     art.setting.update({
-                      name: 'quality',
+                      name: "quality",
                       selector: availableQualities,
                     });
                   }
                 });
-        
+
                 art.on("destroy", () => {
                   console.log("Destroying HLS instance");
                   hls.destroy();
                 });
-        
               } catch (error) {
-                console.error('Error setting up HLS:', error);
-                art.notice.show = 'Failed to load video source';
+                console.error("Error setting up HLS:", error);
+                art.notice.show = "Failed to load video source";
               }
             } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
               // Fallback for Safari
@@ -474,10 +456,8 @@ const detectSandbox = (): boolean => {
               art.notice.show = "Unsupported playback format: m3u8";
             }
           },
-        }
+        },
       });
-
-     
 
       art.on("ready", () => {
         art.play();
@@ -542,7 +522,7 @@ const detectSandbox = (): boolean => {
       });
 
       //art.controls.remove("playAndPause");
-      
+
       if (sub?.length > 0) {
         art.controls.add({
           name: "subtitle",
