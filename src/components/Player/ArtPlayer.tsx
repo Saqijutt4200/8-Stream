@@ -67,13 +67,7 @@ export default function Player({
       try {
         const frame = window.frameElement;
         if (frame?.hasAttribute('sandbox')) {
-          const sandboxAttributes = frame.getAttribute('sandbox') || '';
-          const forbiddenSandboxFlags = ['allow-scripts', 'allow-same-origin'];
-          
-          // Block if any disallowed sandbox flags are found
-          sandboxed = forbiddenSandboxFlags.some(flag =>
-            sandboxAttributes.includes(flag)
-          );
+          sandboxed = true;
         }
       } catch (error) {
         sandboxed = true; // Assume sandboxed if access throws due to security
