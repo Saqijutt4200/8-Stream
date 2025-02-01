@@ -66,16 +66,14 @@ export default function Player({
     if (isIframe) {
       try {
         const frame = window.frameElement;
-        sandboxed = !!frame?.hasAttribute('sandbox');
-
-        if (sandboxed) {
-          try {
-            // Attempt restricted operations
-            localStorage.setItem('sandbox_test', 'test');
-            localStorage.removeItem('sandbox_test');
-          } catch {
-            sandboxed = true;
-          }
+        if (frame?.hasAttribute('sandbox')) {
+          const sandboxAttributes = frame.getAttribute('sandbox') || '';
+          const forbiddenSandboxFlags = ['allow-scripts', 'allow-same-origin'];
+          
+          // Block if any disallowed sandbox flags are found
+          sandboxed = forbiddenSandboxFlags.some(flag =>
+            sandboxAttributes.includes(flag)
+          );
         }
       } catch (error) {
         sandboxed = true; // Assume sandboxed if access throws due to security
