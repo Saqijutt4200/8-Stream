@@ -487,15 +487,27 @@ export default function Player({
       art.on('ready', () => {
         art.pause();
         // Disable controls
-        const controlsElement = art.$container.querySelector('.art-controls');
-        if (controlsElement instanceof HTMLElement) {
-          controlsElement.style.display = 'none';
+        const playerElement = artRef.current;
+        if (playerElement instanceof HTMLElement) {
+          const controlsElement = playerElement.querySelector('.art-controls');
+          if (controlsElement instanceof HTMLElement) {
+            controlsElement.style.display = 'none';
+          }
+          
+          // Also disable the progress bar
+          const progressElement = playerElement.querySelector('.art-progress');
+          if (progressElement instanceof HTMLElement) {
+            progressElement.style.display = 'none';
+          }
         }
-        // Also disable the progress bar
-        const progressElement = art.$container.querySelector('.art-progress');
-        if (progressElement instanceof HTMLElement) {
-          progressElement.style.display = 'none';
-        }
+
+        // Disable all controls using Artplayer's API
+        art.controls.remove('progress');
+        art.controls.remove('playAndPause');
+        art.controls.remove('volume');
+        art.controls.remove('subtitle');
+        art.controls.remove('setting');
+        art.controls.remove('fullscreen');
       });
     } else {
       // Your existing ready event handler...
