@@ -26,10 +26,8 @@ interface SandboxResult {
   reason?: string;
 }
 
-declare module 'artplayer' {
-  interface Artplayer {
-    hls?: Hls;
-  }
+interface ArtPlayerWithHls extends Artplayer {
+  hls?: Hls;
 }
 
 declare global {
@@ -210,7 +208,7 @@ export default function Player({
   ...rest
 }: {
   option: Option;
-  getInstance?: (art: Artplayer) => void;
+  getInstance?: (art: ArtPlayerWithHls) => void;
   artRef: any;
   sub?: any;
   availableLang?: string[];
@@ -296,7 +294,7 @@ export default function Player({
       return;
     }
 
-    let art = new Artplayer({
+    const art: ArtPlayerWithHls = new Artplayer({
       ...option,
       container,
       settings: [
