@@ -67,45 +67,11 @@ export default function Player({
     if (!artRef.current) {
       return;
     }
-    const checkSandbox = () => {
-      try {
-        // Check if we're in an iframe
-        const isIframe = window !== window.parent;
+  
 
-        // Try to access parent window - will throw error if sandboxed
-        if (!isIframe) {
-          return false;
-        }
+    
 
-        // Get the referrer domain
-        const referrer = document.referrer;
-        const referrerDomain = new URL(referrer).hostname;
-        
-        // Check if the referrer is from an allowed sandbox domain
-        const isAllowedSandbox = ALLOWED_SANDBOX_DOMAINS.some(domain => 
-          referrerDomain.includes(domain)
-        );
-
-        if (isAllowedSandbox) {
-          return false;
-        }
-         // Try to access parent window - will throw error if sandboxed
-         try {
-          window.parent.document;
-          return false;
-        } catch (e) {
-          // If we can't access parent and it's not an allowed sandbox, block it
-          return true;
-        }
-      } catch (e) {
-        return true;
-      }
-    };
-
-    const sandboxed = checkSandbox();
-    setIsSandboxed(sandboxed);
-
-    if (!sandboxed) {
+    
       console.log(posterUrl);
       const storedImageUrl = localStorage.getItem("currentPosterUrl");
       const container = artRef.current;
@@ -549,30 +515,10 @@ export default function Player({
           art?.hls?.destroy();
         }
       };
-    }
+   
   }, [artRef.current]);
 
-  if (isSandboxed) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black/95 z-50">
-        <div className="bg-red-600/20 border-2 border-red-600 rounded-lg p-8 max-w-xl mx-4">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="text-red-500 text-5xl">⚠️</div>
-            <h2 className="text-2xl font-bold text-white">
-            Unauthorized Embed Detected
-            </h2>
-            <p className="text-gray-300">
-              This video player cannot be embedded in sandbox mode for security
-              reasons. Please visit our website directly to watch the content.
-            </p>
-            <div className="text-sm text-gray-400 mt-4">
-              Error Code: SANDBOX_RESTRICTED
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+ 
 
   //
 
