@@ -74,8 +74,10 @@ export default function Player({
       }
     }
 
+    setIsSandboxed(sandboxed);
+
     if (sandboxed) {
-      setIsSandboxed(true);
+      
       artRef.current.innerHTML = `
       <div style="
         display: flex;
@@ -91,7 +93,7 @@ export default function Player({
     `;
       return;
     }
-    if (!sandboxed) {
+
     console.log(posterUrl);
     const storedImageUrl = localStorage.getItem("currentPosterUrl");
     const container = artRef.current;
