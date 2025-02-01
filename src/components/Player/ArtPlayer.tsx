@@ -7,9 +7,8 @@ import Hls from "hls.js";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
-
- // Define the level type
- interface HLSLevel {
+// Define the level type
+interface HLSLevel {
   height: number;
   width: number;
   bitrate: number;
@@ -22,7 +21,6 @@ interface QualityLevel {
   html: string;
 }
 
-
 // Extend Window interface to support custom property
 declare global {
   interface Window {
@@ -30,14 +28,7 @@ declare global {
   }
 }
 
-// Add allowed domains for sandbox environments
-const ALLOWED_SANDBOX_DOMAINS = [
-  'codepen.io',
-  'stackblitz.com',
-  'codesandbox.io',
-  'jsfiddle.net',
-  // Add more trusted domains as needed
-];
+
 
 export default function Player({
   option,
@@ -67,22 +58,22 @@ export default function Player({
     if (!artRef.current) {
       return;
     }
-  
+
     // Detect if the player is inside a sandboxed iframe
-  const isIframe = window.self !== window.top;
-  let sandboxed = false;
+    const isIframe = window.self !== window.top;
+    let sandboxed = false;
 
-  if (isIframe) {
-    try {
-      sandboxed = window.frameElement?.hasAttribute('sandbox') || false;
-    } catch (error) {
-      sandboxed = true; // Assume sandboxed if access throws due to security
+    if (isIframe) {
+      try {
+        sandboxed = window.frameElement?.hasAttribute("sandbox") || false;
+      } catch (error) {
+        sandboxed = true; // Assume sandboxed if access throws due to security
+      }
     }
-  }
 
-  if (sandboxed) {
-    setIsSandboxed(true);
-    artRef.current.innerHTML = `
+    if (sandboxed) {
+      setIsSandboxed(true);
+      artRef.current.innerHTML = `
       <div style="
         display: flex;
         justify-content: center;
@@ -95,23 +86,20 @@ export default function Player({
         Video playback is not allowed in a sandboxed environment.
       </div>
     `;
-    return;
-  }
+      return;
+    }
 
-    
+    console.log(posterUrl);
+    const storedImageUrl = localStorage.getItem("currentPosterUrl");
+    const container = artRef.current;
 
-    
-      console.log(posterUrl);
-      const storedImageUrl = localStorage.getItem("currentPosterUrl");
-      const container = artRef.current;
+    if (!(container instanceof Element)) {
+      console.error("Invalid container element for ArtPlayer");
+      return;
+    }
 
-      if (!(container instanceof Element)) {
-        console.error("Invalid container element for ArtPlayer");
-        return;
-      }
-
-      const style = document.createElement("style");
-      style.textContent = `
+    const style = document.createElement("style");
+    style.textContent = `
       
         
         .art-video-player .art-progress .art-progress-bar {
@@ -165,74 +153,76 @@ export default function Player({
         
     
       `;
-      document.head.appendChild(style);
+    document.head.appendChild(style);
 
-      const art = new Artplayer({
-        ...option,
-        settings: [
-          {
-            html: "Quality",
-            tooltip: "Quality",
-            name: "quality",
-            selector: [
-              {
-                html: "480P",
-                default: true,
-                value: "480p",
-              },
-              {
-                html: "720P",
-                value: "720p",
-              },
-              {
-                html: "1080P",
-                
-                value: "1080p",
-              },
-            ],
-            onSelect: function (item) {
-              // Get quality levels from HLS
-              const levels = art.hls.levels;
-              if (!levels || levels.length === 0) return item.html;
-        
-              // Find the closest matching quality level
-              const selectedLevel = levels.reduce((prev: HLSLevel, curr: HLSLevel, index: number) => {
+    const art = new Artplayer({
+      ...option,
+      settings: [
+        {
+          html: "Quality",
+          tooltip: "Quality",
+          name: "quality",
+          selector: [
+            {
+              html: "480P",
+              default: true,
+              value: "480p",
+            },
+            {
+              html: "720P",
+              value: "720p",
+            },
+            {
+              html: "1080P",
+
+              value: "1080p",
+            },
+          ],
+          onSelect: function (item) {
+            // Get quality levels from HLS
+            const levels = art.hls.levels;
+            if (!levels || levels.length === 0) return item.html;
+
+            // Find the closest matching quality level
+            const selectedLevel = levels.reduce(
+              (prev: HLSLevel, curr: HLSLevel, index: number) => {
                 const prevDiff = Math.abs(prev.height - item.value);
                 const currDiff = Math.abs(curr.height - item.value);
                 return currDiff < prevDiff ? { ...curr, index } : prev;
-              }, { ...levels[0], index: 0 });
-        
-              art.hls.currentLevel = selectedLevel.index;
-              return item.html;
-            },
+              },
+              { ...levels[0], index: 0 }
+            );
+
+            art.hls.currentLevel = selectedLevel.index;
+            return item.html;
           },
-         
-        ],
-        container: artRef.current!,
-        layers: [
-          {
-            name: "poster",
-            html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
-            tooltip: "Poster Tip",
-            style: {
-              position: "absolute",
-              top: "0",
-              right: "0",
-              height: "100%",
-              width: "100%",
-              overflow: "hidden",
-            },
-            click: function (...args) {
-              console.info("click", args);
-            },
-            mounted: function (...args) {
-              console.info("mounted", args);
-            },
+        },
+      ],
+      container: artRef.current!,
+      layers: [
+        {
+          name: "poster",
+          html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
+          tooltip: "Poster Tip",
+          style: {
+            position: "absolute",
+            top: "0",
+            right: "0",
+            height: "100%",
+            width: "100%",
+            overflow: "hidden",
           },
-          
-          {
-            name: 'languageSelector',
-            html: `
+          click: function (...args) {
+            console.info("click", args);
+          },
+          mounted: function (...args) {
+            console.info("mounted", args);
+          },
+        },
+
+        {
+          name: "languageSelector",
+          html: `
               <div class="language-selector" style="
                 position: absolute;
                 top: 20px;
@@ -251,7 +241,7 @@ export default function Player({
                   align-items: center;
                   gap: 4px;
                 ">
-                  <span>${availableLang[0] || 'Select Language'}</span>
+                  <span>${availableLang[0] || "Select Language"}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9l6 6 6-6"/>
                   </svg>
@@ -266,7 +256,9 @@ export default function Player({
                   margin-top: 4px;
                   min-width: 100px;
                 ">
-                  ${availableLang.map((lang: string) => `
+                  ${availableLang
+                    .map(
+                      (lang: string) => `
                     <div class="lang-option" data-value="${lang}" style="
                       color: white;
                       padding: 8px 12px;
@@ -276,280 +268,306 @@ export default function Player({
                     ">
                       ${lang}
                     </div>
-                  `).join('')}
+                  `
+                    )
+                    .join("")}
                 </div>
               </div>
             `,
-            click: function(_, event) {
-              const target = event.target as HTMLElement;
-              const selector = target.closest('.language-selector');
-              const option = target.closest('.lang-option');
-              
-              if (selector) {
-                const options = selector.querySelector('.lang-options') as HTMLElement;
+          click: function (_, event) {
+            const target = event.target as HTMLElement;
+            const selector = target.closest(".language-selector");
+            const option = target.closest(".lang-option");
+
+            if (selector) {
+              const options = selector.querySelector(
+                ".lang-options"
+              ) as HTMLElement;
+              if (options) {
+                const isHidden = options.style.display === "none";
+                options.style.display = isHidden ? "block" : "none";
+              }
+            }
+
+            if (option && onLanguageChange) {
+              const value = option.getAttribute("data-value");
+              if (value) {
+                //setCurrentLang(value);
+                onLanguageChange(value);
+                const currentLang = selector?.querySelector(
+                  ".current-lang span"
+                ) as HTMLElement;
+                if (currentLang) {
+                  currentLang.textContent = value;
+                }
+                const options = selector?.querySelector(
+                  ".lang-options"
+                ) as HTMLElement;
                 if (options) {
-                  const isHidden = options.style.display === 'none';
-                  options.style.display = isHidden ? 'block' : 'none';
+                  options.style.display = "none";
                 }
-              }
-              
-              if (option && onLanguageChange) {
-                const value = option.getAttribute('data-value');
-                if (value) {
-                  //setCurrentLang(value);
-                  onLanguageChange(value);
-                  const currentLang = selector?.querySelector('.current-lang span') as HTMLElement;
-                  if (currentLang) {
-                    currentLang.textContent = value;
-                  }
-                  const options = selector?.querySelector('.lang-options') as HTMLElement;
-                  if (options) {
-                    options.style.display = 'none';
-                  }
-                }
-              }
-            },
-            mounted: function(layer) {
-              // Add hover effects
-              const selector = layer.querySelector('.language-selector') as HTMLElement;
-              if (selector) {
-                selector.addEventListener('mouseenter', () => {
-                  selector.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-                });
-                selector.addEventListener('mouseleave', () => {
-                  selector.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-                  const options = selector.querySelector('.lang-options') as HTMLElement;
-                  if (options) {
-                    options.style.display = 'none';
-                  }
-                });
-                
-                // Add hover effect for options
-                const options = selector.querySelectorAll('.lang-option');
-                options.forEach(option => {
-                  const optionElement = option as HTMLElement;
-                  optionElement.addEventListener('mouseenter', () => {
-                    optionElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  });
-                  optionElement.addEventListener('mouseleave', () => {
-                    optionElement.style.backgroundColor = 'transparent';
-                  });
-                });
               }
             }
+          },
+          mounted: function (layer) {
+            // Add hover effects
+            const selector = layer.querySelector(
+              ".language-selector"
+            ) as HTMLElement;
+            if (selector) {
+              selector.addEventListener("mouseenter", () => {
+                selector.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+              });
+              selector.addEventListener("mouseleave", () => {
+                selector.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                const options = selector.querySelector(
+                  ".lang-options"
+                ) as HTMLElement;
+                if (options) {
+                  options.style.display = "none";
+                }
+              });
+
+              // Add hover effect for options
+              const options = selector.querySelectorAll(".lang-option");
+              options.forEach((option) => {
+                const optionElement = option as HTMLElement;
+                optionElement.addEventListener("mouseenter", () => {
+                  optionElement.style.backgroundColor =
+                    "rgba(255, 255, 255, 0.1)";
+                });
+                optionElement.addEventListener("mouseleave", () => {
+                  optionElement.style.backgroundColor = "transparent";
+                });
+              });
+            }
+          },
+        },
+      ],
+      plugins: [],
+      customType: {
+        m3u8: function playM3u8(video, url, art) {
+          if (Hls.isSupported()) {
+            if (art.hls) art.hls.destroy();
+            const hls = new Hls({
+              debug: true, // Enable debug logs
+            });
+
+            // Add error handling
+            hls.on(Hls.Events.ERROR, function (event, data) {
+              if (data.fatal) {
+                console.error("HLS error:", data);
+                switch (data.type) {
+                  case Hls.ErrorTypes.NETWORK_ERROR:
+                    console.log("Network error - attempting to recover...");
+                    hls.startLoad();
+                    break;
+                  case Hls.ErrorTypes.MEDIA_ERROR:
+                    console.log("Media error - attempting to recover...");
+                    hls.recoverMediaError();
+                    break;
+                  default:
+                    // Cannot recover
+                    hls.destroy();
+                    art.notice.show = `Playback error: ${data.type}`;
+                    break;
+                }
+              }
+            });
+
+            // Add loading state handler
+            hls.on(Hls.Events.MANIFEST_LOADING, () => {
+              console.log("Loading manifest from URL:", url);
+            });
+
+            hls.on(Hls.Events.MANIFEST_LOADED, () => {
+              console.log("Manifest loaded successfully");
+            });
+
+            try {
+              hls.loadSource(url);
+              hls.attachMedia(video);
+              art.hls = hls;
+
+              // Add event listener for level loading
+              hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
+                console.log("Available levels:", hls.levels);
+
+                if (hls.levels.length > 0) {
+                  const standardQualities: QualityLevel[] = [
+                    { height: 1080, html: "1080P" },
+                    { height: 720, html: "720P" },
+                    { height: 480, html: "480P" },
+                    { height: 360, html: "360P" },
+                    { height: 240, html: "240P" },
+                  ];
+                  // Filter available qualities to closest matching standard qualities
+                  const availableQualities = standardQualities
+                    .filter((sq) => {
+                      // Only include qualities that have a reasonably close match
+                      return hls.levels.some(
+                        (level) => Math.abs(level.height - sq.height) < 100
+                      );
+                    })
+                    .map((sq) => ({
+                      html: sq.html,
+                      value: sq.height,
+                      default: sq.height === 1080, // Set 1080P as default if available
+                    }));
+
+                  // If 1080P is not available, set the highest available quality as default
+                  if (!availableQualities.some((q) => q.default)) {
+                    availableQualities[0].default = true;
+                  }
+
+                  // Update the quality selector options
+                  art.setting.update({
+                    name: "quality",
+                    selector: availableQualities,
+                  });
+                }
+              });
+
+              art.on("destroy", () => {
+                console.log("Destroying HLS instance");
+                hls.destroy();
+              });
+            } catch (error) {
+              console.error("Error setting up HLS:", error);
+              art.notice.show = "Failed to load video source";
+            }
+          } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+            // Fallback for Safari
+            video.src = url;
+          } else {
+            art.notice.show = "Unsupported playback format: m3u8";
           }
-        ],
-        plugins: [],
-        customType: {
-          m3u8: function playM3u8(video, url, art) {
-            if (Hls.isSupported()) {
-              if (art.hls) art.hls.destroy();
-              const hls = new Hls({
-                debug: true, // Enable debug logs
-              });
-              
-              // Add error handling
-              hls.on(Hls.Events.ERROR, function (event, data) {
-                if (data.fatal) {
-                  console.error('HLS error:', data);
-                  switch (data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                      console.log("Network error - attempting to recover...");
-                      hls.startLoad();
-                      break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                      console.log("Media error - attempting to recover...");
-                      hls.recoverMediaError();
-                      break;
-                    default:
-                      // Cannot recover
-                      hls.destroy();
-                      art.notice.show = `Playback error: ${data.type}`;
-                      break;
-                  }
-                }
-              });
-        
-              // Add loading state handler
-              hls.on(Hls.Events.MANIFEST_LOADING, () => {
-                console.log('Loading manifest from URL:', url);
-              });
-        
-              hls.on(Hls.Events.MANIFEST_LOADED, () => {
-                console.log('Manifest loaded successfully');
-              });
-        
-              try {
-                hls.loadSource(url);
-                hls.attachMedia(video);
-                art.hls = hls;
-                
-                // Add event listener for level loading
-                hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
-                  console.log('Available levels:', hls.levels);
-                  
-                  if (hls.levels.length > 0) {
-                    const standardQualities: QualityLevel[] = [
-                      { height: 1080, html: "1080P" },
-                      { height: 720, html: "720P" },
-                      { height: 480, html: "480P" },
-                      { height: 360, html: "360P" },
-                      { height: 240, html: "240P" }
-                    ];
-                    // Filter available qualities to closest matching standard qualities
-    const availableQualities = standardQualities
-    .filter(sq => {
-      // Only include qualities that have a reasonably close match
-      return hls.levels.some(level => 
-        Math.abs(level.height - sq.height) < 100
-      );
-    })
-    .map(sq => ({
-      html: sq.html,
-      value: sq.height,
-      default: sq.height === 1080 // Set 1080P as default if available
-    }));
+        },
+      },
+    });
 
-  // If 1080P is not available, set the highest available quality as default
-  if (!availableQualities.some(q => q.default)) {
-    availableQualities[0].default = true;
-  }
-                    
-                    // Update the quality selector options
-                    art.setting.update({
-                      name: 'quality',
-                      selector: availableQualities,
-                    });
-                  }
-                });
-        
-                art.on("destroy", () => {
-                  console.log("Destroying HLS instance");
-                  hls.destroy();
-                });
-        
-              } catch (error) {
-                console.error('Error setting up HLS:', error);
-                art.notice.show = 'Failed to load video source';
-              }
-            } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-              // Fallback for Safari
-              video.src = url;
-            } else {
-              art.notice.show = "Unsupported playback format: m3u8";
-            }
-          },
-        }
-      });
+    art.on("ready", () => {
+      art.play();
+      art.forward = 10;
+      art.backward = 10;
+    });
+    if (getInstance && typeof getInstance === "function") {
+      getInstance(art);
+    }
+    art.events.proxy(document, "keypress", (event: any) => {
+      // Check if the focus is on an input field or textarea
+      const isInputFocused =
+        document?.activeElement?.tagName === "INPUT" ||
+        document?.activeElement?.tagName === "TEXTAREA";
 
-     
-
-      art.on("ready", () => {
-        art.play();
-        art.forward = 10;
-        art.backward = 10;
-      });
-      if (getInstance && typeof getInstance === "function") {
-        getInstance(art);
+      if (!isInputFocused && event?.code === "Space") {
+        event.preventDefault();
+        art.playing ? art.pause() : art.play();
+      } else if (!isInputFocused && event?.code === "KeyF") {
+        event.preventDefault();
+        art.fullscreen = !art.fullscreen;
+      } else if (!isInputFocused && event?.code === "ArrowLeft") {
+        event.preventDefault();
+        art.currentTime = Math.max(0, art.currentTime - 10);
+      } else if (!isInputFocused && event?.code === "ArrowRight") {
+        event.preventDefault();
+        art.currentTime = Math.min(art.duration, art.currentTime + 10);
       }
-      art.events.proxy(document, "keypress", (event: any) => {
-        // Check if the focus is on an input field or textarea
-        const isInputFocused =
-          document?.activeElement?.tagName === "INPUT" ||
-          document?.activeElement?.tagName === "TEXTAREA";
+    });
 
-        if (!isInputFocused && event?.code === "Space") {
-          event.preventDefault();
-          art.playing ? art.pause() : art.play();
-        } else if (!isInputFocused && event?.code === "KeyF") {
-          event.preventDefault();
-          art.fullscreen = !art.fullscreen;
-        } else if (!isInputFocused && event?.code === "ArrowLeft") {
-          event.preventDefault();
-          art.currentTime = Math.max(0, art.currentTime - 10);
-        } else if (!isInputFocused && event?.code === "ArrowRight") {
-          event.preventDefault();
-          art.currentTime = Math.min(art.duration, art.currentTime + 10);
-        }
+    art.on("play", () => {
+      art.layers.update({
+        name: "poster",
+        html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
+        tooltip: "Poster Tip",
+        style: {
+          position: "absolute",
+          display: "none",
+          top: "0",
+          right: "0",
+          height: "100%",
+          width: "100%",
+          overflow: "hidden",
+        },
       });
+    });
+    art.on("pause", () => {
+      art.layers.update({
+        name: "poster",
+        html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
+        tooltip: "Poster Tip",
+        style: {
+          position: "absolute",
+          display: "block",
+          top: "0",
+          right: "0",
+          height: "100%",
+          width: "100%",
+          overflow: "hidden",
+        },
+      });
+    });
 
-      art.on("play", () => {
-        art.layers.update({
-          name: "poster",
-          html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
-          tooltip: "Poster Tip",
-          style: {
-            position: "absolute",
-            display: "none",
-            top: "0",
-            right: "0",
-            height: "100%",
-            width: "100%",
-            overflow: "hidden",
-          },
-        });
-      });
-      art.on("pause", () => {
-        art.layers.update({
-          name: "poster",
-          html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
-          tooltip: "Poster Tip",
-          style: {
-            position: "absolute",
-            display: "block",
-            top: "0",
-            right: "0",
-            height: "100%",
-            width: "100%",
-            overflow: "hidden",
-          },
-        });
-      });
+    //art.controls.remove("playAndPause");
 
-      //art.controls.remove("playAndPause");
-      
-      if (sub?.length > 0) {
-        art.controls.add({
-          name: "subtitle",
-          position: "right",
-          html: `subtitle`,
-          selector: [
-            {
-              default: true,
-              html: `off`,
-              value: "",
-            },
-            ...sub.map((item: any, i: number) => {
-              return {
-                html: `<div>${item.lang}</div>`,
-                value: item?.url,
-              };
-            }),
-          ],
-          onSelect: function (item, $dom) {
-            // @ts-ignore
-            art.subtitle.switch(item.value);
-            return item.html;
-          },
-        });
-      }
-      art.controls.update({
-        name: "volume",
+    if (sub?.length > 0) {
+      art.controls.add({
+        name: "subtitle",
         position: "right",
+        html: `subtitle`,
+        selector: [
+          {
+            default: true,
+            html: `off`,
+            value: "",
+          },
+          ...sub.map((item: any, i: number) => {
+            return {
+              html: `<div>${item.lang}</div>`,
+              value: item?.url,
+            };
+          }),
+        ],
+        onSelect: function (item, $dom) {
+          // @ts-ignore
+          art.subtitle.switch(item.value);
+          return item.html;
+        },
       });
-      console.log("controls", art.controls);
-      return () => {
-        if (art && art.destroy) {
-          art.destroy(false);
-          art?.hls?.destroy();
-        }
-      };
-   
+    }
+    art.controls.update({
+      name: "volume",
+      position: "right",
+    });
+    console.log("controls", art.controls);
+    return () => {
+      if (art && art.destroy) {
+        art.destroy(false);
+        art?.hls?.destroy();
+      }
+    };
   }, [artRef.current]);
-
- 
 
   //
 
-  return <div ref={artRef} className="w-full h-full" {...rest}></div>;
+  return (
+    <div ref={artRef} className="w-full h-full" {...rest}>
+      {isSandboxed && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            backgroundColor: "black",
+            color: "white",
+            fontSize: "18px",
+            textAlign: "center",
+          }}
+        >
+          Video playback is not allowed in a sandboxed environment.
+        </div>
+      )}
+    </div>
+  );
 }
