@@ -32,7 +32,7 @@ declare global {
 
 // Add allowed domains for sandbox environments
 const ALLOWED_SANDBOX_DOMAINS = [
-  'codepen.io',
+  
   'stackblitz.com',
   'codesandbox.io',
   'jsfiddle.net',
@@ -66,24 +66,26 @@ export default function Player({
   // Extremely simplified sandbox check - only detects the most restrictive cases
   const checkSandbox = () => {
     try {
-      // Check if we're in an iframe
       const inIframe = window !== window.top;
       if (!inIframe) return false;
   
-      // Check for sandbox attribute
       if (window.frameElement instanceof HTMLIFrameElement) {
         const sandboxAttr = window.frameElement.getAttribute('sandbox');
-        
-        // If sandbox attribute exists at all, block playback
-        // This means ANY sandboxed iframe will be blocked, regardless of permissions
         if (sandboxAttr !== null) {
-          return true;
+          // Check if parent domain is allowed
+          const parentOrigin = window.location.ancestorOrigins?.[0];
+          if (parentOrigin) {
+            const parentHost = new URL(parentOrigin).hostname;
+            const isAllowed = ALLOWED_SANDBOX_DOMAINS.some(domain => 
+              parentHost.endsWith(domain)
+            );
+            return !isAllowed; // Block only if not allowed
+          }
+          return true; // Block if no parent origin info
         }
       }
-  
       return false;
     } catch (e) {
-      // If we can't access frameElement, assume we're sandboxed
       return true;
     }
   };
