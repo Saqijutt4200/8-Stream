@@ -28,8 +28,6 @@ declare global {
   }
 }
 
-
-
 export default function Player({
   option,
   getInstance,
@@ -66,7 +64,7 @@ export default function Player({
     if (isIframe) {
       try {
         const frame = window.frameElement;
-        if (frame?.hasAttribute('sandbox')) {
+        if (frame?.hasAttribute("sandbox")) {
           sandboxed = true;
         }
       } catch (error) {
@@ -77,7 +75,6 @@ export default function Player({
     setIsSandboxed(sandboxed);
 
     if (sandboxed) {
-      
       artRef.current.innerHTML = `
       <div style="
         display: flex;
@@ -551,7 +548,6 @@ export default function Player({
         art?.hls?.destroy();
       }
     };
-  }
   }, [artRef.current]);
 
   //
