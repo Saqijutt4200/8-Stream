@@ -100,6 +100,100 @@ const detectSandbox = (): SandboxResult => {
   }
 };
 
+const setupHLSCustomType = (art: Artplayer) => {
+  return {
+    m3u8: function playM3u8(video: HTMLVideoElement, url: string, art: Artplayer) {
+      if (Hls.isSupported()) {
+        if (art.hls) art.hls.destroy();
+        const hls = new Hls({
+          debug: true,
+        });
+
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          if (data.fatal) {
+            console.error("HLS error:", data);
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.log("Network error - attempting to recover...");
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.log("Media error - attempting to recover...");
+                hls.recoverMediaError();
+                break;
+              default:
+                hls.destroy();
+                art.notice.show = `Playback error: ${data.type}`;
+                break;
+            }
+          }
+        });
+
+        hls.on(Hls.Events.MANIFEST_LOADING, () => {
+          console.log("Loading manifest from URL:", url);
+        });
+
+        hls.on(Hls.Events.MANIFEST_LOADED, () => {
+          console.log("Manifest loaded successfully");
+        });
+
+        try {
+          hls.loadSource(url);
+          hls.attachMedia(video);
+          art.hls = hls;
+
+          hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
+            console.log("Available levels:", hls.levels);
+
+            if (hls.levels.length > 0) {
+              const standardQualities: QualityLevel[] = [
+                { height: 1080, html: "1080P" },
+                { height: 720, html: "720P" },
+                { height: 480, html: "480P" },
+                { height: 360, html: "360P" },
+                { height: 240, html: "240P" },
+              ];
+
+              const availableQualities = standardQualities
+                .filter((sq) => {
+                  return hls.levels.some(
+                    (level) => Math.abs(level.height - sq.height) < 100
+                  );
+                })
+                .map((sq) => ({
+                  html: sq.html,
+                  value: sq.height,
+                  default: sq.height === 1080,
+                }));
+
+              if (!availableQualities.some((q) => q.default)) {
+                availableQualities[0].default = true;
+              }
+
+              art.setting.update({
+                name: "quality",
+                selector: availableQualities,
+              });
+            }
+          });
+
+          art.on("destroy", () => {
+            console.log("Destroying HLS instance");
+            hls.destroy();
+          });
+        } catch (error) {
+          console.error("Error setting up HLS:", error);
+          art.notice.show = "Failed to load video source";
+        }
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = url;
+      } else {
+        art.notice.show = "Unsupported playback format: m3u8";
+      }
+    },
+  };
+};
+
 export default function Player({
   option,
   getInstance,
@@ -128,7 +222,48 @@ export default function Player({
       .art-video-player .art-progress .art-progress-bar {
         height: 4px !important;
       }
-      /* ... rest of your styles ... */
+      
+      .art-video-player .art-progress .art-progress-loaded {
+        height: 4px !important;
+      }
+      
+      .art-video-player .art-progress .art-progress-played {
+        height: 4px !important;
+      }
+      
+      .art-video-player .art-progress .art-progress-highlight {
+        height: 4px !important;
+      }
+      
+      .art-video-player .art-progress .art-progress-indicator {
+        transform: scale(0.6) !important;
+      }
+      
+      .art-video-player .art-progress:hover .art-progress-indicator {
+        transform: scale(0.8) !important;
+      }
+      
+      .art-video-player .art-progress {
+        margin-top: 2px !important;
+      }
+
+      .art-video-player {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+
+      .art-video-player .art-controls {
+        bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .art-video-player .art-control-progress {
+        bottom: 45px !important;
+      }
+
+      .art-video-player .art-control-fullscreen {
+        margin-bottom: 0 !important;
+      }
     `;
     document.head.appendChild(style);
     return () => {
@@ -198,25 +333,250 @@ export default function Player({
           },
         },
       ],
-      // ... rest of your ArtPlayer configuration ...
+      layers: [
+        {
+          name: "poster",
+          html: `<img style="object-fit: cover; height: 100%; width: 100%; " src="${storedImageUrl}">`,
+          tooltip: "Poster Tip",
+          style: {
+            position: "absolute",
+            top: "0",
+            right: "0",
+            height: "100%",
+            width: "100%",
+            overflow: "hidden",
+          },
+          click: function (...args) {
+            console.info("click", args);
+          },
+          mounted: function (...args) {
+            console.info("mounted", args);
+          },
+        },
+        {
+          name: "languageSelector",
+          html: `
+            <div class="language-selector" style="
+              position: absolute;
+              top: 20px;
+              right: 20px;
+              background-color: rgba(0, 0, 0, 0.7);
+              padding: 8px;
+              border-radius: 4px;
+              cursor: pointer;
+              z-index: 100;
+              transition: all 0.3s ease;
+            ">
+              <div class="current-lang" style="
+                color: white;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+              ">
+                <span>${availableLang[0] || "Select Language"}</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </div>
+              <div class="lang-options" style="
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background-color: rgba(0, 0, 0, 0.9);
+                border-radius: 4px;
+                margin-top: 4px;
+                min-width: 100px;
+              ">
+                ${availableLang
+                  .map(
+                    (lang: string) => `
+                  <div class="lang-option" data-value="${lang}" style="
+                    color: white;
+                    padding: 8px 12px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: background-color 0.2s;
+                  ">
+                    ${lang}
+                  </div>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `,
+          click: function (_, event) {
+            const target = event.target as HTMLElement;
+            const selector = target.closest(".language-selector");
+            const option = target.closest(".lang-option");
+
+            if (selector) {
+              const options = selector.querySelector(".lang-options") as HTMLElement;
+              if (options) {
+                const isHidden = options.style.display === "none";
+                options.style.display = isHidden ? "block" : "none";
+              }
+            }
+
+            if (option && onLanguageChange) {
+              const value = option.getAttribute("data-value");
+              if (value) {
+                onLanguageChange(value);
+                const currentLang = selector?.querySelector(".current-lang span") as HTMLElement;
+                if (currentLang) {
+                  currentLang.textContent = value;
+                }
+                const options = selector?.querySelector(".lang-options") as HTMLElement;
+                if (options) {
+                  options.style.display = "none";
+                }
+              }
+            }
+          },
+          mounted: function (layer) {
+            const selector = layer.querySelector(".language-selector") as HTMLElement;
+            if (selector) {
+              selector.addEventListener("mouseenter", () => {
+                selector.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+              });
+              selector.addEventListener("mouseleave", () => {
+                selector.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                const options = selector.querySelector(".lang-options") as HTMLElement;
+                if (options) {
+                  options.style.display = "none";
+                }
+              });
+
+              const options = selector.querySelectorAll(".lang-option");
+              options.forEach((option) => {
+                const optionElement = option as HTMLElement;
+                optionElement.addEventListener("mouseenter", () => {
+                  optionElement.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+                });
+                optionElement.addEventListener("mouseleave", () => {
+                  optionElement.style.backgroundColor = "transparent";
+                });
+              });
+            }
+          },
+        },
+      ],
+      plugins: [],
+      customType: setupHLSCustomType(art),
     });
 
-    // Set up event listeners
-    setupEventListeners(art);
-    setupHLSCustomType(art);
-    setupControls(art, sub);
+    // Event listeners
+    art.on("ready", () => {
+      art.play();
+      art.forward = 10;
+      art.backward = 10;
+    });
 
     if (getInstance && typeof getInstance === "function") {
       getInstance(art);
     }
 
+    // Keyboard controls
+    art.events.proxy(document, "keypress", (event: any) => {
+      const isInputFocused =
+        document?.activeElement?.tagName === "INPUT" ||
+        document?.activeElement?.tagName === "TEXTAREA";
+
+      if (!isInputFocused && event?.code === "Space") {
+        event.preventDefault();
+        art.playing ? art.pause() : art.play();
+      } else if (!isInputFocused && event?.code === "KeyF") {
+        event.preventDefault();
+        art.fullscreen = !art.fullscreen;
+      } else if (!isInputFocused && event?.code === "ArrowLeft") {
+        event.preventDefault();
+        art.currentTime = Math.max(0, art.currentTime - 10);
+      } else if (!isInputFocused && event?.code === "ArrowRight") {
+        event.preventDefault();
+        art.currentTime = Math.min(art.duration, art.currentTime + 10);
+      }
+    });
+
+    // Play/Pause poster handling
+    art.on("play", () => {
+      art.layers.update({
+        name: "poster",
+        html: `<img style="object-fit: cover; height: 100%; width: 100%; " src="${storedImageUrl}">`,
+        tooltip: "Poster Tip",
+        style: {
+          position: "absolute",
+          display: "none",
+          top: "0",
+          right: "0",
+          height: "100%",
+          width: "100%",
+          overflow: "hidden",
+        },
+      });
+    });
+
+    art.on("pause", () => {
+      art.layers.update({
+        name: "poster",
+        html: `<img style="object-fit: cover; height: 100%; width: 100%; " src="${storedImageUrl}">`,
+        tooltip: "Poster Tip",
+        style: {
+          position: "absolute",
+          display: "block",
+          top: "0",
+          right: "0",
+          height: "100%",
+          width: "100%",
+          overflow: "hidden",
+        },
+      });
+    });
+
+    // Subtitle controls
+    if (sub?.length > 0) {
+      art.controls.add({
+        name: "subtitle",
+        position: "right",
+        html: `subtitle`,
+        selector: [
+          {
+            default: true,
+            html: `off`,
+            value: "",
+          },
+          ...sub.map((item: any, i: number) => {
+            return {
+              html: `<div>${item.lang}</div>`,
+              value: item?.url,
+            };
+          }),
+        ],
+        onSelect: function (item, $dom) {
+          // @ts-ignore
+          art.subtitle.switch(item.value);
+          return item.html;
+        },
+      });
+    }
+
+    // Update volume control position
+    art.controls.update({
+      name: "volume",
+      position: "right",
+    });
+
+    console.log("controls", art.controls);
+
+    // Cleanup function
     return () => {
       if (art && art.destroy) {
         art.destroy(false);
-        art.hls?.destroy();
+        art?.hls?.destroy();
       }
     };
-  }, [artRef.current, sandboxResult.isSandboxed, option, getInstance, sub]);
+  }, [artRef.current, sandboxResult.isSandboxed, option, getInstance, sub, availableLang, onLanguageChange, posterUrl]);
 
   if (sandboxResult.isSandboxed) {
     return (
