@@ -105,9 +105,9 @@ const detectSandbox = (): SandboxResult => {
   }
 };
 
-const setupHLSCustomType = (art: Artplayer) => {
+const setupHLSCustomType = () => {
   return {
-    m3u8: function playM3u8(video: HTMLVideoElement, url: string, art: Artplayer) {
+    m3u8: function playM3u8(video: HTMLVideoElement, url: string, art: ArtPlayerWithHls) {
       if (Hls.isSupported()) {
         if (art.hls) art.hls.destroy();
         const hls = new Hls({
@@ -290,14 +290,14 @@ export default function Player({
     const container = artRef.current;
     const storedImageUrl = localStorage.getItem("currentPosterUrl");
 
-    if (!(container instanceof Element)) {
+    if (!(container instanceof HTMLDivElement)) {
       console.error("Invalid container element for ArtPlayer");
       return;
     }
 
     const art: ArtPlayerWithHls = new Artplayer({
       ...option,
-      container,
+      container: container,
       settings: [
         {
           html: "Quality",
