@@ -26,9 +26,10 @@ interface SandboxResult {
   reason?: string;
 }
 
-interface ArtPlayerWithHls extends Artplayer {
+/ Use type intersection instead of extension
+type ArtPlayerWithHls = Artplayer & {
   hls?: Hls;
-}
+};
 
 declare global {
   interface Document {
