@@ -65,7 +65,18 @@ export default function Player({
 
     if (isIframe) {
       try {
-        sandboxed = window.frameElement?.hasAttribute("sandbox") || false;
+        const frame = window.frameElement;
+        sandboxed = !!frame?.hasAttribute('sandbox');
+
+        if (sandboxed) {
+          try {
+            // Attempt restricted operations
+            localStorage.setItem('sandbox_test', 'test');
+            localStorage.removeItem('sandbox_test');
+          } catch {
+            sandboxed = true;
+          }
+        }
       } catch (error) {
         sandboxed = true; // Assume sandboxed if access throws due to security
       }
