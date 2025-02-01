@@ -53,28 +53,41 @@ export default function Player({
 
   // NEW: Effect to detect mobile devices
   useEffect(() => {
+    console.log("=== Component Mount ===");
+    console.log("Initial isSandboxed state:", isSandboxed);
     if (!artRef.current) {
+      console.log("No artRef.current found");
       return;
     }
 
     // Detect if the player is inside a sandboxed iframe
     const isIframe = window.self !== window.top;
+    console.log("No artRef.current found");
+
     let sandboxed = false;
 
     if (isIframe) {
       try {
+        console.log("Attempting to access frameElement...");
         const frame = window.frameElement;
+        console.log("Attempting to access frameElement...");
         if (frame?.hasAttribute("sandbox")) {
+          console.log("Sandbox attribute found");
           sandboxed = true;
+        } else{
+          console.log("No sandbox attribute found");
         }
       } catch (error) {
+        console.log("Error accessing frameElement:", error);
+        console.log("Assuming sandboxed due to security restriction");
         sandboxed = true; // Assume sandboxed if access throws due to security
       }
     }
-
+    console.log("Final sandbox detection result:", sandboxed);
     setIsSandboxed(sandboxed);
 
     if (sandboxed) {
+      console.log("Showing sandbox message and stopping initialization");
       artRef.current.innerHTML = `
       <div style="
         display: flex;
@@ -90,7 +103,7 @@ export default function Player({
     `;
       return;
     }
-
+    console.log("Proceeding with player initialization...");
     console.log(posterUrl);
     const storedImageUrl = localStorage.getItem("currentPosterUrl");
     const container = artRef.current;
@@ -157,6 +170,7 @@ export default function Player({
       `;
     document.head.appendChild(style);
 
+    console.log("Creating Artplayer instance...");
     const art = new Artplayer({
       ...option,
       settings: [
@@ -551,7 +565,7 @@ export default function Player({
   }, [artRef.current]);
 
   //
-
+  console.log("Render - isSandboxed:", isSandboxed);
   return (
     <div ref={artRef} className="w-full h-full" {...rest}>
       {isSandboxed && (
