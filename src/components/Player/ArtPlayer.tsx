@@ -210,7 +210,7 @@ export default function Player({
 }: {
   option: Option;
   getInstance?: (art: ArtPlayerWithHls) => void;
-  artRef: any;
+  artRef: React.RefObject<HTMLDivElement>; // Update the ref type;
   sub?: any;
   availableLang?: string[];
   onLanguageChange?: (lang: string) => void;
