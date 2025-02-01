@@ -66,22 +66,25 @@ export default function Player({
   // Extremely simplified sandbox check - only detects the most restrictive cases
   const checkSandbox = () => {
     try {
+      // Check if we're in an iframe
       const inIframe = window !== window.top;
       if (!inIframe) return false;
-
-      // Try to access parent window - if this fails, we're sandboxed
-      window.parent.document;
-      
-      // We can access parent, so check if we have a sandbox attribute with no permissions
+  
+      // Check for sandbox attribute
       if (window.frameElement instanceof HTMLIFrameElement) {
         const sandboxAttr = window.frameElement.getAttribute('sandbox');
-        return sandboxAttr === ''; // Only consider fully restricted sandbox
+        
+        // If sandbox attribute exists at all, block playback
+        // This means ANY sandboxed iframe will be blocked, regardless of permissions
+        if (sandboxAttr !== null) {
+          return true;
+        }
       }
-      
+  
       return false;
     } catch (e) {
-      // If we can't access parent at all, we're in a cross-origin frame
-      return false; // Let's allow cross-origin frames to play
+      // If we can't access frameElement, assume we're sandboxed
+      return true;
     }
   };
   // NEW: Effect to detect mobile devices
