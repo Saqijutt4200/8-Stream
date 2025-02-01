@@ -487,7 +487,15 @@ export default function Player({
       art.on('ready', () => {
         art.pause();
         // Disable controls
-        art.controls.style.display = 'none';
+        const controlsElement = art.$container.querySelector('.art-controls');
+        if (controlsElement instanceof HTMLElement) {
+          controlsElement.style.display = 'none';
+        }
+        // Also disable the progress bar
+        const progressElement = art.$container.querySelector('.art-progress');
+        if (progressElement instanceof HTMLElement) {
+          progressElement.style.display = 'none';
+        }
       });
     } else {
       // Your existing ready event handler...
