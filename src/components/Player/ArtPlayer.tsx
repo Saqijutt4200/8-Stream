@@ -26,6 +26,12 @@ interface SandboxResult {
   reason?: string;
 }
 
+declare module 'artplayer' {
+  interface Artplayer {
+    hls?: Hls;
+  }
+}
+
 declare global {
   interface Document {
     sandbox?: DOMTokenList;
@@ -290,7 +296,7 @@ export default function Player({
       return;
     }
 
-    const art = new Artplayer({
+    let art = new Artplayer({
       ...option,
       container,
       settings: [
