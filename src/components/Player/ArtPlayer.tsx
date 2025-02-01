@@ -66,32 +66,31 @@ export default function Player({
   const checkSandbox = () => {
     try {
       // Check if we're in an iframe
-      if (window.top !== window.self) {
-        // Try to access parent window - this will throw if sandboxed
-        window.parent.document;
-        
-        // Check if we're in a sandboxed iframe by looking at iframe attributes
-        const iframes = window.parent.document.getElementsByTagName('iframe');
-        for (let i = 0; i < iframes.length; i++) {
-          const iframe = iframes[i];
-          if (iframe.contentWindow === window) {
-            const sandboxAttr = iframe.getAttribute('sandbox');
-            if (sandboxAttr !== null) {
-              // Check sandbox attributes
-              if (sandboxAttr === '' || 
-                  !sandboxAttr.includes('allow-same-origin') || 
-                  !sandboxAttr.includes('allow-scripts')) {
-                setIsSandboxed(true);
-                return true;
-              }
-            }
-          }
+      if (window.top === window.self) {
+        // Not in an iframe at all
+        return false;
+      }
+
+      // Try to access parent window
+      window.parent.document;
+      
+      // If we can access parent window, check for sandbox attribute
+      const frameElement = window.frameElement;
+      if (frameElement instanceof HTMLIFrameElement) {
+        const sandboxAttr = frameElement.getAttribute('sandbox');
+        // Only return true if sandbox attribute exists and doesn't have both required permissions
+        if (sandboxAttr !== null &&
+            (!sandboxAttr.includes('allow-same-origin') || !sandboxAttr.includes('allow-scripts'))) {
+          return true;
         }
       }
+      
+      // If we got here, we're either not in an iframe or in an unrestricted iframe
       return false;
+      
     } catch (e) {
-      // If we can't access parent window, we're definitely sandboxed
-      setIsSandboxed(true);
+      // If we can't access parent window due to security restrictions,
+      // we're definitely in a sandboxed environment
       return true;
     }
   };
@@ -103,6 +102,9 @@ export default function Player({
   
 
     const isSandboxEnvironment = checkSandbox();
+    setIsSandboxed(isSandboxEnvironment);
+    
+    console.log('Is sandboxed:', isSandboxEnvironment);
 
     
       console.log(posterUrl);
@@ -342,7 +344,7 @@ export default function Player({
               }
             }
           },
-          {
+          ...(isSandboxEnvironment ? [{
             name: 'sandboxWarning',
             html: `
               <div class="sandbox-warning" style="
@@ -357,7 +359,6 @@ export default function Player({
                 text-align: center;
                 z-index: 1000;
                 max-width: 80%;
-                display: ${isSandboxed ? 'block' : 'none'};
               ">
                 <h3 style="margin-bottom: 10px; font-size: 18px;">⚠️ Restricted Playback</h3>
                 <p style="font-size: 14px;">This video cannot be played in a sandboxed environment. Please view it in a regular browser window.</p>
@@ -369,9 +370,10 @@ export default function Player({
               left: '0',
               width: '100%',
               height: '100%',
-              pointerEvents: isSandboxed ? 'auto' : 'none',
+              pointerEvents: 'auto',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)'
             }
-          }
+          }] : []),
         ],
         plugins: [],
         customType: {
@@ -483,23 +485,23 @@ export default function Player({
      
 
       // Prevent playback if sandboxed
-    if (isSandboxed) {
-      art.on('ready', () => {
-        art.pause();
-        // Disable controls
-        const playerElement = artRef.current;
-        if (playerElement instanceof HTMLElement) {
-          const controlsElement = playerElement.querySelector('.art-controls');
-          if (controlsElement instanceof HTMLElement) {
-            controlsElement.style.display = 'none';
-          }
+      if (isSandboxEnvironment) {
+        art.on('ready', () => {
+          art.pause();
           
-          // Also disable the progress bar
-          const progressElement = playerElement.querySelector('.art-progress');
-          if (progressElement instanceof HTMLElement) {
-            progressElement.style.display = 'none';
+          // Disable controls
+          const playerElement = artRef.current;
+          if (playerElement instanceof HTMLElement) {
+            const controlsElement = playerElement.querySelector('.art-controls');
+            if (controlsElement instanceof HTMLElement) {
+              controlsElement.style.display = 'none';
+            }
+            
+            const progressElement = playerElement.querySelector('.art-progress');
+            if (progressElement instanceof HTMLElement) {
+              progressElement.style.display = 'none';
+            }
           }
-        }
 
         // Disable all controls using Artplayer's API
         art.controls.remove('progress');
