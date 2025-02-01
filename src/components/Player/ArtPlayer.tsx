@@ -91,7 +91,7 @@ export default function Player({
     `;
       return;
     }
-
+    if (!sandboxed) {
     console.log(posterUrl);
     const storedImageUrl = localStorage.getItem("currentPosterUrl");
     const container = artRef.current;
@@ -549,6 +549,7 @@ export default function Player({
         art?.hls?.destroy();
       }
     };
+  }
   }, [artRef.current]);
 
   //
