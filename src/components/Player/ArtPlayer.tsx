@@ -26,7 +26,7 @@ interface SandboxResult {
   reason?: string;
 }
 
-/ Use type intersection instead of extension
+// Use type intersection instead of extension
 type ArtPlayerWithHls = Artplayer & {
   hls?: Hls;
 };
