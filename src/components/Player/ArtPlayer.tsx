@@ -68,6 +68,35 @@ export default function Player({
       return;
     }
   
+    // Detect if the player is inside a sandboxed iframe
+  const isIframe = window.self !== window.top;
+  let sandboxed = false;
+
+  if (isIframe) {
+    try {
+      sandboxed = window.frameElement?.hasAttribute('sandbox') || false;
+    } catch (error) {
+      sandboxed = true; // Assume sandboxed if access throws due to security
+    }
+  }
+
+  if (sandboxed) {
+    setIsSandboxed(true);
+    artRef.current.innerHTML = `
+      <div style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        background-color: black;
+        color: white;
+        font-size: 18px;
+      ">
+        Video playback is not allowed in a sandboxed environment.
+      </div>
+    `;
+    return;
+  }
 
     
 
