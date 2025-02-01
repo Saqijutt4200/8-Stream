@@ -469,7 +469,7 @@ export default function Player({
         },
       ],
       plugins: [],
-      customType: setupHLSCustomType(art),
+      customType: setupHLSCustomType(),
     });
 
     // Event listeners
