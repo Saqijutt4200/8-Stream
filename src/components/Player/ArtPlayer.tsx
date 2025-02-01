@@ -63,42 +63,31 @@ export default function Player({
   const [showControls, setShowControls] = useState(false);
 
   // Function to check if we're in a sandboxed iframe
+  // Extremely simplified sandbox check - only detects the most restrictive cases
   const checkSandbox = () => {
     try {
-      // Check if we're in an iframe
-      if (window.top === window.self) {
-        // Not in an iframe at all
-        return false;
-      }
+      const inIframe = window !== window.top;
+      if (!inIframe) return false;
 
-      // Try to access parent window
+      // Try to access parent window - if this fails, we're sandboxed
       window.parent.document;
       
-      // If we can access parent window, check for sandbox attribute
-      const frameElement = window.frameElement;
-      if (frameElement instanceof HTMLIFrameElement) {
-        const sandboxAttr = frameElement.getAttribute('sandbox');
-        // Only return true if sandbox attribute exists and doesn't have both required permissions
-        if (sandboxAttr !== null &&
-            (!sandboxAttr.includes('allow-same-origin') || !sandboxAttr.includes('allow-scripts'))) {
-          return true;
-        }
+      // We can access parent, so check if we have a sandbox attribute with no permissions
+      if (window.frameElement instanceof HTMLIFrameElement) {
+        const sandboxAttr = window.frameElement.getAttribute('sandbox');
+        return sandboxAttr === ''; // Only consider fully restricted sandbox
       }
       
-      // If we got here, we're either not in an iframe or in an unrestricted iframe
       return false;
-      
     } catch (e) {
-      // If we can't access parent window due to security restrictions,
-      // we're definitely in a sandboxed environment
-      return true;
+      // If we can't access parent at all, we're in a cross-origin frame
+      return false; // Let's allow cross-origin frames to play
     }
   };
   // NEW: Effect to detect mobile devices
   useEffect(() => {
-    if (!artRef.current) {
-      return;
-    }
+    if (!artRef.current) return;
+    
   
 
     const isSandboxEnvironment = checkSandbox();
@@ -352,7 +341,7 @@ export default function Player({
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                background-color: rgba(0, 0, 0, 0.8);
+                background-color: black;
                 color: white;
                 padding: 20px;
                 border-radius: 8px;
@@ -371,7 +360,7 @@ export default function Player({
               width: '100%',
               height: '100%',
               pointerEvents: 'auto',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)'
+              backgroundColor: 'black'
             }
           }] : []),
         ],
@@ -379,9 +368,7 @@ export default function Player({
         customType: {
           m3u8: function playM3u8(video, url, art) {
             // Don't initialize player if sandboxed
-          if (isSandboxed) {
-            return;
-          }
+          if (isSandboxed) return;
             if (Hls.isSupported()) {
               if (art.hls) art.hls.destroy();
               const hls = new Hls({
