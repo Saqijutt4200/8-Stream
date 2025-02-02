@@ -64,64 +64,51 @@ export default function Player({
     // Enhanced sandbox detection function
     const detectSandbox = (): boolean => {
       try {
-        // Check if we're in an iframe
-        const isIframe = window.top !== window;
-        console.log("Is iframe:", isIframe);
+        // First check if we're in an iframe
+        if (window.top === window) {
+          return false; // Not in an iframe at all
+        }
 
-        // If we're not in an iframe, we're definitely not sandboxed
-        if (!isIframe) {
-          console.log("Not in an iframe");
+        // Try to get the iframe element
+        let frame: HTMLIFrameElement | null = null;
+        
+        try {
+          frame = window.frameElement as HTMLIFrameElement;
+        } catch (e) {
+          // If we can't access frameElement, we'll try a different approach
+          console.log("Cannot directly access frameElement:", e);
+        }
+
+        // If we got the frame element, check its sandbox attribute
+        if (frame) {
+          const hasSandbox = frame.hasAttribute('sandbox');
+          console.log("Frame sandbox attribute:", frame.getAttribute('sandbox'));
+          return hasSandbox;
+        }
+
+        // If we couldn't get the frame element directly, we can try to infer
+        // sandbox status from other security restrictions
+        try {
+          // Try to access parent - if we can, we're not sandboxed
+          window.parent.document;
           return false;
-        }
-
-        // Try to access frameElement
-        try {
-          const frame = window.frameElement;
-          console.log("Frame element:", frame);
-          if (frame) {
-            const sandboxAttr = frame.getAttribute("sandbox");
-            console.log("Sandbox attribute:", sandboxAttr);
-            return Boolean(sandboxAttr);
-          }
-        } catch (frameError: unknown) {
-          console.log("Cannot access frameElement:", frameError);
-        }
-
-        // Try to access parent
-        try {
-          const canAccessParent = Boolean(window.parent.location.href);
-          console.log("Can access parent location:", canAccessParent);
-          return !canAccessParent;
-        } catch (parentError: unknown) {
-          // If we can't access parent.location, we're in a cross-origin iframe
-          // This usually means we're sandboxed or have security restrictions
-          console.log("Cannot access parent location:", parentError);
-          // Type guard for Error objects
-          if (parentError instanceof Error) {
-            if (parentError.name === "SecurityError") {
-              console.log(
-                "Security restrictions detected - treating as sandboxed"
-              );
-              return true;
+        } catch (e) {
+          if (e instanceof DOMException && e.name === "SecurityError") {
+            // Before assuming it's sandboxed, try to access localStorage
+            // If we can access localStorage, it's likely not a sandbox
+            // restriction but rather a same-origin policy restriction
+            try {
+              window.localStorage;
+              return false; // Can access localStorage, probably not sandboxed
+            } catch (storageError) {
+              return true; // Can't access localStorage, likely sandboxed
             }
           }
-          // If we got any error accessing parent, treat as sandboxed
-          return true;
+          return false; // Other types of errors shouldn't trigger sandbox mode
         }
-
-        // Try to access localStorage as a final check
-        try {
-          window.localStorage;
-          return false;
-        } catch (storageError: unknown) {
-          console.log("Cannot access localStorage:", storageError);
-          return true;
-        }
-
-        return false;
-      } catch (error: unknown) {
-        console.log("General error during sandbox detection:", error);
-        return false;
+      } catch (error) {
+        console.log("Error in sandbox detection:", error);
+        return false; // Default to not sandboxed on unexpected errors
       }
     };
     const sandboxed = detectSandbox();
