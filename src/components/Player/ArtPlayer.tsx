@@ -22,6 +22,13 @@ interface QualityLevel {
   html: string;
 }
 
+// Add type declaration for sandbox detection
+declare global {
+  interface Document {
+    sandbox?: DOMTokenList;
+  }
+}
+
 
 // Extend Window interface to support custom property
 declare global {
@@ -29,15 +36,6 @@ declare global {
     controlsTimeout?: NodeJS.Timeout;
   }
 }
-
-// Add allowed domains for sandbox environments
-const ALLOWED_SANDBOX_DOMAINS = [
-  
-  'stackblitz.com',
-  'codesandbox.io',
-  'jsfiddle.net',
-  // Add more trusted domains as needed
-];
 
 export default function Player({
   option,
@@ -59,48 +57,61 @@ export default function Player({
   const posterUrl = useSelector(
     (state: RootState) => state.posterUrl.currentPosterUrl
   );
-  const [isSandboxed, setIsSandboxed] = useState(false);
+  const [isSandboxed, setIsSandboxed] = useState<boolean>(false);
   const [showControls, setShowControls] = useState(false);
 
-  // Function to check if we're in a sandboxed iframe
-  // Extremely simplified sandbox check - only detects the most restrictive cases
-  const checkSandbox = () => {
-    try {
-      const inIframe = window !== window.top;
-      if (!inIframe) return false;
-  
-      if (window.frameElement instanceof HTMLIFrameElement) {
-        const sandboxAttr = window.frameElement.getAttribute('sandbox');
-        if (sandboxAttr !== null) {
-          // Check if parent domain is allowed
-          const parentOrigin = window.location.ancestorOrigins?.[0];
-          if (parentOrigin) {
-            const parentHost = new URL(parentOrigin).hostname;
-            const isAllowed = ALLOWED_SANDBOX_DOMAINS.some(domain => 
-              parentHost.endsWith(domain)
-            );
-            return !isAllowed; // Block only if not allowed
-          }
-          return true; // Block if no parent origin info
-        }
-      }
-      return false;
-    } catch (e) {
-      return true;
-    }
-  };
   // NEW: Effect to detect mobile devices
   useEffect(() => {
-    if (!artRef.current) return;
     
-  
+    // Simplified sandbox detection using document.sandbox
+    // Enhanced sandbox detection function
+const detectSandbox = (): boolean => {
+  try {
+    // Check if we're in an iframe
+    if (window !== window.parent) {
+      // Check for sandbox attribute on the iframe
+      const currentFrame = window.frameElement as HTMLIFrameElement | null;
+      
+      if (currentFrame) {
+        // Explicit sandbox attribute check
+        const isSandboxed = currentFrame.hasAttribute('sandbox');
+        
+        // Additional sandbox content restriction check
+        const sandboxValue = currentFrame.getAttribute('sandbox') || '';
+        const hasRestrictiveContent = 
+          sandboxValue.length > 0 && 
+          (sandboxValue.includes('allow-scripts') === false ||
+           sandboxValue.includes('allow-same-origin') === false);
+        
+        console.log(`Sandbox detected: ${isSandboxed}`);
+        console.log(`Restrictive sandbox: ${hasRestrictiveContent}`);
+        
+        return isSandboxed || hasRestrictiveContent;
+      }
+      
+      // Cross-origin iframe detection
+      try {
+        window.parent.location.href;
+        return false; // Can access parent, likely not sandboxed
+      } catch (e) {
+        // Cross-origin restrictions might indicate sandbox
+        console.log('Cross-origin iframe detected');
+        return true;
+      }
+    }
+    
+    return false; // Not in an iframe
+  } catch (error) {
+    console.error('Sandbox detection error:', error);
+    return false; // Default to non-sandboxed if detection fails
+  }
+};
 
-    const isSandboxEnvironment = checkSandbox();
-    setIsSandboxed(isSandboxEnvironment);
-    
-    console.log('Is sandboxed:', isSandboxEnvironment);
+    const sandboxed = detectSandbox();
+    setIsSandboxed(Boolean(sandboxed));
+    console.log(`Final sandbox status: ${sandboxed}`);
 
-    
+    if (!sandboxed) {
       console.log(posterUrl);
       const storedImageUrl = localStorage.getItem("currentPosterUrl");
       const container = artRef.current;
@@ -337,43 +348,11 @@ export default function Player({
                 });
               }
             }
-          },
-          ...(isSandboxEnvironment ? [{
-            name: 'sandboxWarning',
-            html: `
-              <div class="sandbox-warning" style="
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: black;
-                color: white;
-                padding: 20px;
-                border-radius: 8px;
-                text-align: center;
-                z-index: 1000;
-                max-width: 80%;
-              ">
-                <h3 style="margin-bottom: 10px; font-size: 18px;">⚠️ Restricted Playback</h3>
-                <p style="font-size: 14px;">This video cannot be played in a sandboxed environment. Please view it in a regular browser window.</p>
-              </div>
-            `,
-            style: {
-              position: 'absolute',
-              top: '0',
-              left: '0',
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'auto',
-              backgroundColor: 'black'
-            }
-          }] : []),
+          }
         ],
         plugins: [],
         customType: {
           m3u8: function playM3u8(video, url, art) {
-            // Don't initialize player if sandboxed
-          if (isSandboxed) return;
             if (Hls.isSupported()) {
               if (art.hls) art.hls.destroy();
               const hls = new Hls({
@@ -476,41 +455,11 @@ export default function Player({
 
      
 
-      // Prevent playback if sandboxed
-      if (isSandboxEnvironment) {
-        art.on('ready', () => {
-          art.pause();
-          
-          // Disable controls
-          const playerElement = artRef.current;
-          if (playerElement instanceof HTMLElement) {
-            const controlsElement = playerElement.querySelector('.art-controls');
-            if (controlsElement instanceof HTMLElement) {
-              controlsElement.style.display = 'none';
-            }
-            
-            const progressElement = playerElement.querySelector('.art-progress');
-            if (progressElement instanceof HTMLElement) {
-              progressElement.style.display = 'none';
-            }
-          }
-
-        // Disable all controls using Artplayer's API
-        art.controls.remove('progress');
-        art.controls.remove('playAndPause');
-        art.controls.remove('volume');
-        art.controls.remove('subtitle');
-        art.controls.remove('setting');
-        art.controls.remove('fullscreen');
-      });
-    } else {
-      // Your existing ready event handler...
-      art.on('ready', () => {
+      art.on("ready", () => {
         art.play();
         art.forward = 10;
         art.backward = 10;
       });
-    }
       if (getInstance && typeof getInstance === "function") {
         getInstance(art);
       }
@@ -606,10 +555,30 @@ export default function Player({
           art?.hls?.destroy();
         }
       };
-   
+    }
   }, [artRef.current]);
 
- 
+  if (isSandboxed) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black/95 z-50">
+        <div className="bg-red-600/20 border-2 border-red-600 rounded-lg p-8 max-w-xl mx-4">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="text-red-500 text-5xl">⚠️</div>
+            <h2 className="text-2xl font-bold text-white">
+              Sandbox Mode Detected
+            </h2>
+            <p className="text-gray-300">
+              This video player cannot be embedded in sandbox mode for security
+              reasons. Please visit our website directly to watch the content.
+            </p>
+            <div className="text-sm text-gray-400 mt-4">
+              Error Code: SANDBOX_RESTRICTED
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   //
 
