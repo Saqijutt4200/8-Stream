@@ -95,13 +95,20 @@ export default function Player({
           }
           
           return false; // If we got here, likely not sandboxed
-        } catch (e) {
+        } catch (error: unknown) {
           // If these operations fail, check the error message
           // Some browsers give specific error messages for sandbox restrictions
-          const errorMsg = e.toString().toLowerCase();
-          return errorMsg.includes('sandbox') || errorMsg.includes('security');
+          if (error instanceof Error) {
+            const errorMsg = error.message.toLowerCase();
+            return errorMsg.includes('sandbox') || errorMsg.includes('security');
+          }
+          if (typeof error === 'string') {
+            const errorMsg = error.toLowerCase();
+            return errorMsg.includes('sandbox') || errorMsg.includes('security');
+          }
+          return false; // If we can't read the error, assume not sandboxed
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Sandbox detection error:', error);
         // In case of unexpected errors, default to false to avoid false positives
         return false;
