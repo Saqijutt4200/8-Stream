@@ -93,14 +93,16 @@ const detectSandbox = (): boolean => {
       }
       
       // Cross-origin iframe detection
-      {/*try {
+      try {
         window.parent.location.href;
         return false; // Can access parent, likely not sandboxed
       } catch (e) {
         // Cross-origin restrictions might indicate sandbox
+        const currentFrames = window.frameElement as HTMLIFrameElement | null;
+      console.log(currentFrames);
         console.log('Cross-origin iframe detected');
         return true;
-      }*/}
+      }
     }
     
     return false; // Not in an iframe
