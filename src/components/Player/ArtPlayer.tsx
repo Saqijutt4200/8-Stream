@@ -58,54 +58,28 @@ export default function Player({
   const [isSandboxed, setIsSandboxed] = useState<boolean>(false);
   const [showControls, setShowControls] = useState(false);
 
-  const checkSandbox = (): boolean => {
-    try {
-      // Check if we're in an iframe
-      if (window.top === window) {
-        return false; // Not in an iframe at all
+  const detectSandbox = () => {
+    if (window.top !== window.self) {
+      try {
+        // Try to access the parent window's location
+        window.parent.location.href
+        // If we can access it, we're not in a sandboxed iframe
+        return false
+      } catch (e) {
+        // If we can't access it, we're in a sandboxed iframe
+        return true
       }
-
-      // Try to access parent window to check if we're sandboxed
-      window.parent.document;
-      
-      // If we can access parent, check for sandbox attribute
-      if (window !== window.parent) {
-        const iframes = window.parent.document.getElementsByTagName('iframe');
-        for (let i = 0; i < iframes.length; i++) {
-          if (iframes[i].contentWindow === window) {
-            // Check if sandbox attribute exists and doesn't include necessary permissions
-            const sandboxAttr = iframes[i].getAttribute('sandbox');
-            if (sandboxAttr) {
-              const permissions = sandboxAttr.split(' ');
-              // Video needs these permissions to play properly
-              const requiredPermissions = [
-                'hello',
-                'hi',
-                'what'
-              ];
-              
-              // Check if all required permissions are present
-              return !requiredPermissions.every(perm => 
-                permissions.includes(perm)
-              );
-            }
-          }
-        }
-      }
-      
-      return false; // No sandbox restrictions found
-    } catch (e) {
-      // If we can't access parent window, we're definitely sandboxed
-      return true;
     }
-  };
+    // If we're not in an iframe at all
+    return false
+  }
   // NEW: Effect to detect mobile devices
   useEffect(() => {
     // Simplified sandbox detection using document.sandbox
     // Enhanced sandbox detection function
     
      // Check sandbox status immediately
-     const sandboxed = checkSandbox();
+     const sandboxed = detectSandbox();
      setIsSandboxed(sandboxed);
 
      if(sandboxed){
