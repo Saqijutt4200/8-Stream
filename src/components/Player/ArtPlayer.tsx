@@ -79,9 +79,9 @@ export default function Player({
               const permissions = sandboxAttr.split(' ');
               // Video needs these permissions to play properly
               const requiredPermissions = [
-                'allow-scripts',
-                'allow-same-origin',
-                'allow-presentation'
+                'hello',
+                'hi',
+                'what'
               ];
               
               // Check if all required permissions are present
