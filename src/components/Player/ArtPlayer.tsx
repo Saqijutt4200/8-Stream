@@ -58,64 +58,66 @@ export default function Player({
   const [isSandboxed, setIsSandboxed] = useState<boolean>(false);
   const [showControls, setShowControls] = useState(false);
 
+  const checkSandbox = (): boolean => {
+    try {
+      // Check if we're in an iframe
+      if (window.top === window) {
+        return false; // Not in an iframe at all
+      }
+
+      // Try to access parent window to check if we're sandboxed
+      window.parent.document;
+      
+      // If we can access parent, check for sandbox attribute
+      if (window !== window.parent) {
+        const iframes = window.parent.document.getElementsByTagName('iframe');
+        for (let i = 0; i < iframes.length; i++) {
+          if (iframes[i].contentWindow === window) {
+            // Check if sandbox attribute exists and doesn't include necessary permissions
+            const sandboxAttr = iframes[i].getAttribute('sandbox');
+            if (sandboxAttr) {
+              const permissions = sandboxAttr.split(' ');
+              // Video needs these permissions to play properly
+              const requiredPermissions = [
+                'allow-scripts',
+                'allow-same-origin',
+                'allow-presentation'
+              ];
+              
+              // Check if all required permissions are present
+              return !requiredPermissions.every(perm => 
+                permissions.includes(perm)
+              );
+            }
+          }
+        }
+      }
+      
+      return false; // No sandbox restrictions found
+    } catch (e) {
+      // If we can't access parent window, we're definitely sandboxed
+      return true;
+    }
+  };
   // NEW: Effect to detect mobile devices
   useEffect(() => {
     // Simplified sandbox detection using document.sandbox
     // Enhanced sandbox detection function
-    const detectSandbox = (): boolean => {
-      try {
-        // First check if we're in an iframe
-        if (window.top === window) {
-          return false; // Not in an iframe at all
-        }
+    
+     // Check sandbox status immediately
+     const sandboxed = checkSandbox();
+     setIsSandboxed(sandboxed);
 
-        // Try to get the iframe element
-        let frame: HTMLIFrameElement | null = null;
-        
-        try {
-          frame = window.frameElement as HTMLIFrameElement;
-        } catch (e) {
-          // If we can't access frameElement, we'll try a different approach
-          console.log("Cannot directly access frameElement:", e);
-        }
+     if(sandboxed){
+       console.log("player is sandboxed");
+     }
+    
+     if(!sandboxed){
+       console.log("player is sandboxed");
+     }
+    
 
-        // If we got the frame element, check its sandbox attribute
-        if (frame) {
-          const hasSandbox = frame.hasAttribute('sandbox');
-          console.log("Frame sandbox attribute:", frame.getAttribute('sandbox'));
-          return hasSandbox;
-        }
-
-        // If we couldn't get the frame element directly, we can try to infer
-        // sandbox status from other security restrictions
-        try {
-          // Try to access parent - if we can, we're not sandboxed
-          window.parent.document;
-          return false;
-        } catch (e) {
-          if (e instanceof DOMException && e.name === "SecurityError") {
-            // Before assuming it's sandboxed, try to access localStorage
-            // If we can access localStorage, it's likely not a sandbox
-            // restriction but rather a same-origin policy restriction
-            try {
-              window.localStorage;
-              return false; // Can access localStorage, probably not sandboxed
-            } catch (storageError) {
-              return true; // Can't access localStorage, likely sandboxed
-            }
-          }
-          return false; // Other types of errors shouldn't trigger sandbox mode
-        }
-      } catch (error) {
-        console.log("Error in sandbox detection:", error);
-        return false; // Default to not sandboxed on unexpected errors
-      }
-    };
-    const sandboxed = detectSandbox();
-    setIsSandboxed(Boolean(sandboxed));
-    console.log(`Final sandbox status: ${sandboxed}`);
-
-    if (!sandboxed) {
+    
       console.log(posterUrl);
       const storedImageUrl = localStorage.getItem("currentPosterUrl");
       const container = artRef.current;
@@ -573,30 +575,10 @@ export default function Player({
           art?.hls?.destroy();
         }
       };
-    }
+    
   }, [artRef.current]);
 
-  if (isSandboxed) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black/95 z-50">
-        <div className="bg-red-600/20 border-2 border-red-600 rounded-lg p-8 max-w-xl mx-4">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="text-red-500 text-5xl">⚠️</div>
-            <h2 className="text-2xl font-bold text-white">
-              Sandbox Mode Detected
-            </h2>
-            <p className="text-gray-300">
-              This video player cannot be embedded in sandbox mode for security
-              reasons. Please visit our website directly to watch the content.
-            </p>
-            <div className="text-sm text-gray-400 mt-4">
-              Error Code: SANDBOX_RESTRICTED
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  
 
   //
 
