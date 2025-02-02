@@ -75,6 +75,7 @@ export default function Player({
         // Try to access frameElement first
         if (window.frameElement) {
           const sandboxAttr = window.frameElement.getAttribute('sandbox');
+          console.log(sandboxAttr)
           // If sandbox attribute exists and doesn't have necessary permissions
           return sandboxAttr !== null && (
             !sandboxAttr.includes('allow-scripts') ||
