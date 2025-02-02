@@ -113,7 +113,7 @@ export default function Player({
      }
     
      if(!sandboxed){
-       console.log("player is sandboxed");
+       console.log("player is not sandboxed");
      }
     
 
