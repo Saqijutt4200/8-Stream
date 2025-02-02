@@ -63,14 +63,14 @@ export default function Player({
   const checkSandbox = () => {
     try {
       // Modern browsers support document.sandbox
-      const sandboxed = document.sandbox && document.sandbox.length > 0;
+      const sandboxed = document.sandbox ? document.sandbox.length > 0: false;
       setIsSandboxed(sandboxed);
     } catch (error) {
       // Fallback for older browsers
       try {
         // @ts-ignore
-        const iframe = window.frameElement;
-        if (iframe && iframe.hasAttribute('sandbox')) {
+        const iframe = window.frameElement as HTMLIFrameElement | null;
+        if (!!iframe?.hasAttribute('sandbox')) {
           setIsSandboxed(true);
         }
       } catch (e) {
