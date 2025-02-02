@@ -69,14 +69,12 @@ export default function Player({
       try {
         // First check if we're actually in an iframe
         if (window.top === window) {
-          console.log('Not in an iframe');
-          return false;
+          return false; // Not in an iframe at all
         }
     
         // Try to access frameElement first
         if (window.frameElement) {
           const sandboxAttr = window.frameElement.getAttribute('sandbox');
-          console.log('Sandbox attribute:', sandboxAttr);
           // If sandbox attribute exists and doesn't have necessary permissions
           return sandboxAttr !== null && (
             !sandboxAttr.includes('allow-scripts') ||
@@ -85,58 +83,34 @@ export default function Player({
         }
     
         // For cross-origin iframes, check if we can execute basic operations
+        // that are typically blocked in sandboxed iframes
         try {
+          // Try to access localStorage (blocked in sandboxed iframes)
+          window.localStorage;
+          
           // Try to create a popup (blocked in sandboxed iframes)
           const popup = window.open('', '_blank');
           if (popup) {
             popup.close();
           }
-          return false;
-        } catch (error: unknown) {
-          // Convert error to string regardless of its type
-          const errorString = String(error);
-          console.log('Popup test error:', errorString);
           
-          // Check for specific sandbox-related error messages
-          if (
-            errorString.includes('sandboxed frame') ||
-            errorString.includes('allow-popups') ||
-            errorString.includes('sandbox') ||
-            errorString.includes('security')
-          ) {
-            console.log('Sandbox detected through popup test');
-            return true;
-          }
-        }
-    
-        // Additional localStorage test
-        try {
-          window.localStorage;
-          return false;
+          return false; // If we got here, likely not sandboxed
         } catch (error: unknown) {
-          const errorString = String(error);
-          console.log('localStorage test error:', errorString);
-          
-          if (
-            errorString.includes('sandbox') ||
-            errorString.includes('security') ||
-            errorString.includes('access') ||
-            errorString.includes('denied')
-          ) {
-            console.log('Sandbox detected through localStorage test');
-            return true;
+          // If these operations fail, check the error message
+          // Some browsers give specific error messages for sandbox restrictions
+          if (error instanceof Error) {
+            const errorMsg = error.message.toLowerCase();
+            return errorMsg.includes('sandbox') || errorMsg.includes('security');
           }
+          if (typeof error === 'string') {
+            const errorMsg = error.toLowerCase();
+            return errorMsg.includes('sandbox') || errorMsg.includes('security');
+          }
+          return false; // If we can't read the error, assume not sandboxed
         }
-    
-        return false;
       } catch (error: unknown) {
         console.error('Sandbox detection error:', error);
-        // Log the full error for debugging
-        console.log('Error details:', {
-          message: error instanceof Error ? error.message : String(error),
-          type: typeof error,
-          stack: error instanceof Error ? error.stack : undefined
-        });
+        // In case of unexpected errors, default to false to avoid false positives
         return false;
       }
     };
