@@ -67,38 +67,59 @@ export default function Player({
     // Enhanced sandbox detection function
     const detectSandbox = (): boolean => {
       try {
-        // Log window relationships
-        console.log('Is top window?', window.top === window);
-        console.log('Window parent:', window.parent);
+        // Check if we're in an iframe
+        const isIframe = window.top !== window;
+        console.log('Is iframe:', isIframe);
         
-        // Try to get the frame element in different ways
-        const frameElement = window.frameElement;
-        console.log('Direct frameElement:', frameElement);
-        
-        // Try to find iframe another way
-        const iframes = window.parent?.document?.getElementsByTagName('iframe');
-        console.log('Parent iframes:', iframes);
-        
-        // If we're in an iframe but can't access frameElement, it's likely cross-origin
-        if (window.top !== window && !frameElement) {
-          console.log('Cross-origin iframe detected - cannot access frameElement');
-          return true;
+        // If we're not in an iframe, we're definitely not sandboxed
+        if (!isIframe) {
+          console.log('Not in an iframe');
+          return false;
         }
     
-        // If we can access frameElement, check its sandbox attribute
-        if (frameElement) {
-          const sandboxAttr = frameElement.getAttribute('sandbox');
-          console.log('Sandbox attribute:', sandboxAttr);
-          return sandboxAttr !== null;
+        // Try to access frameElement
+        try {
+          const frame = window.frameElement;
+          console.log('Frame element:', frame);
+          if (frame) {
+            const sandboxAttr = frame.getAttribute('sandbox');
+            console.log('Sandbox attribute:', sandboxAttr);
+            return Boolean(sandboxAttr);
+          }
+        } catch (frameError) {
+          console.log('Cannot access frameElement:', frameError);
+        }
+    
+        // Try to access parent
+        try {
+          const canAccessParent = Boolean(window.parent.location.href);
+          console.log('Can access parent location:', canAccessParent);
+          return !canAccessParent;
+        } catch (parentError) {
+          // If we can't access parent.location, we're in a cross-origin iframe
+          // This usually means we're sandboxed or have security restrictions
+          console.log('Cannot access parent location:', parentError);
+          if (parentError.name === 'SecurityError') {
+            console.log('Security restrictions detected - treating as sandboxed');
+            return true;
+          }
+        }
+    
+        // Try to access localStorage as a final check
+        try {
+          window.localStorage;
+          return false;
+        } catch (storageError) {
+          console.log('Cannot access localStorage:', storageError);
+          return true;
         }
     
         return false;
       } catch (error) {
-        console.log('Error during sandbox detection:', error);
+        console.log('General error during sandbox detection:', error);
         return false;
       }
     };
-
     const sandboxed = detectSandbox();
     setIsSandboxed(Boolean(sandboxed));
     console.log(`Final sandbox status: ${sandboxed}`);
