@@ -58,37 +58,44 @@ export default function Player({
   const [isSandboxed, setIsSandboxed] = useState<boolean>(false);
   const [showControls, setShowControls] = useState(false);
 
-  const detectSandbox = () => {
-    if (window.top !== window.self) {
+ // Sandbox detection useEffect
+ useEffect(() => {
+  const checkSandbox = () => {
+    try {
+      // Modern browsers support document.sandbox
+      const sandboxed = document.sandbox && document.sandbox.length > 0;
+      setIsSandboxed(sandboxed);
+    } catch (error) {
+      // Fallback for older browsers
       try {
-        // Try to access the parent window's location
-        window.parent.location.href
-        // If we can access it, we're not in a sandboxed iframe
-        return false
+        // @ts-ignore
+        const iframe = window.frameElement;
+        if (iframe && iframe.hasAttribute('sandbox')) {
+          setIsSandboxed(true);
+        }
       } catch (e) {
-        // If we can't access it, we're in a sandboxed iframe
-        return true
+        setIsSandboxed(false);
       }
     }
-    // If we're not in an iframe at all
-    return false
-  }
+  };
+
+  checkSandbox();
+}, []);
   // NEW: Effect to detect mobile devices
   useEffect(() => {
     // Simplified sandbox detection using document.sandbox
     // Enhanced sandbox detection function
     
      // Check sandbox status immediately
-     const sandboxed = detectSandbox();
-     setIsSandboxed(sandboxed);
+     
 
-     if(sandboxed){
+     if(isSandboxed){
        console.log("player is sandboxed");
+     }else{
+      console.log("player is not sandboxed");
      }
     
-     if(!sandboxed){
-       console.log("player is not sandboxed");
-     }
+     
     
 
     
