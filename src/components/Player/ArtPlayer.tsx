@@ -71,10 +71,13 @@ const detectSandbox = (): boolean => {
     if (window !== window.parent) {
       // Check for sandbox attribute on the iframe
       const currentFrame = window.frameElement as HTMLIFrameElement | null;
+      console.log(currentFrame);
       
       if (currentFrame) {
+        console.log(currentFrame.getAttribute("sandbox"))
         // Explicit sandbox attribute check
         const isSandboxed = currentFrame.hasAttribute('sandbox');
+        console.log(isSandboxed);
         
         // Additional sandbox content restriction check
         const sandboxValue = currentFrame.getAttribute('sandbox') || '';
