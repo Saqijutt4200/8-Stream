@@ -65,52 +65,48 @@ export default function Player({
     
     // Simplified sandbox detection using document.sandbox
     // Enhanced sandbox detection function
-const detectSandbox = (): boolean => {
-  try {
-    // Check if we're in an iframe
-    if (window !== window.parent) {
-      // Check for sandbox attribute on the iframe
-      const currentFrame = window.frameElement as HTMLIFrameElement | null;
-      console.log(currentFrame);
-      
-      if (currentFrame) {
-        console.log(currentFrame.getAttribute("sandbox"))
-        // Explicit sandbox attribute check
-        const isSandboxed = currentFrame.hasAttribute('sandbox');
-        console.log(isSandboxed);
-        
-        // Additional sandbox content restriction check
-        const sandboxValue = currentFrame.getAttribute('sandbox') || '';
-        const hasRestrictiveContent = 
-          sandboxValue.length > 0 && 
-          (sandboxValue.includes('allow-scripts') === false ||
-           sandboxValue.includes('allow-same-origin') === false);
-        
-        console.log(`Sandbox detected: ${isSandboxed}`);
-        console.log(`Restrictive sandbox: ${hasRestrictiveContent}`);
-        
-        return isSandboxed || hasRestrictiveContent;
-      }
-      
-      // Cross-origin iframe detection
+    const detectSandbox = (): boolean => {
       try {
-        window.parent.location.href;
-        return false; // Can access parent, likely not sandboxed
-      } catch (e) {
-        // Cross-origin restrictions might indicate sandbox
-        const currentFrames = window.frameElement as HTMLIFrameElement | null;
-      console.log(currentFrames);
-        console.log('Cross-origin iframe detected');
-        return true;
-      }
-    }
+        // First check if we're actually in an iframe
+        if (window.top === window) {
+          return false; // Not in an iframe at all
+        }
     
-    return false; // Not in an iframe
-  } catch (error) {
-    console.error('Sandbox detection error:', error);
-    return false; // Default to non-sandboxed if detection fails
-  }
-};
+        // Try to access frameElement first
+        if (window.frameElement) {
+          const sandboxAttr = window.frameElement.getAttribute('sandbox');
+          // If sandbox attribute exists and doesn't have necessary permissions
+          return sandboxAttr !== null && (
+            !sandboxAttr.includes('allow-scripts') ||
+            !sandboxAttr.includes('allow-same-origin')
+          );
+        }
+    
+        // For cross-origin iframes, check if we can execute basic operations
+        // that are typically blocked in sandboxed iframes
+        try {
+          // Try to access localStorage (blocked in sandboxed iframes)
+          window.localStorage;
+          
+          // Try to create a popup (blocked in sandboxed iframes)
+          const popup = window.open('', '_blank');
+          if (popup) {
+            popup.close();
+          }
+          
+          return false; // If we got here, likely not sandboxed
+        } catch (e) {
+          // If these operations fail, check the error message
+          // Some browsers give specific error messages for sandbox restrictions
+          const errorMsg = e.toString().toLowerCase();
+          return errorMsg.includes('sandbox') || errorMsg.includes('security');
+        }
+      } catch (error) {
+        console.error('Sandbox detection error:', error);
+        // In case of unexpected errors, default to false to avoid false positives
+        return false;
+      }
+    };
 
     const sandboxed = detectSandbox();
     setIsSandboxed(Boolean(sandboxed));
