@@ -77,7 +77,7 @@ export default function Player({
         setIsSandboxed(false);
       }
     };
-
+  });
   // NEW: Effect to detect mobile devices
   useEffect(() => {
     // Simplified sandbox detection using document.sandbox
