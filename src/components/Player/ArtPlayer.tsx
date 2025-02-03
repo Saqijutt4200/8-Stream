@@ -62,23 +62,41 @@ export default function Player({
  useEffect(() => {
   const checkSandbox = () => {
     try {
-      // Modern browsers - check for any sandbox attribute presence
-      const hasSandbox = 'sandbox' in document;
-      setIsSandboxed(hasSandbox);
+      // 1. Check for basic sandbox restrictions
+      const isIframe = window.self !== window.top;
+      const isSandboxed = isIframe && (
+        // 2. Check if we're in a cross-origin iframe with sandbox
+        (() => {
+          try {
+            // This will throw in cross-origin iframes without 'allow-same-origin'
+            window.localStorage;
+            return false;
+          } catch (error) {
+            return error instanceof DOMException && error.name === 'SecurityError';
+          }
+        })() ||
+        // 3. Check for specific sandbox features
+        (() => {
+          try {
+            // Create test element for feature detection
+            const iframe = document.createElement('iframe');
+            iframe.sandbox.add('allow-scripts');
+            return iframe.sandbox.length > 0;
+          } catch (e) {
+            return true;
+          }
+        })()
+      );
+
+      setIsSandboxed(!!isSandboxed);
     } catch (error) {
-      // Fallback for older browsers
+      // Final fallback check
       try {
-        const iframe = window.frameElement as HTMLIFrameElement | null;
-        setIsSandboxed(!!iframe?.hasAttribute('sandbox'));
+        // Attempt to access parent document (will fail in cross-origin sandbox)
+        window.parent.document;
+        setIsSandboxed(false);
       } catch (e) {
-        // Cross-origin iframe - use feature detection
-        try {
-          // Check if sandbox restrictions are applied
-          localStorage.getItem('test');
-          setIsSandboxed(false);
-        } catch {
-          setIsSandboxed(true);
-        }
+        setIsSandboxed(true);
       }
     }
   };
