@@ -62,19 +62,23 @@ export default function Player({
  useEffect(() => {
   const checkSandbox = () => {
     try {
-      // Modern browsers support document.sandbox
-      const sandboxed = document.sandbox ? document.sandbox.length > 0: false;
-      setIsSandboxed(sandboxed);
+      // Modern browsers - check for any sandbox attribute presence
+      const hasSandbox = 'sandbox' in document;
+      setIsSandboxed(hasSandbox);
     } catch (error) {
       // Fallback for older browsers
       try {
-        // @ts-ignore
         const iframe = window.frameElement as HTMLIFrameElement | null;
-        if (!!iframe?.hasAttribute('sandbox')) {
+        setIsSandboxed(!!iframe?.hasAttribute('sandbox'));
+      } catch (e) {
+        // Cross-origin iframe - use feature detection
+        try {
+          // Check if sandbox restrictions are applied
+          localStorage.getItem('test');
+          setIsSandboxed(false);
+        } catch {
           setIsSandboxed(true);
         }
-      } catch (e) {
-        setIsSandboxed(false);
       }
     }
   };
@@ -89,11 +93,26 @@ export default function Player({
      // Check sandbox status immediately
      
 
-     if(isSandboxed){
-       console.log("player is sandboxed");
-     }else{
-      console.log("player is not sandboxed");
-     }
+     if (isSandboxed) {
+      // Block playback and show message
+      if (artRef.current) {
+        artRef.current.innerHTML = `
+          <div style="
+            color: white;
+            padding: 20px;
+            text-align: center;
+            background: #000;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">
+            Video playback disabled in sandboxed frames
+          </div>
+        `;
+      }
+      return;
+    }
     
      
     
@@ -557,7 +576,7 @@ export default function Player({
         }
       };
     
-  }, [artRef.current]);
+  }, [artRef.current, isSandboxed]);
 
   
 
