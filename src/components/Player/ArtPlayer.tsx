@@ -62,15 +62,24 @@ export default function Player({
   useEffect(() => {
     const checkSandbox = () => {
       try {
-        window.parent.document;
-        setIsSandboxed(false);
+        // Direct sandbox detection
+        const directSandbox = document.sandbox?.length > 0;
+        
+        // Cross-origin sandbox detection
+        let crossOriginSandbox = false;
+        try {
+          window.parent.document;
+        } catch (error) {
+          crossOriginSandbox = error instanceof DOMException && 
+                             error.name === 'SecurityError';
+        }
+
+        setIsSandboxed(directSandbox || crossOriginSandbox);
       } catch (error) {
-        setIsSandboxed(
-          error instanceof DOMException && error.name === "SecurityError"
-        );
+        setIsSandboxed(false);
       }
     };
-
+    
     checkSandbox();
   }, []);
 
