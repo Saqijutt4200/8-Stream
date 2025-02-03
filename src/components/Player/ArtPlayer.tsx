@@ -63,7 +63,7 @@ export default function Player({
     const checkSandbox = () => {
       try {
         // Direct sandbox detection
-        const directSandbox = document.sandbox?.length > 0;
+        const directSandbox = (document.sandbox?.length ?? 0) > 0;
         
         // Cross-origin sandbox detection
         let crossOriginSandbox = false;
