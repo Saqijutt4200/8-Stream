@@ -62,24 +62,34 @@ export default function Player({
   useEffect(() => {
     const checkSandbox = () => {
       try {
-        // Direct sandbox detection
-        const directSandbox = (document.sandbox?.length ?? 0) > 0;
-        
-        // Cross-origin sandbox detection
-        let crossOriginSandbox = false;
-        try {
-          window.parent.document;
-        } catch (error) {
-          crossOriginSandbox = error instanceof DOMException && 
-                             error.name === 'SecurityError';
+        // Feature detection for sandbox restrictions
+        const testFeatures = () => {
+          try {
+            // Test for restricted features
+            localStorage.getItem('test'); // Blocked without allow-same-origin
+            window.open('about:blank'); // Blocked without allow-popups
+            new BroadcastChannel('test'); // Blocked without allow-scripts
+            return false;
+          } catch (error) {
+            return error instanceof DOMException && error.name === 'SecurityError';
+          }
+        };
+        // Check if we're in an iframe
+        const isIframe = window.self !== window.top;
+        // If not in iframe, definitely not sandboxed
+        if (!isIframe) {
+          setIsSandboxed(false);
+          return;
         }
-
+        // Check for direct sandbox property (same-origin)
+        const directSandbox = (document.sandbox?.length ?? 0) > 0;
+        // Check for cross-origin sandbox using feature detection
+        const crossOriginSandbox = isIframe && testFeatures();
         setIsSandboxed(directSandbox || crossOriginSandbox);
       } catch (error) {
         setIsSandboxed(false);
       }
     };
-    
     checkSandbox();
   }, []);
 
