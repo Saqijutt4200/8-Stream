@@ -401,7 +401,7 @@ export default function Player({
             </div>
           `,
           style: {
-            zIndex: 100,
+            zIndex: '100',
           }
         }] : [])
       ],
