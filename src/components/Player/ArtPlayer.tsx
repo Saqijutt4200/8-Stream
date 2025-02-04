@@ -7,6 +7,7 @@ import Hls from "hls.js";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
+
 // Define the level type
 interface HLSLevel {
   height: number;
@@ -21,10 +22,24 @@ interface QualityLevel {
   html: string;
 }
 
+// Define types for sandbox detection results
+interface SandboxDetails {
+  sandboxed: boolean;
+  reasons?: string[];
+  environments?: string[];
+  securityLevel?: number;
+}
+
 // Add type declaration for sandbox detection
 declare global {
   interface Document {
     sandbox?: DOMTokenList;
+  }
+  interface Window {
+    controlsTimeout?: NodeJS.Timeout;
+    sandblaster?: {
+      detect: () => SandboxDetails;
+    };
   }
 }
 
@@ -33,6 +48,7 @@ declare global {
   interface Window {
     controlsTimeout?: NodeJS.Timeout;
   }
+  
 }
 
 export default function Player({
@@ -57,54 +73,61 @@ export default function Player({
   );
   const [isSandboxed, setIsSandboxed] = useState<boolean>(false);
   const [showControls, setShowControls] = useState(false);
+  const [sandboxDetails, setSandboxDetails] = useState<SandboxDetails | null>(null);
 
-  // Sandbox detection useEffect
+  
+  
   useEffect(() => {
+
+    // Load Sandblaster script
+    const script = document.createElement('script');
+    script.src = "https://unpkg.com/sandblaster/dist/sandblaster.min.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+
+    // Sandbox detection function
     const checkSandbox = () => {
       try {
-        const sameOriginSandbox = (document.sandbox?.length ?? 0) > 0;
-        let crossOriginSandbox = false;
-        
-        try {
-          window.parent.document;
-        } catch (error) {
-          crossOriginSandbox = error instanceof DOMException && 
-                             error.name === 'SecurityError';
-        }
+        // Check if Sandblaster is available
+        if (window.sandblaster && window.sandblaster.detect) {
+          // Use Sandblaster to detect sandbox status
+          const result = window.sandblaster.detect();
 
-        setIsSandboxed(sameOriginSandbox || crossOriginSandbox);
+          // Set sandboxed state
+          setIsSandboxed(result.sandboxed === true);
+
+          // Store full sandbox details
+          setSandboxDetails(result);
+
+          // Log detailed sandbox information
+          console.log('Sandbox Detection Result:', result);
+        } else {
+          // Fallback detection methods
+          // Method 1: Check document.sandbox attribute
+          if (document.sandbox && document.sandbox.length > 0) {
+            setIsSandboxed(true);
+          }
+
+          // Method 2: Check for CSP restrictions
+          try {
+            const testElement = document.createElement('div');
+            testElement.innerHTML = '<img src="data:text/html">';
+          } catch (e) {
+            setIsSandboxed(true);
+          }
+        }
       } catch (error) {
+        console.error('Sandbox detection error:', error);
         setIsSandboxed(false);
       }
     };
-  });
-  // NEW: Effect to detect mobile devices
-  useEffect(() => {
-    // Simplified sandbox detection using document.sandbox
-    // Enhanced sandbox detection function
 
-    // Check sandbox status immediately
+    // Wait for script to load
+    script.onload = checkSandbox;
+   
 
-    if (isSandboxed) {
-      // Block playback and show message
-      if (artRef.current) {
-        artRef.current.innerHTML = `
-          <div style="
-            color: white;
-            padding: 20px;
-            text-align: center;
-            background: #000;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          ">
-            Video playback disabled in sandboxed frames
-          </div>
-        `;
-      }
-      return;
-    }
+   
 
     console.log(posterUrl);
     const storedImageUrl = localStorage.getItem("currentPosterUrl");
@@ -360,6 +383,27 @@ export default function Player({
             }
           },
         },
+        // Add sandbox warning layer
+        ...(isSandboxed ? [{
+          name: 'sandbox-warning',
+          html: `
+            <div style="
+              position: absolute;
+              top: 10px;
+              left: 10px;
+              background-color: rgba(255, 0, 0, 0.7);
+              color: white;
+              padding: 5px 10px;
+              border-radius: 4px;
+              z-index: 100;
+            ">
+              Sandboxed Environment Detected
+            </div>
+          `,
+          style: {
+            zIndex: 100,
+          }
+        }] : [])
       ],
       plugins: [],
       customType: {
@@ -557,15 +601,22 @@ export default function Player({
       position: "right",
     });
     console.log("controls", art.controls);
+    // If sandbox is detected, add a notice
+    if (isSandboxed) {
+      art.notice.show = "Running in a restricted environment";
+    }
     return () => {
       if (art && art.destroy) {
         art.destroy(false);
         art?.hls?.destroy();
       }
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
     };
-  }, [artRef.current, isSandboxed]);
+  }, [artRef.current]);
 
   //
 
-  return <div ref={artRef} className="w-full h-full" {...rest}></div>;
+  return <div ref={artRef} className="w-full h-full" data-sandboxed={isSandboxed} {...rest}></div>;
 }
