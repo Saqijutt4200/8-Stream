@@ -275,7 +275,7 @@ export default function Player({
                 transition: all 0.3s ease;
               ">
                 <div class="current-lang" style="
-                  color: white;
+                  color: #49484a;
                   font-size: 14px;
                   display: flex;
                   align-items: center;
