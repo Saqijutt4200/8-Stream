@@ -184,7 +184,7 @@ export default function Player({
         }
 
         .art-video-player .art-control-progress {
-          bottom: 45px !important;
+          bottom: 0 !important;
         }
 
         .art-video-player .art-control-fullscreen {

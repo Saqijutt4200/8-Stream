@@ -161,7 +161,7 @@ const Stream = ({
                 "--art-indicator-size": "15px",
                 "--art-bottom-gap": "0px",
                 "--art-control-icon-scale": 1.7,
-                "--art-padding": "10px 30px",
+                //"--art-padding": "10px 30px 0px",
                 // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
