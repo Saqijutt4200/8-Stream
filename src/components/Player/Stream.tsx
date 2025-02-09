@@ -8,6 +8,12 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { consumetPlay } from "@/lib/consumetApi";
 import { toast } from "react-toastify";
 
+
+interface PosterData {
+  posterPath?: string;
+  backdropPath?: string;
+}
+
 const Stream = ({
   params,
 }: {
@@ -19,6 +25,7 @@ const Stream = ({
   //const episode = searchParams.get("episode");
   const dispatch = useAppDispatch();
   const [url, setUrl] = useState<string>("");
+  const [posterData, setPosterData] = useState<PosterData>({});
   const ref = React.useRef<any>();
   const [art, setArt] = useState<any>();
   const [availableLang, setAvailableLang] = useState<any>([""]);
@@ -37,6 +44,45 @@ const Stream = ({
   
 
   const provider = useAppSelector((state) => state.options.api);
+
+  // Fetch poster data from TMDB
+  useEffect(() => {
+    async function fetchPosterData() {
+      try {
+        // First try to get TMDB ID using IMDB ID
+        const findResponse = await fetch(
+          `https://api.themoviedb.org/3/find/${params.imdb}?api_key=${process.env.NEXT_PUBLIC_TMDB_KEY}&external_source=imdb_id`
+        );
+        console.log(findResponse)
+        const findData = await findResponse.json();
+        
+        // Get the TMDB ID from the results
+        const tmdbId = findData?.movie_results?.[0]?.id || findData?.tv_results?.[0]?.id;
+        console.log(tmdbId)
+        
+        if (tmdbId) {
+          // Fetch detailed data using TMDB ID
+          const detailsResponse = await fetch(
+            `https://api.themoviedb.org/3/${params.type}/${tmdbId}?api_key=${process.env.NEXT_PUBLIC_TMDB_KEY}`
+          );
+          console.log(detailsResponse)
+          const detailsData = await detailsResponse.json();
+          console.log(detailsData)
+          
+          setPosterData({
+            posterPath: detailsData.poster_path,
+            backdropPath: detailsData.backdrop_path
+          });
+          console.log(detailsData.poster_path)
+          console.log(detailsData.backdrop_path)
+        }
+      } catch (error) {
+        console.error('Error fetching poster data:', error);
+      }
+    }
+
+    fetchPosterData();
+  }, [params.imdb, params.type]);
 
   useEffect(() => {
 
@@ -120,6 +166,17 @@ const Stream = ({
       getConsumet();
     }
   }, [currentLang, season, episode]);
+
+  const getPosterUrl = () => {
+    if (posterData.backdropPath) {
+      return `https://image.tmdb.org/t/p/original${posterData.backdropPath}`;
+    }
+    if (posterData.posterPath) {
+      return `https://image.tmdb.org/t/p/original${posterData.posterPath}`;
+    }
+    return ''; // Fallback empty string if no poster available
+  };
+
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
@@ -127,6 +184,7 @@ const Stream = ({
           <Artplayer
             artRef={ref}
             sub={sub}
+            posterUrl={getPosterUrl()} // Pass poster URL directly to ArtPlayer
             availableLang={availableLang} // Add this prop
             onLanguageChange={(lang: string) => {
               setCurrentLang(lang);  // This will trigger the useEffect to fetch new URL

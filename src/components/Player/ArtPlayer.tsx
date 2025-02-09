@@ -56,6 +56,7 @@ export default function Player({
   getInstance,
   artRef,
   sub,
+  posterUrl, // Add this prop
   availableLang = [], // Add this prop with default empty array
   onLanguageChange, // Add this prop
   ...rest
@@ -64,13 +65,14 @@ export default function Player({
   getInstance?: (art: Artplayer) => void;
   artRef: any;
   sub?: any;
+  posterUrl?: string; // Add this prop
   availableLang?: string[]; // Add this to the type
   onLanguageChange?: (lang: string) => void; // Add this to the type
   [key: string]: any;
 }) {
-  const posterUrl = useSelector(
-    (state: RootState) => state.posterUrl.currentPosterUrl
-  );
+  //const posterUrl = useSelector(
+    //(state: RootState) => state.posterUrl.currentPosterUrl
+  //);
   const [isSandboxed, setIsSandboxed] = useState<boolean>(false);
   const [showControls, setShowControls] = useState(false);
   const [sandboxDetails, setSandboxDetails] = useState<SandboxDetails | null>(null);
@@ -242,7 +244,7 @@ export default function Player({
       layers: [
         {
           name: "poster",
-          html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
+          html: posterUrl ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">` : '',
           tooltip: "Poster Tip",
           style: {
             position: "absolute",
@@ -539,7 +541,7 @@ export default function Player({
     art.on("play", () => {
       art.layers.update({
         name: "poster",
-        html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
+        html: posterUrl ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">` : '',
         tooltip: "Poster Tip",
         style: {
           position: "absolute",
@@ -555,7 +557,7 @@ export default function Player({
     art.on("pause", () => {
       art.layers.update({
         name: "poster",
-        html: `<img style="object-fit: cover; height: 100%; width: 100%; "  src="${storedImageUrl}">`,
+        html: posterUrl ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">` : '',
         tooltip: "Poster Tip",
         style: {
           position: "absolute",
@@ -614,7 +616,7 @@ export default function Player({
         script.parentNode.removeChild(script);
       }
     };
-  }, [artRef.current]);
+  }, [artRef.current, posterUrl]);
 
   //
 
