@@ -192,6 +192,25 @@ export default function Player({
         .art-video-player .art-control-fullscreen {
           margin-bottom: 0 !important;
         }
+        /* Add custom scrollbar styles */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.3);
+  }
+  
+  /* For webkit browsers */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+  }
         
     
       `;
@@ -419,8 +438,7 @@ export default function Player({
                // Add custom scrollbar styles
             const langOptions = selector.querySelector(".lang-options") as HTMLElement;
             if (langOptions) {
-              langOptions.style.scrollbarWidth = "thin";
-              langOptions.style.scrollbarColor = "rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.3)";
+              langOptions.classList.add('custom-scrollbar');
             }
             }
           },
