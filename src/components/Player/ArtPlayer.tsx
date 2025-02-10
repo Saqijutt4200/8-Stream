@@ -288,7 +288,7 @@ export default function Player({
                 position: absolute;
                 top: 20px;
                 right: 20px;
-                background-color: rgba(0, 0, 0, 0.7);
+                background-color: #fcba03;
                 padding: 8px;
                 border-radius: 4px;
                 cursor: pointer;
@@ -297,6 +297,7 @@ export default function Player({
               ">
                 <div class="current-lang" style="
                   color: white;
+                  background-color: #fcba03;
                   font-size: 14px;
                   display: flex;
                   align-items: center;
@@ -324,7 +325,7 @@ export default function Player({
                     .map(
                       (lang: string) => `
                     <div class="lang-option" data-value="${lang}" style="
-                    color: ${lang === availableLang[0] ? 'yellow' : 'white'};
+                    color: ${lang === availableLang[0] ? '#fcba03' : 'white'};
                     background-color: ${lang === availableLang[0] ? '#49484a' : 'transparent'};
                       padding: 8px 12px;
                       cursor: pointer;
@@ -360,7 +361,7 @@ export default function Player({
                     const optElement = opt as HTMLElement;
                     const isCurrentLang = optElement.getAttribute("data-value") === currentLangText;
                     optElement.style.backgroundColor = isCurrentLang ? "#49484a" : "transparent";
-                    optElement.style.color = isCurrentLang ? "yellow" : "white";
+                    optElement.style.color = isCurrentLang ? "#fcba03" : "white";
                   });
                 }
               }
@@ -383,7 +384,7 @@ export default function Player({
               // Add selected styling to clicked option
               const optionElement = option as HTMLElement;
     optionElement.style.backgroundColor = "#49484a";
-    optionElement.style.color = "yellow";
+    optionElement.style.color = "#fcba03";
                 const currentLang = selector?.querySelector(
                   ".current-lang span"
                 ) as HTMLElement;
@@ -406,10 +407,10 @@ export default function Player({
             ) as HTMLElement;
             if (selector) {
               selector.addEventListener("mouseenter", () => {
-                selector.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+                selector.style.backgroundColor = "#fcba03";
               });
               selector.addEventListener("mouseleave", () => {
-                selector.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                selector.style.backgroundColor = "#fcba03";
                 const options = selector.querySelector(
                   ".lang-options"
                 ) as HTMLElement;
@@ -423,7 +424,7 @@ export default function Player({
               options.forEach((option) => {
                 const optionElement = option as HTMLElement;
                 optionElement.addEventListener("mouseenter", () => {
-                  if (optionElement.style.color !== "yellow") {
+                  if (optionElement.style.color !== "#fcba03") {
                     optionElement.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
                   }
                 });
