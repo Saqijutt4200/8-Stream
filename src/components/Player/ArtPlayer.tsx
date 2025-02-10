@@ -355,13 +355,15 @@ export default function Player({
                 // Update all options to remove selected styling
               const allOptions = selector?.querySelectorAll(".lang-option");
               allOptions?.forEach((opt) => {
-                (opt as HTMLElement).style.backgroundColor = "transparent";
-                (opt as HTMLElement).style.color = "white";
+                onst optElement = opt as HTMLElement;
+      optElement.style.backgroundColor = "transparent";
+      optElement.style.color = "white";
               });
               
               // Add selected styling to clicked option
-              option.style.backgroundColor = "#49484a";
-              option.style.color = "yellow";
+              const optionElement = option as HTMLElement;
+    optionElement.style.backgroundColor = "#49484a";
+    optionElement.style.color = "yellow";
                 const currentLang = selector?.querySelector(
                   ".current-lang span"
                 ) as HTMLElement;
