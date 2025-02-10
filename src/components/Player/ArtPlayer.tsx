@@ -277,7 +277,7 @@ export default function Player({
                 transition: all 0.3s ease;
               ">
                 <div class="current-lang" style="
-                  color: #49484a;
+                  color: white;
                   font-size: 14px;
                   display: flex;
                   align-items: center;
@@ -297,12 +297,16 @@ export default function Player({
                   border-radius: 4px;
                   margin-top: 4px;
                   min-width: 100px;
+                  max-height: 100px;
+                  overflow-y: auto;
+                  border: 1px solid white;
                 ">
                   ${availableLang
                     .map(
                       (lang: string) => `
                     <div class="lang-option" data-value="${lang}" style="
-                      color: white;
+                    color: ${lang === availableLang[0] ? 'yellow' : 'white'};
+                    background-color: ${lang === availableLang[0] ? '#49484a' : 'transparent'};
                       padding: 8px 12px;
                       cursor: pointer;
                       font-size: 14px;
@@ -328,6 +332,18 @@ export default function Player({
               if (options) {
                 const isHidden = options.style.display === "none";
                 options.style.display = isHidden ? "block" : "none";
+              
+                if (isHidden) {
+                  // When opening the dropdown, highlight the current selection
+                  const currentLangText = selector.querySelector(".current-lang span")?.textContent;
+                  const allOptions = options.querySelectorAll(".lang-option");
+                  allOptions.forEach((opt) => {
+                    const optElement = opt as HTMLElement;
+                    const isCurrentLang = optElement.getAttribute("data-value") === currentLangText;
+                    optElement.style.backgroundColor = isCurrentLang ? "#49484a" : "transparent";
+                    optElement.style.color = isCurrentLang ? "yellow" : "white";
+                  });
+                }
               }
             }
 
@@ -336,6 +352,16 @@ export default function Player({
               if (value) {
                 //setCurrentLang(value);
                 onLanguageChange(value);
+                // Update all options to remove selected styling
+              const allOptions = selector?.querySelectorAll(".lang-option");
+              allOptions?.forEach((opt) => {
+                (opt as HTMLElement).style.backgroundColor = "transparent";
+                (opt as HTMLElement).style.color = "white";
+              });
+              
+              // Add selected styling to clicked option
+              option.style.backgroundColor = "#49484a";
+              option.style.color = "yellow";
                 const currentLang = selector?.querySelector(
                   ".current-lang span"
                 ) as HTMLElement;
@@ -375,13 +401,24 @@ export default function Player({
               options.forEach((option) => {
                 const optionElement = option as HTMLElement;
                 optionElement.addEventListener("mouseenter", () => {
-                  optionElement.style.backgroundColor =
-                    "rgba(255, 255, 255, 0.1)";
+                  if (optionElement.style.color !== "yellow") {
+                    optionElement.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+                  }
                 });
                 optionElement.addEventListener("mouseleave", () => {
-                  optionElement.style.backgroundColor = "transparent";
+                  const currentLangText = selector.querySelector(".current-lang span")?.textContent;
+                  const isCurrentLang = optionElement.getAttribute("data-value") === currentLangText;
+                  if (!isCurrentLang) {
+                    optionElement.style.backgroundColor = "transparent";
+                  }
                 });
               });
+               // Add custom scrollbar styles
+            const langOptions = selector.querySelector(".lang-options") as HTMLElement;
+            if (langOptions) {
+              langOptions.style.scrollbarWidth = "thin";
+              langOptions.style.scrollbarColor = "rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.3)";
+            }
             }
           },
         },
