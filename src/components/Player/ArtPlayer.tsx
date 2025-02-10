@@ -352,12 +352,11 @@ export default function Player({
               if (value) {
                 //setCurrentLang(value);
                 onLanguageChange(value);
-              }
-            }
+              
                 // Update all options to remove selected styling
               const allOptions = selector?.querySelectorAll(".lang-option");
               allOptions?.forEach((opt) => {
-                onst optElement = opt as HTMLElement;
+                const optElement = opt as HTMLElement;
       optElement.style.backgroundColor = "transparent";
       optElement.style.color = "white";
               });
