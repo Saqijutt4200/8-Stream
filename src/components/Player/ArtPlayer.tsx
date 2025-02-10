@@ -353,6 +353,7 @@ export default function Player({
                 //setCurrentLang(value);
                 onLanguageChange(value);
               }
+            }
                 // Update all options to remove selected styling
               const allOptions = selector?.querySelectorAll(".lang-option");
               allOptions?.forEach((opt) => {
