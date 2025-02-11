@@ -165,7 +165,13 @@ export default function Player({
         
         .art-video-player .art-progress .art-progress-indicator {
           transform: scale(0.6) !important; /* Reduce dot size by 40% */
-          
+          width: 12px !important;
+      height: 12px !important;
+      background: white !important;
+      border-radius: 0 !important;
+      top: -4px !important;
+      /* Create TV shape using clip-path */
+      clip-path: path('M2,3 v6 h8 v-6 h-8 M0,1 v10 h12 v-10 h-12 M3,0 h6 l1,1 h-8 l1,-1');
         }
         
         .art-video-player .art-progress:hover .art-progress-indicator {
