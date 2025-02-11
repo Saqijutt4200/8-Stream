@@ -205,6 +205,7 @@ const Stream = ({
               url: url,
               aspectRatio: true,
               flip: true,
+              miniProgressBar: true,
               setting: true,
               theme: "#fcba03",
               controls: [],
