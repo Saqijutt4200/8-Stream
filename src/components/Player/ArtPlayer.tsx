@@ -165,13 +165,14 @@ export default function Player({
         
         .art-video-player .art-progress .art-progress-indicator {
           transform: scale(0.6) !important; /* Reduce dot size by 40% */
-          width: 12px !important;
-      height: 12px !important;
-      background: white !important;
-      border-radius: 0 !important;
-      top: -4px !important;
-      /* Create TV shape using clip-path */
-      clip-path: path('M2,3 v6 h8 v-6 h-8 M0,1 v10 h12 v-10 h-12 M3,0 h6 l1,1 h-8 l1,-1');
+          width: 16px !important;
+      height: 16px !important;
+      top: -6px !important;
+      background-color: transparent !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='white' d='M 33.488281 1.9863281 A 1.50015 1.50015 0 0 0 32.5625 2.328125 L 23.533203 9.5527344 L 17.476562 4.3613281 A 1.50015 1.50015 0 1 0 15.523438 6.6386719 L 19.445312 10 L 11.5 10 C 7.9280619 10 5 12.928062 5 16.5 L 5 34.5 C 5 38.071938 7.9280619 41 11.5 41 L 36.5 41 C 40.071938 41 43 38.071938 43 34.5 L 43 16.5 C 43 12.928062 40.071938 10 36.5 10 L 27.777344 10 L 34.4375 4.671875 A 1.50015 1.50015 0 0 0 33.488281 1.9863281 z M 11.5 13 L 23.486328 13 L 36.5 13 C 38.450062 13 40 14.549938 40 16.5 L 40 34.5 C 40 36.450062 38.450062 38 36.5 38 L 11.5 38 C 9.5499381 38 8 36.450062 8 34.5 L 8 16.5 C 8 14.549938 9.5499381 13 11.5 13 z M 35.5 20 A 1.5 1.5 0 0 0 35.5 23 A 1.5 1.5 0 0 0 35.5 20 z M 35.5 27 A 1.5 1.5 0 0 0 35.5 30 A 1.5 1.5 0 0 0 35.5 27 z'/%3E%3C/svg%3E") !important;
+      background-size: contain !important;
+      background-repeat: no-repeat !important;
+      background-position: center !important;
         }
         
         .art-video-player .art-progress:hover .art-progress-indicator {
