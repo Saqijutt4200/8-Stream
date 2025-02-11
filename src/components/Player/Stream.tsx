@@ -203,6 +203,8 @@ const Stream = ({
             option={{
               container: "#player-container",
               url: url,
+              aspectRatio: true,
+              flip: true,
               setting: true,
               theme: "#fcba03",
               controls: [],
