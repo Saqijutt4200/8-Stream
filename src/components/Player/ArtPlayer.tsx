@@ -23,14 +23,24 @@ export default function Player({
       container: artRef.current!,
       plugins: [
         artplayerPluginHlsQuality({
+          // Show quality in control
           control: true,
+
+          // Get the resolution text from level
           getResolution: (level) => {
-            if (level.height <= 240) return "240P";
-            if (level.height <= 360) return "360P";
-            if (level.height <= 480) return "480P";
-            if (level.height <= 720) return "720P";
-            if (level.height <= 1080) return "1080P";
-            return level.height + "P";
+            if (level.height <= 240) {
+              return "240P";
+            } else if (level.height > 240 && level.height <= 360) {
+              return "360P";
+            } else if (level.height > 360 && level.height <= 480) {
+              return "480P";
+            } else if (level.height > 480 && level.height <= 720) {
+              return "720P";
+            } else if (level.height > 720 && level.height <= 1080) {
+              return "1080P";
+            } else {
+              return level.height + "P";
+            }
           },
         }),
       ],
@@ -60,33 +70,23 @@ export default function Player({
       getInstance(art);
     }
 
-    // Handle keyboard shortcuts
     art.events.proxy(document, "keypress", (event: any) => {
+      // Check if the focus is on an input field or textarea
       const isInputFocused =
         document?.activeElement?.tagName === "INPUT" ||
         document?.activeElement?.tagName === "TEXTAREA";
 
-      if (!isInputFocused) {
-        if (event?.code === "Space") {
-          event.preventDefault();
-          art.playing ? art.pause() : art.play();
-        } else if (event?.code === "KeyF") {
-          event.preventDefault();
-          art.fullscreen = !art.fullscreen;
-        } else if (event?.code === "ArrowLeft") {
-          event.preventDefault();
-          art.currentTime = Math.max(0, art.currentTime - 10);
-        } else if (event?.code === "ArrowRight") {
-          event.preventDefault();
-          art.currentTime = Math.min(art.duration, art.currentTime + 10);
-        }
+      if (!isInputFocused && event?.code === "Space") {
+        event.preventDefault();
+        art.playing ? art.pause() : art.play();
+      } else if (!isInputFocused && event?.code === "KeyF") {
+        event.preventDefault();
+        art.fullscreen = !art.fullscreen;
       }
     });
 
-    // Remove default play/pause control
     art.controls.remove("playAndPause");
 
-    // Add subtitle selection
     if (sub?.length > 0) {
       art.controls.add({
         name: "subtitle",
@@ -98,19 +98,26 @@ export default function Player({
             html: `off`,
             value: "",
           },
-          ...sub.map((item: any) => ({
-            html: `<div>${item.lang}</div>`,
-            value: item?.url,
-          })),
+          ...sub.map((item: any, i: number) => {
+            return {
+              html: `<div>${item.lang}</div>`,
+              value: item?.url,
+            };
+          }),
         ],
-        onSelect: function (item) {
+        onSelect: function (item, $dom) {
+          // @ts-ignore
           art.subtitle.switch(item.value);
           return item.html;
         },
       });
     }
 
-    // Add 10s backward button
+    art.controls.update({
+      name: "volume",
+      position: "right",
+    });
+// Add 10s backward button
     art.controls.add({
       name: "backward",
       position: "left",
@@ -139,7 +146,6 @@ export default function Player({
         padding: "5px",
       },
     });
-
     console.log("controls", art.controls);
 
     return () => {
