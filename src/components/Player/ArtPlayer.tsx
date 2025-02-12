@@ -190,15 +190,15 @@ export default function Player({
           bottom: 0 !important;
         }
         .art-video-player .art-control-volume {
-          margin-right: 12px !important; /* Add extra spacing after volume control */
+          margin-right: 24px !important; /* Add extra spacing after volume control */
         }
         
         .art-video-player .art-control-quality {
-          margin-left: 12px !important; /* Add extra spacing before quality control */
+          margin-left: 24px !important; /* Add extra spacing before quality control */
         }
         
         .art-video-player .art-control-subtitle {
-          margin-left: 12px !important; /* Add extra spacing before subtitle control */
+          margin-left: 24px !important; /* Add extra spacing before subtitle control */
         }
 
         .art-video-player .art-control-fullscreen {
