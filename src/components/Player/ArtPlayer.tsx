@@ -139,7 +139,7 @@ export default function Player({
         
         .art-video-player .art-progress .art-progress-bar {
           height: 4px !important; /* Make the line bolder */
-          bottom: 48px !important; /* Make the line bolder */
+          
           
           
         }
