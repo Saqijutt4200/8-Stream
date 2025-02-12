@@ -698,7 +698,7 @@ export default function Player({
     }
     art.controls.update({
       name: "volume",
-      position: "right",
+      position: "left",
     });
     console.log("controls", art.controls);
     // If sandbox is detected, add a notice
