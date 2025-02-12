@@ -285,7 +285,7 @@ export default function Player({
         {
           name: "poster",
           html: posterUrl
-            ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">`
+            ? `<img style="object-fit: cover; height: 100%; width: 100%; pointer-events: none; user-select: none; -webkit-user-select: none;" src="${posterUrl}">`
             : "",
           tooltip: "Poster Tip",
           style: {
@@ -295,6 +295,10 @@ export default function Player({
             height: "100%",
             width: "100%",
             overflow: "hidden",
+             // Add these styles to prevent selection and context menu
+    userSelect: "none",
+    WebkitUserSelect: "none",
+    WebkitTouchCallout: "none",
           },
           click: function (...args) {
             console.info("click", args);
@@ -433,6 +437,12 @@ export default function Player({
             }
           },
           mounted: function (layer) {
+            const img = layer.querySelector('img');
+    if (img) {
+      img.addEventListener('contextmenu', (e) => e.preventDefault());
+      img.addEventListener('touchstart', (e) => e.preventDefault());
+      img.addEventListener('mousedown', (e) => e.preventDefault());
+    }
             // Add hover effects
             const selector = layer.querySelector(
               ".language-selector"
