@@ -23,25 +23,19 @@ export default function Player({
       container: artRef.current!,
       plugins: [
         artplayerPluginHlsQuality({
-          // Show quality in control
           control: true,
-
-          // Get the resolution text from level
-          getResolution: (level) => {
-            if (level.height <= 240) {
-              return "240P";
-            } else if (level.height > 240 && level.height <= 360) {
-              return "360P";
-            } else if (level.height > 360 && level.height <= 480) {
-              return "480P";
-            } else if (level.height > 480 && level.height <= 720) {
-              return "720P";
-            } else if (level.height > 720 && level.height <= 1080) {
-              return "1080P";
-            } else {
-              return level.height + "P";
-            }
-          },
+          getResolution: (level) =>
+            level.height <= 240
+              ? "240P"
+              : level.height <= 360
+              ? "360P"
+              : level.height <= 480
+              ? "480P"
+              : level.height <= 720
+              ? "720P"
+              : level.height <= 1080
+              ? "1080P"
+              : level.height + "P",
         }),
       ],
       customType: {
@@ -70,83 +64,55 @@ export default function Player({
       getInstance(art);
     }
 
-    art.events.proxy(document, "keypress", (event: any) => {
-      // Check if the focus is on an input field or textarea
-      const isInputFocused =
-        document?.activeElement?.tagName === "INPUT" ||
-        document?.activeElement?.tagName === "TEXTAREA";
-
-      if (!isInputFocused && event?.code === "Space") {
-        event.preventDefault();
-        art.playing ? art.pause() : art.play();
-      } else if (!isInputFocused && event?.code === "KeyF") {
-        event.preventDefault();
-        art.fullscreen = !art.fullscreen;
-      }
-    });
-
     art.controls.remove("playAndPause");
 
-    if (sub?.length > 0) {
-      art.controls.add({
-        name: "subtitle",
-        position: "right",
-        html: `subtitle`,
-        selector: [
-          {
-            default: true,
-            html: `off`,
-            value: "",
-          },
-          ...sub.map((item: any, i: number) => {
-            return {
-              html: `<div>${item.lang}</div>`,
-              value: item?.url,
-            };
-          }),
-        ],
-        onSelect: function (item, $dom) {
-          // @ts-ignore
-          art.subtitle.switch(item.value);
-          return item.html;
-        },
-      });
-    }
-
-    art.controls.update({
-      name: "volume",
-      position: "right",
-    });
-// Add 15s backward button
+    // Custom Play/Pause Button with Backward and Forward
     art.controls.add({
-      name: "backward",
-      position: "left",
-      html: `<svg width="20" height="20" viewBox="0 0 24 24">
-        <path fill="white" d="M13 18v-2H7v2H5v-2H3V8h2V6h2v2h6V6h2v2h2v8h-2v2h-2Zm-2-4h8V10h-8Zm-6 0h4V10H5Z"/>
-      </svg>`,
-      click: () => {
-        art.currentTime = Math.max(0, art.currentTime - 15);
-      },
+      name: "customCenter",
+      position: "center",
+      html: `
+        <div class="custom-controls">
+          <button class="art-backward">
+            <svg width="40" height="40" viewBox="0 0 24 24">
+              <path fill="white" d="M13 18v-2H7v2H5v-2H3V8h2V6h2v2h6V6h2v2h2v8h-2v2h-2Zm-2-4h8V10h-8Zm-6 0h4V10H5Z"/>
+            </svg>
+          </button>
+          <button class="art-play">
+            <svg width="50" height="50" viewBox="0 0 24 24">
+              <path fill="white" d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+          <button class="art-forward">
+            <svg width="40" height="40" viewBox="0 0 24 24">
+              <path fill="white" d="M11 18v-2h6v2h2v-2h2V8h-2V6h-2v2h-6V6h-2v2H5v8h2v2h2Zm2-4h-8V10h8Zm6 0h-4V10h4Z"/>
+            </svg>
+          </button>
+        </div>
+      `,
       style: {
-        padding: "5px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "15px",
       },
-    });
+      mounted: ($control) => {
+        const playButton = $control.querySelector(".art-play");
+        const backwardButton = $control.querySelector(".art-backward");
+        const forwardButton = $control.querySelector(".art-forward");
 
-    // Add 15s forward button
-    art.controls.add({
-      name: "forward",
-      position: "right",
-      html: `<svg width="20" height="20" viewBox="0 0 24 24">
-        <path fill="white" d="M11 18v-2h6v2h2v-2h2V8h-2V6h-2v2h-6V6h-2v2H5v8h2v2h2Zm2-4h-8V10h8Zm6 0h-4V10h4Z"/>
-      </svg>`,
-      click: () => {
-        art.currentTime = Math.min(art.duration, art.currentTime + 15);
-      },
-      style: {
-        padding: "5px",
+        playButton.addEventListener("click", () => {
+          art.playing ? art.pause() : art.play();
+        });
+
+        backwardButton.addEventListener("click", () => {
+          art.currentTime = Math.max(0, art.currentTime - 15);
+        });
+
+        forwardButton.addEventListener("click", () => {
+          art.currentTime = Math.min(art.duration, art.currentTime + 15);
+        });
       },
     });
-    console.log("controls", art.controls);
 
     return () => {
       if (art && art.destroy) {
