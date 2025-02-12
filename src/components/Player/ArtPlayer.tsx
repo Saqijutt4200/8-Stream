@@ -139,6 +139,8 @@ export default function Player({
         
         .art-video-player .art-progress .art-progress-bar {
           height: 4px !important; /* Make the line bolder */
+          bottom: 48px !important; /* Make the line bolder */
+          
           
         }
         
@@ -307,8 +309,8 @@ export default function Player({
           html: `
               <div class="language-selector" style="
                 position: absolute;
-                top: 20px;
-                right: 20px;
+                top: 15px;
+                right: 15px;
                 background-color: #fcba03;
                 padding: 8px;
                 border-radius: 4px;
