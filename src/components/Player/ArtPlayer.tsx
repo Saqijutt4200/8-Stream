@@ -190,7 +190,7 @@ export default function Player({
         }
 
         .art-video-player .art-control-progress {
-          bottom: 0 !important;
+          bottom: 5px !important;
         }
         .art-video-player .art-control-volume {
           margin-right: 12px !important; /* Add extra spacing after volume control */
