@@ -203,7 +203,7 @@ export default function Player({
 
         .art-video-player .art-control-fullscreen {
           margin-bottom: 0 !important;
-          margin-left: 12px !important; /* Add extra spacing before fullscreen button */
+          margin-left: 24px !important; /* Add extra spacing before fullscreen button */
         }
         /* Add custom scrollbar styles */
   .custom-scrollbar {
