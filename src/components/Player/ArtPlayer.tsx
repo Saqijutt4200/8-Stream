@@ -184,27 +184,28 @@ export default function Player({
         .art-video-player .art-controls {
           bottom: 0 !important;
           margin-bottom: 0 !important;
-          padding: 0 12px !important; /* Add horizontal padding to the controls container */
+          padding: 0 6px !important; /* Add horizontal padding to the controls container */
         }
 
         .art-video-player .art-control-progress {
           bottom: 0 !important;
         }
         .art-video-player .art-control-volume {
-          margin-right: 24px !important; /* Add extra spacing after volume control */
+          margin-right: 12px !important; /* Add extra spacing after volume control */
+          margin-left: 12px !important; /* Add extra spacing after volume control */
         }
         
         .art-video-player .art-control-quality {
-          margin-left: 24px !important; /* Add extra spacing before quality control */
+          margin-left: 12px !important; /* Add extra spacing before quality control */
         }
         
         .art-video-player .art-control-subtitle {
-          margin-left: 24px !important; /* Add extra spacing before subtitle control */
+          margin-left: 12px !important; /* Add extra spacing before subtitle control */
         }
 
         .art-video-player .art-control-fullscreen {
           margin-bottom: 0 !important;
-          margin-left: 24px !important; /* Add extra spacing before fullscreen button */
+          margin-left: 12px !important; /* Add extra spacing before fullscreen button */
         }
         /* Add custom scrollbar styles */
   .custom-scrollbar {
