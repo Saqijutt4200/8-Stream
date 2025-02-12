@@ -7,7 +7,6 @@ import Hls from "hls.js";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
-
 // Define the level type
 interface HLSLevel {
   height: number;
@@ -48,7 +47,6 @@ declare global {
   interface Window {
     controlsTimeout?: NodeJS.Timeout;
   }
-  
 }
 
 export default function Player({
@@ -71,22 +69,20 @@ export default function Player({
   [key: string]: any;
 }) {
   //const posterUrl = useSelector(
-    //(state: RootState) => state.posterUrl.currentPosterUrl
+  //(state: RootState) => state.posterUrl.currentPosterUrl
   //);
   const [isSandboxed, setIsSandboxed] = useState<boolean>(false);
   const [showControls, setShowControls] = useState(false);
-  const [sandboxDetails, setSandboxDetails] = useState<SandboxDetails | null>(null);
+  const [sandboxDetails, setSandboxDetails] = useState<SandboxDetails | null>(
+    null
+  );
 
-  
-  
   useEffect(() => {
-
     // Load Sandblaster script
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = "https://unpkg.com/sandblaster/dist/sandblaster.min.js";
     script.async = true;
     document.body.appendChild(script);
-
 
     // Sandbox detection function
     const checkSandbox = () => {
@@ -103,7 +99,7 @@ export default function Player({
           setSandboxDetails(result);
 
           // Log detailed sandbox information
-          console.log('Sandbox Detection Result:', result);
+          console.log("Sandbox Detection Result:", result);
         } else {
           // Fallback detection methods
           // Method 1: Check document.sandbox attribute
@@ -113,23 +109,20 @@ export default function Player({
 
           // Method 2: Check for CSP restrictions
           try {
-            const testElement = document.createElement('div');
+            const testElement = document.createElement("div");
             testElement.innerHTML = '<img src="data:text/html">';
           } catch (e) {
             setIsSandboxed(true);
           }
         }
       } catch (error) {
-        console.error('Sandbox detection error:', error);
+        console.error("Sandbox detection error:", error);
         setIsSandboxed(false);
       }
     };
 
     // Wait for script to load
     script.onload = checkSandbox;
-   
-
-   
 
     console.log(posterUrl);
     const storedImageUrl = localStorage.getItem("currentPosterUrl");
@@ -168,7 +161,7 @@ export default function Player({
           width: 16px !important;
       height: 16px !important;
       top: -6px !important;
-      background-color: transparent !important;
+      background-color: white !important;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='white' d='M 33.488281 1.9863281 A 1.50015 1.50015 0 0 0 32.5625 2.328125 L 23.533203 9.5527344 L 17.476562 4.3613281 A 1.50015 1.50015 0 1 0 15.523438 6.6386719 L 19.445312 10 L 11.5 10 C 7.9280619 10 5 12.928062 5 16.5 L 5 34.5 C 5 38.071938 7.9280619 41 11.5 41 L 36.5 41 C 40.071938 41 43 38.071938 43 34.5 L 43 16.5 C 43 12.928062 40.071938 10 36.5 10 L 27.777344 10 L 34.4375 4.671875 A 1.50015 1.50015 0 0 0 33.488281 1.9863281 z M 11.5 13 L 23.486328 13 L 36.5 13 C 38.450062 13 40 14.549938 40 16.5 L 40 34.5 C 40 36.450062 38.450062 38 36.5 38 L 11.5 38 C 9.5499381 38 8 36.450062 8 34.5 L 8 16.5 C 8 14.549938 9.5499381 13 11.5 13 z M 35.5 20 A 1.5 1.5 0 0 0 35.5 23 A 1.5 1.5 0 0 0 35.5 20 z M 35.5 27 A 1.5 1.5 0 0 0 35.5 30 A 1.5 1.5 0 0 0 35.5 27 z'/%3E%3C/svg%3E") !important;
       background-size: contain !important;
       background-repeat: no-repeat !important;
@@ -270,7 +263,9 @@ export default function Player({
       layers: [
         {
           name: "poster",
-          html: posterUrl ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">` : '',
+          html: posterUrl
+            ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">`
+            : "",
           tooltip: "Poster Tip",
           style: {
             position: "absolute",
@@ -333,8 +328,10 @@ export default function Player({
                     .map(
                       (lang: string) => `
                     <div class="lang-option" data-value="${lang}" style="
-                    color: ${lang === availableLang[0] ? '#fcba03' : 'white'};
-                    background-color: ${lang === availableLang[0] ? '#49484a' : 'transparent'};
+                    color: ${lang === availableLang[0] ? "#fcba03" : "white"};
+                    background-color: ${
+                      lang === availableLang[0] ? "#49484a" : "transparent"
+                    };
                       padding: 8px 12px;
                       cursor: pointer;
                       font-size: 14px;
@@ -360,16 +357,22 @@ export default function Player({
               if (options) {
                 const isHidden = options.style.display === "none";
                 options.style.display = isHidden ? "block" : "none";
-              
+
                 if (isHidden) {
                   // When opening the dropdown, highlight the current selection
-                  const currentLangText = selector.querySelector(".current-lang span")?.textContent;
+                  const currentLangText =
+                    selector.querySelector(".current-lang span")?.textContent;
                   const allOptions = options.querySelectorAll(".lang-option");
                   allOptions.forEach((opt) => {
                     const optElement = opt as HTMLElement;
-                    const isCurrentLang = optElement.getAttribute("data-value") === currentLangText;
-                    optElement.style.backgroundColor = isCurrentLang ? "#49484a" : "transparent";
-                    optElement.style.color = isCurrentLang ? "#fcba03" : "white";
+                    const isCurrentLang =
+                      optElement.getAttribute("data-value") === currentLangText;
+                    optElement.style.backgroundColor = isCurrentLang
+                      ? "#49484a"
+                      : "transparent";
+                    optElement.style.color = isCurrentLang
+                      ? "#fcba03"
+                      : "white";
                   });
                 }
               }
@@ -380,19 +383,19 @@ export default function Player({
               if (value) {
                 //setCurrentLang(value);
                 onLanguageChange(value);
-              
+
                 // Update all options to remove selected styling
-              const allOptions = selector?.querySelectorAll(".lang-option");
-              allOptions?.forEach((opt) => {
-                const optElement = opt as HTMLElement;
-      optElement.style.backgroundColor = "transparent";
-      optElement.style.color = "white";
-              });
-              
-              // Add selected styling to clicked option
-              const optionElement = option as HTMLElement;
-    optionElement.style.backgroundColor = "#49484a";
-    optionElement.style.color = "#fcba03";
+                const allOptions = selector?.querySelectorAll(".lang-option");
+                allOptions?.forEach((opt) => {
+                  const optElement = opt as HTMLElement;
+                  optElement.style.backgroundColor = "transparent";
+                  optElement.style.color = "white";
+                });
+
+                // Add selected styling to clicked option
+                const optionElement = option as HTMLElement;
+                optionElement.style.backgroundColor = "#49484a";
+                optionElement.style.color = "#fcba03";
                 const currentLang = selector?.querySelector(
                   ".current-lang span"
                 ) as HTMLElement;
@@ -433,29 +436,37 @@ export default function Player({
                 const optionElement = option as HTMLElement;
                 optionElement.addEventListener("mouseenter", () => {
                   if (optionElement.style.color !== "#fcba03") {
-                    optionElement.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+                    optionElement.style.backgroundColor =
+                      "rgba(255, 255, 255, 0.1)";
                   }
                 });
                 optionElement.addEventListener("mouseleave", () => {
-                  const currentLangText = selector.querySelector(".current-lang span")?.textContent;
-                  const isCurrentLang = optionElement.getAttribute("data-value") === currentLangText;
+                  const currentLangText =
+                    selector.querySelector(".current-lang span")?.textContent;
+                  const isCurrentLang =
+                    optionElement.getAttribute("data-value") ===
+                    currentLangText;
                   if (!isCurrentLang) {
                     optionElement.style.backgroundColor = "transparent";
                   }
                 });
               });
-               // Add custom scrollbar styles
-            const langOptions = selector.querySelector(".lang-options") as HTMLElement;
-            if (langOptions) {
-              langOptions.classList.add('custom-scrollbar');
-            }
+              // Add custom scrollbar styles
+              const langOptions = selector.querySelector(
+                ".lang-options"
+              ) as HTMLElement;
+              if (langOptions) {
+                langOptions.classList.add("custom-scrollbar");
+              }
             }
           },
         },
         // Add sandbox warning layer
-        ...(isSandboxed ? [{
-          name: 'sandbox-warning',
-          html: `
+        ...(isSandboxed
+          ? [
+              {
+                name: "sandbox-warning",
+                html: `
             <div style="
               position: absolute;
               top: 10px;
@@ -469,10 +480,12 @@ export default function Player({
               Sandboxed Environment Detected
             </div>
           `,
-          style: {
-            zIndex: '100',
-          }
-        }] : [])
+                style: {
+                  zIndex: "100",
+                },
+              },
+            ]
+          : []),
       ],
       plugins: [],
       customType: {
@@ -608,7 +621,9 @@ export default function Player({
     art.on("play", () => {
       art.layers.update({
         name: "poster",
-        html: posterUrl ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">` : '',
+        html: posterUrl
+          ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">`
+          : "",
         tooltip: "Poster Tip",
         style: {
           position: "absolute",
@@ -624,7 +639,9 @@ export default function Player({
     art.on("pause", () => {
       art.layers.update({
         name: "poster",
-        html: posterUrl ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">` : '',
+        html: posterUrl
+          ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">`
+          : "",
         tooltip: "Poster Tip",
         style: {
           position: "absolute",
@@ -687,5 +704,12 @@ export default function Player({
 
   //
 
-  return <div ref={artRef} className="w-full h-full" data-sandboxed={isSandboxed} {...rest}></div>;
+  return (
+    <div
+      ref={artRef}
+      className="w-full h-full"
+      data-sandboxed={isSandboxed}
+      {...rest}
+    ></div>
+  );
 }
