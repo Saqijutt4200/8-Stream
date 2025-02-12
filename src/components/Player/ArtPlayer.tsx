@@ -207,7 +207,7 @@ export default function Player({
           margin-bottom: 0 !important;
           margin-left: 12px !important; /* Add extra spacing before fullscreen button */
         }
-        .art-video-player .art-control-fullscreenweb {
+        .art-video-player .art-control-fullscreenWeb {
           margin-left: 12px !important;
           
         }
