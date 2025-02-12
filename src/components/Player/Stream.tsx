@@ -208,28 +208,7 @@ const Stream = ({
               miniProgressBar: true,
               setting: true,
               theme: "#fcba03",
-              controls: [
-                {
-                  name: 'play',
-                  position: 'left',
-                },
-                {
-                  name: 'volume',
-                  position: 'left',
-                },
-                {
-                  name: 'time',
-                  position: 'left',
-                },
-                {
-                  name: 'setting',
-                  position: 'right',
-                },
-                {
-                  name: 'fullscreen',
-                  position: 'right',
-                },
-              ],
+              controls: [],
               playbackRate: true,
               fullscreen: true,
               
