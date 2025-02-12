@@ -211,6 +211,7 @@ const Stream = ({
               controls: [],
               playbackRate: true,
               fullscreen: true,
+              fullscreenWeb: true,
               
               subtitle: {
                 type: "vtt",
