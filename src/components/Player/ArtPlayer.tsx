@@ -489,28 +489,6 @@ export default function Player({
           : []),
       ],
       plugins: [],
-      controls: [
-        {
-          name: 'play',
-          position: 'left',
-        },
-        {
-          name: 'volume',
-          position: 'left',
-        },
-        {
-          name: 'time',
-          position: 'left',
-        },
-        {
-          name: 'setting',
-          position: 'right',
-        },
-        {
-          name: 'fullscreen',
-          position: 'right',
-        },
-      ],
       customType: {
         m3u8: function playM3u8(video, url, art) {
           if (Hls.isSupported()) {
