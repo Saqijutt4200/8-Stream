@@ -240,7 +240,7 @@ export default function Player({
       settings: [
         {
           html: "Quality",
-          tooltip: "Quality",
+          tooltip: "Auto",
           name: "quality",
           selector: [
             {
