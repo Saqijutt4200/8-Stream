@@ -184,6 +184,7 @@ export default function Player({
         .art-video-player .art-controls {
           bottom: 0 !important;
           margin-bottom: 0 !important;
+          padding: 0 12px !important; /* Add horizontal padding to the controls container */
         }
 
         .art-video-player .art-control-progress {
