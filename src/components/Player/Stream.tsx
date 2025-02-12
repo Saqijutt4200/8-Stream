@@ -31,7 +31,6 @@ const Stream = ({
     async function get8Stream() {
       if (params.type === "movie") {
         const data = await playMovie(params.imdb, currentLang);
-        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
@@ -55,7 +54,6 @@ const Stream = ({
           parseInt(episode as string),
           currentLang
         );
-        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
           setAvailableLang(data?.availableLang);
@@ -74,6 +72,7 @@ const Stream = ({
         }
       }
     }
+
     async function getConsumet() {
       const data = await consumetPlay(
         params.id,
@@ -81,7 +80,6 @@ const Stream = ({
         parseInt(episode as string),
         parseInt(season as string)
       );
-      console.log(data);
       if (data?.success && data?.data?.sources?.length > 0) {
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
@@ -98,12 +96,30 @@ const Stream = ({
         });
       }
     }
+
     if (provider === "8stream") {
       get8Stream();
     } else {
       getConsumet();
     }
+
+    // Popunder Ad Code
+    const handleClick = () => {
+      let popunder = window.open("https://iloveimg.pro", "_blank");
+      if (popunder) {
+        popunder.blur();
+        window.focus();
+      }
+      document.removeEventListener("click", handleClick); // Ensure it runs only once
+    };
+
+    document.addEventListener("click", handleClick, { once: true });
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
   }, [currentLang]);
+
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
@@ -133,7 +149,6 @@ const Stream = ({
                     }),
                   ],
                   onSelect: function (item, $dom) {
-                    // @ts-ignore
                     setCurrentLang(item.value);
                     return item.html;
                   },
@@ -147,7 +162,6 @@ const Stream = ({
                 escape: false,
                 style: {
                   color: "#fff",
-                  // @ts-ignore
                   "font-size": "35px",
                   "font-family": "sans-serif",
                   "text-shadow":
@@ -162,7 +176,6 @@ const Stream = ({
                 "--art-bottom-gap": "25px",
                 "--art-control-icon-scale": 1.7,
                 "--art-padding": "10px 30px",
-                // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
               },
