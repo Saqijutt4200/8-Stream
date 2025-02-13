@@ -21,13 +21,6 @@ interface QualityLevel {
   html: string;
 }
 
-/ Extend the Artplayer type to include container property
-declare module 'artplayer' {
-  interface Artplayer {
-    container: HTMLElement;
-  }
-}
-
 // Define types for sandbox detection results
 interface SandboxDetails {
   sandboxed: boolean;
@@ -85,8 +78,6 @@ export default function Player({
   );
 
   useEffect(() => {
-
-    let controlsTimeout: NodeJS.Timeout;
     // Load Sandblaster script
     const script = document.createElement("script");
     script.src = "https://unpkg.com/sandblaster/dist/sandblaster.min.js";
@@ -144,52 +135,7 @@ export default function Player({
 
     const style = document.createElement("style");
     style.textContent = `
-    .middle-controls {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      transform: translateY(-50%);
-      display: flex;
-      justify-content: space-between;
-      padding: 0 20%;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 100;
-    }
-
-    .art-video-player.art-control-show .middle-controls {
-      opacity: 1;
-    }
-
-    .art-video-player.art-control-hide .middle-controls {
-      opacity: 0;
-    }
-
-    .control-button {
-      width: 40px;
-      height: 40px;
-      background-color: rgba(0, 0, 0, 0.6);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      pointer-events: auto;
-      transition: transform 0.2s ease, background-color 0.2s ease;
-    }
-
-    .control-button:hover {
-      transform: scale(1.1);
-      background-color: rgba(0, 0, 0, 0.8);
-    }
-
-    .control-button svg {
-      width: 24px;
-      height: 24px;
-      fill: white;
-    }
+      
         
         .art-video-player .art-progress .art-progress-bar {
           height: 4px !important; /* Make the line bolder */
@@ -336,49 +282,6 @@ export default function Player({
       ],
       container: artRef.current!,
       layers: [
-        {
-          name: 'middleControls',
-          html: `
-            <div class="middle-controls">
-              <div class="control-button" data-action="backward">
-                <svg viewBox="0 0 24 24">
-                  <path fill="white" d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8zm-1.1 11H10v-3.3L9 13v-.7l1.8-.6h.1V16zm4.3-1.8c0 .3 0 .6-.1.8l-.3.6s-.3.3-.5.3-.4.1-.6.1-.4 0-.6-.1-.3-.2-.5-.3-.2-.3-.3-.6-.1-.5-.1-.8v-.7c0-.3 0-.6.1-.8l.3-.6s.3-.3.5-.3.4-.1.6-.1.4 0 .6.1c.2.1.3.2.5.3s.2.3.3.6.1.5.1.8v.7zm-.9-.8v-.5s-.1-.2-.1-.3-.1-.1-.2-.2-.2-.1-.3-.1-.2 0-.3.1l-.2.2s-.1.2-.1.3v2s.1.2.1.3.1.1.2.2.2.1.3.1.2 0 .3-.1l.2-.2s.1-.2.1-.3v-1.5z"/>
-                </svg>
-              </div>
-              <div class="control-button" data-action="forward">
-                <svg viewBox="0 0 24 24">
-                  <path fill="white" d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8zm2.9 11H14v-3.3L13 13v-.7l1.8-.6h.1V16zm2.3-1.8c0 .3 0 .6-.1.8l-.3.6s-.3.3-.5.3-.4.1-.6.1-.4 0-.6-.1-.3-.2-.5-.3-.2-.3-.3-.6-.1-.5-.1-.8v-.7c0-.3 0-.6.1-.8l.3-.6s.3-.3.5-.3.4-.1.6-.1.4 0 .6.1c.2.1.3.2.5.3s.2.3.3.6.1.5.1.8v.7zm-.9-.8v-.5s-.1-.2-.1-.3-.1-.1-.2-.2-.2-.1-.3-.1-.2 0-.3.1l-.2.2s-.1.2-.1.3v2s.1.2.1.3.1.1.2.2.2.1.3.1.2 0 .3-.1l.2-.2s.1-.2.1-.3v-1.5z"/>
-                </svg>
-              </div>
-            </div>
-          `,
-          click: function (_, event) {
-            const target = event.target as HTMLElement;
-            const button = target.closest('.control-button');
-            
-            if (button && art) {
-              const action = button.getAttribute('data-action');
-              if (action === 'backward') {
-                art.currentTime = Math.max(0, art.currentTime - 15);
-              } else if (action === 'forward') {
-                art.currentTime = Math.min(art.duration, art.currentTime + 15);
-              }
-               // Reset the control show timer when buttons are clicked
-               if (art.container) {  // Add null check for container
-                art.container.classList.add('art-control-show');
-                art.container.classList.remove('art-control-hide');
-                if (controlsTimeout) {
-                  clearTimeout(controlsTimeout);
-                }
-               controlsTimeout = setTimeout(() => {
-                 if (art.container && !art.container.matches(':hover')) {
-                   art.container.classList.remove('art-control-show');
-                   art.container.classList.add('art-control-hide');
-                 }
-               }, 3000);
-            }
-          },
-        },
         {
           name: "poster",
           html: posterUrl
@@ -823,40 +726,6 @@ export default function Player({
       position: "left",
     });
     console.log("controls", art.controls);
-
-    // Add mouse movement and touch event handlers to show/hide controls
-    
-
-    const showControlsHandler = () => {
-      if (art && art.container) {
-        art.container.classList.add('art-control-show');
-        art.container.classList.remove('art-control-hide');
-        
-        if (controlsTimeout) {
-          clearTimeout(controlsTimeout);
-        }
-        controlsTimeout = setTimeout(() => {
-          if (art.container && !art.container.matches(':hover')) {
-            art.container.classList.remove('art-control-show');
-            art.container.classList.add('art-control-hide');
-          }
-        }, 3000);
-      }
-    };
-
-    art.container.addEventListener('mousemove', showControlsHandler);
-    art.container.addEventListener('touchstart', showControlsHandler);
-
-    art.container.addEventListener('mouseleave', () => {
-      if (controlsTimeout) {
-        clearTimeout(controlsTimeout);
-      }
-      controlsTimeout = setTimeout(() => {
-        art.container.classList.remove('art-control-show');
-        art.container.classList.add('art-control-hide');
-      }, 300);
-    });
-
     // If sandbox is detected, add a notice
     if (isSandboxed) {
       art.notice.show = "Running in a restricted environment";
@@ -868,9 +737,6 @@ export default function Player({
       }
       if (script.parentNode) {
         script.parentNode.removeChild(script);
-      }
-      if (controlsTimeout) {
-        clearTimeout(controlsTimeout);
       }
     };
   }, [artRef.current, posterUrl]);
