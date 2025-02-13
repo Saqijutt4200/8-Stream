@@ -21,6 +21,13 @@ interface QualityLevel {
   html: string;
 }
 
+/ Extend the Artplayer type to include container property
+declare module 'artplayer' {
+  interface Artplayer {
+    container: HTMLElement;
+  }
+}
+
 // Define types for sandbox detection results
 interface SandboxDetails {
   sandboxed: boolean;
@@ -349,7 +356,7 @@ export default function Player({
             const target = event.target as HTMLElement;
             const button = target.closest('.control-button');
             
-            if (button) {
+            if (button && art) {
               const action = button.getAttribute('data-action');
               if (action === 'backward') {
                 art.currentTime = Math.max(0, art.currentTime - 15);
@@ -357,13 +364,14 @@ export default function Player({
                 art.currentTime = Math.min(art.duration, art.currentTime + 15);
               }
                // Reset the control show timer when buttons are clicked
-               art.container.classList.add('art-control-show');
-               art.container.classList.remove('art-control-hide');
-               if (controlsTimeout) {
-                clearTimeout(controlsTimeout);
-              }
+               if (art.container) {  // Add null check for container
+                art.container.classList.add('art-control-show');
+                art.container.classList.remove('art-control-hide');
+                if (controlsTimeout) {
+                  clearTimeout(controlsTimeout);
+                }
                controlsTimeout = setTimeout(() => {
-                 if (!art.container.matches(':hover')) {
+                 if (art.container && !art.container.matches(':hover')) {
                    art.container.classList.remove('art-control-show');
                    art.container.classList.add('art-control-hide');
                  }
@@ -820,18 +828,20 @@ export default function Player({
     
 
     const showControlsHandler = () => {
-      art.container.classList.add('art-control-show');
-      art.container.classList.remove('art-control-hide');
-      
-      if (controlsTimeout) {
-        clearTimeout(controlsTimeout);
-      }
-      controlsTimeout = setTimeout(() => {
-        if (!art.container.matches(':hover')) {
-          art.container.classList.remove('art-control-show');
-          art.container.classList.add('art-control-hide');
+      if (art && art.container) {
+        art.container.classList.add('art-control-show');
+        art.container.classList.remove('art-control-hide');
+        
+        if (controlsTimeout) {
+          clearTimeout(controlsTimeout);
         }
-      }, 3000);
+        controlsTimeout = setTimeout(() => {
+          if (art.container && !art.container.matches(':hover')) {
+            art.container.classList.remove('art-control-show');
+            art.container.classList.add('art-control-hide');
+          }
+        }, 3000);
+      }
     };
 
     art.container.addEventListener('mousemove', showControlsHandler);
