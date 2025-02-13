@@ -299,7 +299,7 @@ export default function Player({
     userSelect: "none",
     webkitUserSelect: "none",
     webkitTouchCallout: "none",
-          } as React.CSSProperties,
+          } as Partial<CSSStyleDeclaration>,
           click: function (...args) {
             console.info("click", args);
           },
@@ -664,7 +664,7 @@ export default function Player({
           height: "100%",
           width: "100%",
           overflow: "hidden",
-        },
+        } as Partial<CSSStyleDeclaration>,
       });
     });
     art.on("pause", () => {
@@ -682,7 +682,7 @@ export default function Player({
           height: "100%",
           width: "100%",
           overflow: "hidden",
-        },
+        } as Partial<CSSStyleDeclaration>,
       });
     });
 
