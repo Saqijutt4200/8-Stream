@@ -232,62 +232,6 @@ export default function Player({
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 4px;
   }
-  /* Add styles for centered skip controls */
-      .art-video-player .art-control-skip {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 100;
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background-color: rgba(0, 0, 0, 0.6);
-        border: 2px solid rgba(255, 255, 255, 0.8);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        opacity: 0;
-      }
-
-      .art-video-player .art-control-skip:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-        transform: translateY(-50%) scale(1.1);
-      }
-
-      .art-video-player .art-control-skip.backward {
-        left: 20%;
-      }
-
-      .art-video-player .art-control-skip.forward {
-        right: 20%;
-      }
-
-      .art-video-player .art-control-skip svg {
-        width: 24px;
-        height: 24px;
-        fill: white;
-      }
-
-      .art-video-player:hover .art-control-skip {
-        opacity: 1;
-      }
-
-      /* Add skip time indicator */
-      .art-video-player .skip-indicator {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-size: 14px;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
         
     
       `;
@@ -295,79 +239,6 @@ export default function Player({
 
     const art = new Artplayer({
       ...option,
-      controls: [
-        {
-          name: 'skip-backward',
-          position: 'right',
-          html: `
-            <div class="art-control-skip backward">
-              <svg viewBox="0 0 24 24">
-                <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8zm-1.1 11h-.85v-3.26l-1.01.31v-.69l1.77-.63h.09V16z"/>
-              </svg>
-            </div>
-          `,
-          click: function () {
-            const newTime = Math.max(0, art.currentTime - 10);
-            art.seek = newTime;
-            
-            // Show skip indicator
-            const indicator = document.createElement('div');
-            indicator.className = 'skip-indicator';
-            indicator.style.left = '20%';
-            indicator.textContent = '-10s';
-            art.container.appendChild(indicator);
-            
-            // Fade in
-            setTimeout(() => {
-              indicator.style.opacity = '1';
-            }, 0);
-            
-            // Remove after animation
-            setTimeout(() => {
-              indicator.style.opacity = '0';
-              setTimeout(() => {
-                art.container.removeChild(indicator);
-              }, 300);
-            }, 500);
-          },
-        },
-        {
-          name: 'skip-forward',
-          position: 'right',
-          html: `
-            <div class="art-control-skip forward">
-              <svg viewBox="0 0 24 24">
-                <path d="M13 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8zm1.1 11h.85v-3.26l1.01.31v-.69l-1.77-.63h-.09V16z"/>
-              </svg>
-            </div>
-          `,
-          click: function () {
-            const newTime = Math.min(art.duration, art.currentTime + 10);
-            art.seek = newTime;
-            
-            // Show skip indicator
-            const indicator = document.createElement('div');
-            indicator.className = 'skip-indicator';
-            indicator.style.right = '20%';
-            indicator.textContent = '+10s';
-            art.container.appendChild(indicator);
-            
-            // Fade in
-            setTimeout(() => {
-              indicator.style.opacity = '1';
-            }, 0);
-            
-            // Remove after animation
-            setTimeout(() => {
-              indicator.style.opacity = '0';
-              setTimeout(() => {
-                art.container.removeChild(indicator);
-              }, 300);
-            }, 500);
-          },
-        },
-        // ... rest of your existing controls
-      ],
       settings: [
         {
           html: "Quality",
@@ -747,27 +618,6 @@ export default function Player({
           }
         },
       },
-      let timeout: NodeJS.Timeout;
-      container.addEventListener('mousemove', () => {
-        clearTimeout(timeout);
-        const skipButtons = container.querySelectorAll('.art-control-skip');
-        skipButtons.forEach(button => {
-          (button as HTMLElement).style.opacity = '1';
-        });
-  
-        timeout = setTimeout(() => {
-          if (!art.played) return;
-          skipButtons.forEach(button => {
-            (button as HTMLElement).style.opacity = '0';
-          });
-        }, 2000);
-      });
-  
-      container.addEventListener('mouseleave', () => {
-        const skipButtons = container.querySelectorAll('.art-control-skip');
-        skipButtons.forEach(button => {
-          (button as HTMLElement).style.opacity = '0';
-        });
     });
 
     art.on("ready", () => {
