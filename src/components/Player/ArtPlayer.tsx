@@ -653,7 +653,7 @@ export default function Player({
       art.layers.update({
         name: "poster",
         html: posterUrl
-          ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">`
+          ? `<img style="object-fit: cover; height: 100%; width: 100%; pointer-events: none; user-select: none; -webkit-user-select: none;" src="${posterUrl}">`
           : "",
         tooltip: "Poster Tip",
         style: {
@@ -664,6 +664,10 @@ export default function Player({
           height: "100%",
           width: "100%",
           overflow: "hidden",
+          // Add these styles to prevent selection and context menu
+    userSelect: "none",
+    webkitUserSelect: "none",
+    webkitTouchCallout: "none",
         } as Partial<CSSStyleDeclaration>,
       });
     });
@@ -671,7 +675,7 @@ export default function Player({
       art.layers.update({
         name: "poster",
         html: posterUrl
-          ? `<img style="object-fit: cover; height: 100%; width: 100%;" src="${posterUrl}">`
+          ? `<img style="object-fit: cover; height: 100%; width: 100%; pointer-events: none; user-select: none; -webkit-user-select: none;" src="${posterUrl}">`
           : "",
         tooltip: "Poster Tip",
         style: {
@@ -682,6 +686,10 @@ export default function Player({
           height: "100%",
           width: "100%",
           overflow: "hidden",
+          // Add these styles to prevent selection and context menu
+    userSelect: "none",
+    webkitUserSelect: "none",
+    webkitTouchCallout: "none",
         } as Partial<CSSStyleDeclaration>,
       });
     });
