@@ -123,16 +123,17 @@ art.controls.add({
   html: `<svg fill="#ffffff" width="45px" height="45px" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><path d="..."></path></svg>`,
   click: () => {
     art.currentTime = Math.max(0, art.currentTime - 15);
-  },
-  style: {
-    position: "absolute",
-    left: "5%", // Screen ke left side par center align
-    top: "50%",
-    transform: "translateY(-50%)",
-    zIndex: "999", // Ensure it stays above
-    cursor: "pointer",
-  },
+  }
 });
+
+document.querySelector('.art-control-backward').style.cssText = `
+    position: absolute;
+    left: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 999;
+    cursor: pointer;
+`;
 
 // Add 15s forward button
 art.controls.add({
@@ -140,16 +141,18 @@ art.controls.add({
   html: `<svg fill="#ffffff" width="45px" height="45px" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><path d="..."></path></svg>`,
   click: () => {
     art.currentTime = Math.min(art.duration, art.currentTime + 15);
-  },
-  style: {
-    position: "absolute",
-    right: "5%", // Screen ke right side par center align
-    top: "50%",
-    transform: "translateY(-50%)",
-    zIndex: "999", // Ensure it stays above
-    cursor: "pointer",
-  },
+  }
 });
+
+document.querySelector('.art-control-forward').style.cssText = `
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 999;
+    cursor: pointer;
+`;
+
 
     console.log("controls", art.controls);
 
@@ -162,4 +165,4 @@ art.controls.add({
   }, []);
 
   return <div ref={artRef} {...rest}></div>;
-    }
+}
