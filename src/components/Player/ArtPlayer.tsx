@@ -78,6 +78,8 @@ export default function Player({
   );
 
   useEffect(() => {
+
+    let controlsTimeout: NodeJS.Timeout;
     // Load Sandblaster script
     const script = document.createElement("script");
     script.src = "https://unpkg.com/sandblaster/dist/sandblaster.min.js";
@@ -357,10 +359,10 @@ export default function Player({
                // Reset the control show timer when buttons are clicked
                art.container.classList.add('art-control-show');
                art.container.classList.remove('art-control-hide');
-               if (window.controlsTimeout) {
-                 clearTimeout(window.controlsTimeout);
-               }
-               window.controlsTimeout = setTimeout(() => {
+               if (controlsTimeout) {
+                clearTimeout(controlsTimeout);
+              }
+               controlsTimeout = setTimeout(() => {
                  if (!art.container.matches(':hover')) {
                    art.container.classList.remove('art-control-show');
                    art.container.classList.add('art-control-hide');
@@ -815,30 +817,33 @@ export default function Player({
     console.log("controls", art.controls);
 
     // Add mouse movement and touch event handlers to show/hide controls
-    const container = art.container;
-    let timeout: NodeJS.Timeout;
+    
 
-    const showControls = () => {
-      container.classList.add('art-control-show');
-      container.classList.remove('art-control-hide');
+    const showControlsHandler = () => {
+      art.container.classList.add('art-control-show');
+      art.container.classList.remove('art-control-hide');
       
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        if (!container.matches(':hover')) {
-          container.classList.remove('art-control-show');
-          container.classList.add('art-control-hide');
+      if (controlsTimeout) {
+        clearTimeout(controlsTimeout);
+      }
+      controlsTimeout = setTimeout(() => {
+        if (!art.container.matches(':hover')) {
+          art.container.classList.remove('art-control-show');
+          art.container.classList.add('art-control-hide');
         }
       }, 3000);
     };
 
-    container.addEventListener('mousemove', showControls);
-    container.addEventListener('touchstart', showControls);
+    art.container.addEventListener('mousemove', showControlsHandler);
+    art.container.addEventListener('touchstart', showControlsHandler);
 
-    container.addEventListener('mouseleave', () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        container.classList.remove('art-control-show');
-        container.classList.add('art-control-hide');
+    art.container.addEventListener('mouseleave', () => {
+      if (controlsTimeout) {
+        clearTimeout(controlsTimeout);
+      }
+      controlsTimeout = setTimeout(() => {
+        art.container.classList.remove('art-control-show');
+        art.container.classList.add('art-control-hide');
       }, 300);
     });
 
@@ -854,7 +859,9 @@ export default function Player({
       if (script.parentNode) {
         script.parentNode.removeChild(script);
       }
-      clearTimeout(timeout);
+      if (controlsTimeout) {
+        clearTimeout(controlsTimeout);
+      }
     };
   }, [artRef.current, posterUrl]);
 
