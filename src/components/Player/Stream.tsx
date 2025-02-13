@@ -31,6 +31,7 @@ const Stream = ({
     async function get8Stream() {
       if (params.type === "movie") {
         const data = await playMovie(params.imdb, currentLang);
+        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
@@ -54,6 +55,7 @@ const Stream = ({
           parseInt(episode as string),
           currentLang
         );
+        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
           setAvailableLang(data?.availableLang);
@@ -79,6 +81,7 @@ const Stream = ({
         parseInt(episode as string),
         parseInt(season as string)
       );
+      console.log(data);
       if (data?.success && data?.data?.sources?.length > 0) {
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
@@ -101,22 +104,6 @@ const Stream = ({
       getConsumet();
     }
   }, [currentLang]);
-
-  // Handle the 15s backward and forward buttons
-  const handleSeekBackward = () => {
-    if (art) {
-      const currentTime = art.currentTime || 0; // Get current time or default to 0
-      art.seek(currentTime - 15); // Seek back 15 seconds
-    }
-  };
-
-  const handleSeekForward = () => {
-    if (art) {
-      const currentTime = art.currentTime || 0; // Get current time or default to 0
-      art.seek(currentTime + 15); // Seek forward 15 seconds
-    }
-  };
-
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
@@ -160,6 +147,7 @@ const Stream = ({
                 escape: false,
                 style: {
                   color: "#fff",
+                  // @ts-ignore
                   "font-size": "35px",
                   "font-family": "sans-serif",
                   "text-shadow":
@@ -174,38 +162,25 @@ const Stream = ({
                 "--art-bottom-gap": "25px",
                 "--art-control-icon-scale": 1.7,
                 "--art-padding": "10px 30px",
+                // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
               },
             }}
             getInstance={(art: any) => {
-              setArt(art); // Set art instance here
+              setArt(art);
             }}
           />
         ) : (
-          <div className="flex justify-center items-center h-full">
+          <div className="flex 
+justify-center items-center h-full">
             <span className="loader"></span>
           </div>
         )}
-      </div>
-
-      {/* Add 15s Backward and Forward Buttons */}
-      <div className="absolute bottom-10 left-0 right-0 flex justify-center space-x-10">
-        <button
-          onClick={handleSeekBackward}
-          className="text-white text-xl bg-black p-3 rounded-full hover:bg-gray-600"
-        >
-          -15s
-        </button>
-        <button
-          onClick={handleSeekForward}
-          className="text-white text-xl bg-black p-3 rounded-full hover:bg-gray-600"
-        >
-          +15s
-        </button>
       </div>
     </div>
   );
 };
 
 export default Stream;
+        
