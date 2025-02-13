@@ -105,15 +105,15 @@ const Stream = ({
   // Handle the 15s backward and forward buttons
   const handleSeekBackward = () => {
     if (art) {
-      const currentTime = art?.currentTime;
-      art?.seek(currentTime - 15);
+      const currentTime = art.currentTime || 0; // Get current time or default to 0
+      art.seek(currentTime - 15); // Seek back 15 seconds
     }
   };
 
   const handleSeekForward = () => {
     if (art) {
-      const currentTime = art?.currentTime;
-      art?.seek(currentTime + 15);
+      const currentTime = art.currentTime || 0; // Get current time or default to 0
+      art.seek(currentTime + 15); // Seek forward 15 seconds
     }
   };
 
@@ -179,7 +179,7 @@ const Stream = ({
               },
             }}
             getInstance={(art: any) => {
-              setArt(art);
+              setArt(art); // Set art instance here
             }}
           />
         ) : (
@@ -209,4 +209,3 @@ const Stream = ({
 };
 
 export default Stream;
-        
