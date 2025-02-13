@@ -130,6 +130,7 @@ art.controls.add({
     position: "absolute",
     top: "50%",
     left: "10px",
+    marginBottom: '50%',
     transform: "translateY(-50%)", // To center vertically
   },
 });
@@ -147,6 +148,7 @@ art.controls.add({
     position: "absolute",
     top: "50%",
     right: "10px",
+    marginBottom: '50%',
     transform: "translateY(-50%)", // To center vertically
   },
 });
