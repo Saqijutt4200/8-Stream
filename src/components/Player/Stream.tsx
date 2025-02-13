@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 const Stream = ({
   params,
 }: {
-  params: { tmdb: string; type: string; id: string };
+  params: { imdb: string; type: string; id: string };
 }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
