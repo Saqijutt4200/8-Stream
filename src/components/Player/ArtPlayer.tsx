@@ -150,8 +150,12 @@ export default function Player({
       z-index: 100;
     }
 
-    .art-video-player:hover .middle-controls {
+    .art-video-player.art-control-show .middle-controls {
       opacity: 1;
+    }
+
+    .art-video-player.art-control-hide .middle-controls {
+      opacity: 0;
     }
 
     .control-button {
@@ -350,6 +354,18 @@ export default function Player({
               } else if (action === 'forward') {
                 art.currentTime = Math.min(art.duration, art.currentTime + 15);
               }
+               // Reset the control show timer when buttons are clicked
+               art.player.classList.add('art-control-show');
+               art.player.classList.remove('art-control-hide');
+               if (window.controlsTimeout) {
+                 clearTimeout(window.controlsTimeout);
+               }
+               window.controlsTimeout = setTimeout(() => {
+                 if (!art.player.matches(':hover')) {
+                   art.player.classList.remove('art-control-show');
+                   art.player.classList.add('art-control-hide');
+                 }
+               }, 3000);
             }
           },
         },
@@ -797,6 +813,35 @@ export default function Player({
       position: "left",
     });
     console.log("controls", art.controls);
+
+    // Add mouse movement and touch event handlers to show/hide controls
+    const player = art.player;
+    let timeout: NodeJS.Timeout;
+
+    const showControls = () => {
+      player.classList.add('art-control-show');
+      player.classList.remove('art-control-hide');
+      
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (!player.matches(':hover')) {
+          player.classList.remove('art-control-show');
+          player.classList.add('art-control-hide');
+        }
+      }, 3000);
+    };
+
+    player.addEventListener('mousemove', showControls);
+    player.addEventListener('touchstart', showControls);
+
+    player.addEventListener('mouseleave', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        player.classList.remove('art-control-show');
+        player.classList.add('art-control-hide');
+      }, 300);
+    });
+
     // If sandbox is detected, add a notice
     if (isSandboxed) {
       art.notice.show = "Running in a restricted environment";
@@ -809,6 +854,7 @@ export default function Player({
       if (script.parentNode) {
         script.parentNode.removeChild(script);
       }
+      clearTimeout(timeout);
     };
   }, [artRef.current, posterUrl]);
 
