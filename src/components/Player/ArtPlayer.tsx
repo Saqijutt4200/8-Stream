@@ -355,15 +355,15 @@ export default function Player({
                 art.currentTime = Math.min(art.duration, art.currentTime + 15);
               }
                // Reset the control show timer when buttons are clicked
-               art.player.classList.add('art-control-show');
-               art.player.classList.remove('art-control-hide');
+               art.container.classList.add('art-control-show');
+               art.container.classList.remove('art-control-hide');
                if (window.controlsTimeout) {
                  clearTimeout(window.controlsTimeout);
                }
                window.controlsTimeout = setTimeout(() => {
-                 if (!art.player.matches(':hover')) {
-                   art.player.classList.remove('art-control-show');
-                   art.player.classList.add('art-control-hide');
+                 if (!art.container.matches(':hover')) {
+                   art.container.classList.remove('art-control-show');
+                   art.container.classList.add('art-control-hide');
                  }
                }, 3000);
             }
@@ -815,30 +815,30 @@ export default function Player({
     console.log("controls", art.controls);
 
     // Add mouse movement and touch event handlers to show/hide controls
-    const player = art.player;
+    const container = art.container;
     let timeout: NodeJS.Timeout;
 
     const showControls = () => {
-      player.classList.add('art-control-show');
-      player.classList.remove('art-control-hide');
+      container.classList.add('art-control-show');
+      container.classList.remove('art-control-hide');
       
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        if (!player.matches(':hover')) {
-          player.classList.remove('art-control-show');
-          player.classList.add('art-control-hide');
+        if (!container.matches(':hover')) {
+          container.classList.remove('art-control-show');
+          container.classList.add('art-control-hide');
         }
       }, 3000);
     };
 
-    player.addEventListener('mousemove', showControls);
-    player.addEventListener('touchstart', showControls);
+    container.addEventListener('mousemove', showControls);
+    container.addEventListener('touchstart', showControls);
 
-    player.addEventListener('mouseleave', () => {
+    container.addEventListener('mouseleave', () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        player.classList.remove('art-control-show');
-        player.classList.add('art-control-hide');
+        container.classList.remove('art-control-show');
+        container.classList.add('art-control-hide');
       }, 300);
     });
 
