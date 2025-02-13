@@ -299,7 +299,7 @@ export default function Player({
     userSelect: "none",
     webkitUserSelect: "none",
     webkitTouchCallout: "none",
-          },
+          } as React.CSSProperties,
           click: function (...args) {
             console.info("click", args);
           },
