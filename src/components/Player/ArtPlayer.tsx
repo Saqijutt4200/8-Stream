@@ -297,8 +297,8 @@ export default function Player({
             overflow: "hidden",
              // Add these styles to prevent selection and context menu
     userSelect: "none",
-    WebkitUserSelect: "none",
-    WebkitTouchCallout: "none",
+    webkitUserSelect: "none",
+    webkitTouchCallout: "none",
           },
           click: function (...args) {
             console.info("click", args);
