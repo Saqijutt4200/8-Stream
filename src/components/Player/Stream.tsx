@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 const Stream = ({
   params,
 }: {
-  params: { imdb: string; type: string; id: string };
+  params: { tmdb: string; type: string; id: string };
 }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -31,6 +31,7 @@ const Stream = ({
     async function get8Stream() {
       if (params.type === "movie") {
         const data = await playMovie(params.imdb, currentLang);
+        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
@@ -54,6 +55,7 @@ const Stream = ({
           parseInt(episode as string),
           currentLang
         );
+        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
           setAvailableLang(data?.availableLang);
@@ -79,6 +81,7 @@ const Stream = ({
         parseInt(episode as string),
         parseInt(season as string)
       );
+      console.log(data);
       if (data?.success && data?.data?.sources?.length > 0) {
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
@@ -101,23 +104,6 @@ const Stream = ({
       getConsumet();
     }
   }, [currentLang]);
-
-  // Function to move the player backward by 15 seconds
-  const handleBackward = () => {
-    if (art) {
-      const currentTime = art.currentTime;
-      art.seek(currentTime - 15);
-    }
-  };
-
-  // Function to move the player forward by 15 seconds
-  const handleForward = () => {
-    if (art) {
-      const currentTime = art.currentTime;
-      art.seek(currentTime + 15);
-    }
-  };
-
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
@@ -147,6 +133,7 @@ const Stream = ({
                     }),
                   ],
                   onSelect: function (item, $dom) {
+                    // @ts-ignore
                     setCurrentLang(item.value);
                     return item.html;
                   },
@@ -160,6 +147,7 @@ const Stream = ({
                 escape: false,
                 style: {
                   color: "#fff",
+                  // @ts-ignore
                   "font-size": "35px",
                   "font-family": "sans-serif",
                   "text-shadow":
@@ -174,6 +162,7 @@ const Stream = ({
                 "--art-bottom-gap": "25px",
                 "--art-control-icon-scale": 1.7,
                 "--art-padding": "10px 30px",
+                // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
               },
@@ -183,25 +172,11 @@ const Stream = ({
             }}
           />
         ) : (
-          <div className="flex justify-center items-center h-full">
+          <div className="flex 
+justify-center items-center h-full">
             <span className="loader"></span>
           </div>
         )}
-        {/* Controls for 15-second forward and backward */}
-        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex space-x-4">
-          <button
-            onClick={handleBackward}
-            className="bg-gray-700 p-2 rounded-full text-white hover:bg-gray-600"
-          >
-            -15s
-          </button>
-          <button
-            onClick={handleForward}
-            className="bg-gray-700 p-2 rounded-full text-white hover:bg-gray-600"
-          >
-            +15s
-          </button>
-        </div>
       </div>
     </div>
   );
