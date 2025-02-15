@@ -137,8 +137,12 @@ export default function Player({
     style.textContent = `
         .my-style{
           height: 100vh;
-          
+          pointer-events: none; /* Make the container non-interactive */
           top: 0;
+        }
+          .my-style svg {
+          pointer-events: auto; /* Make only the SVG clickable */
+          cursor: pointer;
         }
         .art-video-player .art-control-backward,
       .art-video-player .art-control-forward {
@@ -174,7 +178,7 @@ export default function Player({
       .art-video-player:not(.art-hide-cursor) .art-control-backward,
       .art-video-player:not(.art-hide-cursor) .art-control-forward {
         opacity: 0.8;
-        pointer-events: auto;
+        pointer-events: none;
       }
 
       .art-video-player:not(.art-hide-cursor) .art-control-backward:hover,
@@ -194,7 +198,7 @@ export default function Player({
       .art-video-player.art-mobile .art-control-backward,
       .art-video-player.art-mobile .art-control-forward {
         
-        pointer-events: auto;
+        pointer-events: none;
       }
         .art-video-player .art-progress .art-progress-bar {
           height: 4px !important; /* Make the line bolder */
