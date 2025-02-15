@@ -153,6 +153,10 @@ export default function Player({
         z-index: 100;
         cursor: pointer;
         pointer-events: none;
+        /* Add these properties to prevent movement */
+          transform-origin: center center;
+          will-change: opacity;
+          backface-visibility: hidden;
       }
 
       .art-video-player .art-control-backward {
@@ -177,7 +181,7 @@ export default function Player({
       .art-video-player:not(.art-hide-cursor) .art-control-forward:hover {
         opacity: 1;
         background-color: rgba(0, 0, 0, 0.7);
-        transform: translateY(-50%) scale(1.1) !important;
+        transform: translateY(-50%) !important;
       }
 
       .art-video-player.art-hide-cursor .art-control-backward,
