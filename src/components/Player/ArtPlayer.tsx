@@ -798,19 +798,14 @@ export default function Player({
       position: "left",
     });
     // Add event listeners to sync with control visibility
-    art.on('controls:show', () => {
+    art.on('hover', (show: boolean) => {
       const backward = document.querySelector('.art-control-backward');
       const forward = document.querySelector('.art-control-forward');
-      if (backward) backward.style.opacity = '0.8';
-      if (forward) forward.style.opacity = '0.8';
+      if (backward) backward.style.opacity = show ? '0.8' : '0';
+      if (forward) forward.style.opacity = show ? '0.8' : '0';
     });
 
-    art.on('controls:hide', () => {
-      const backward = document.querySelector('.art-control-backward');
-      const forward = document.querySelector('.art-control-forward');
-      if (backward) backward.style.opacity = '0';
-      if (forward) forward.style.opacity = '0';
-    });
+    
     console.log("controls", art.controls);
     // If sandbox is detected, add a notice
     if (isSandboxed) {
