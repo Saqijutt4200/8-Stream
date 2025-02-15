@@ -797,20 +797,6 @@ export default function Player({
       name: "volume",
       position: "left",
     });
-    // Add event listeners to sync with control visibility
-    art.on('controls:show', () => {
-      const backward = document.querySelector('.art-control-backward') as HTMLElement | null;
-      const forward = document.querySelector('.art-control-forward') as HTMLElement | null;
-      if (backward) backward.style.opacity = '0.8';
-      if (forward) forward.style.opacity = '0.8';
-    });
-    art.on('controls:hide', () => {
-      const backward = document.querySelector('.art-control-backward') as HTMLElement | null;
-      const forward = document.querySelector('.art-control-forward') as HTMLElement | null;
-      if (backward) backward.style.opacity = '0';
-      if (forward) forward.style.opacity = '0';
-    });
-
     
     console.log("controls", art.controls);
     // If sandbox is detected, add a notice
