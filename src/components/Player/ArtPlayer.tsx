@@ -136,7 +136,54 @@ export default function Player({
     const style = document.createElement("style");
     style.textContent = `
       
-        
+       .art-video-player .art-control-backward,
+      .art-video-player .art-control-forward {
+        opacity: 0;
+        transition: all 0.3s ease;
+        position: absolute !important;
+        top: -600% !important;
+        transform: translateY(-50%) !important;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        padding: 10px !important;
+        z-index: 100;
+        cursor: pointer;
+        pointer-events: none;
+      }
+
+      .art-video-player .art-control-backward {
+        left: 20px !important;
+      }
+
+      .art-video-player .art-control-forward {
+        right: 20px !important;
+      }
+
+      .art-video-player:not(.art-hide-cursor) .art-control-backward,
+      .art-video-player:not(.art-hide-cursor) .art-control-forward {
+        opacity: 0.8;
+        pointer-events: auto;
+      }
+
+      .art-video-player:not(.art-hide-cursor) .art-control-backward:hover,
+      .art-video-player:not(.art-hide-cursor) .art-control-forward:hover {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.7);
+        transform: translateY(-50%) scale(1.1) !important;
+      }
+
+      .art-video-player.art-hide-cursor .art-control-backward,
+      .art-video-player.art-hide-cursor .art-control-forward {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Additional control for mobile or touch devices */
+      .art-video-player.art-mobile .art-control-backward,
+      .art-video-player.art-mobile .art-control-forward {
+        opacity: 0.8;
+        pointer-events: auto;
+      }
         .art-video-player .art-progress .art-progress-bar {
           height: 4px !important; /* Make the line bolder */
           
@@ -694,6 +741,21 @@ export default function Player({
       });
     });
 
+     // Add event listeners to sync with control visibility
+     art.on('controls:show', () => {
+      const backward = document.querySelector('.art-control-backward');
+      const forward = document.querySelector('.art-control-forward');
+      if (backward) backward.style.opacity = '0.8';
+      if (forward) forward.style.opacity = '0.8';
+    });
+
+    art.on('controls:hide', () => {
+      const backward = document.querySelector('.art-control-backward');
+      const forward = document.querySelector('.art-control-forward');
+      if (backward) backward.style.opacity = '0';
+      if (forward) forward.style.opacity = '0';
+    });
+
     //art.controls.remove("playAndPause");
 
     if (sub?.length > 0) {
@@ -725,6 +787,32 @@ export default function Player({
       name: "volume",
       position: "left",
     });
+    // Add backward button (15s)
+    art.controls.add({
+      name: "backward",
+      position: "left",
+      html: `<svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M 27.9999 54.4024 C 41.0546 54.4024 51.9063 43.5742 51.9063 30.4961 C 51.9063 18.9649 43.4687 9.1914 32.5234 7.0351 L 32.5234 3.7070 C 32.5234 2.0430 31.3749 1.5976 30.0858 2.5117 L 22.6093 7.7383 C 21.5546 8.4883 21.5312 9.6133 22.6093 10.3867 L 30.0624 15.6367 C 31.3749 16.5742 32.5234 16.1289 32.5234 14.4414 L 32.5234 11.0898 C 41.3827 13.1055 47.8983 21.0039 47.8983 30.4961 C 47.8983 41.5586 39.0390 50.4180 27.9999 50.4180 C 16.9374 50.4180 8.0546 41.5586 8.0780 30.4961 C 8.1014 23.8398 11.3358 17.9570 16.3280 14.3945 C 17.2890 13.6680 17.5936 12.5664 16.9843 11.5820 C 16.4218 10.6211 15.1327 10.3633 14.1014 11.1602 C 8.0546 15.5430 4.0937 22.6211 4.0937 30.4961 C 4.0937 43.5742 14.9218 54.4024 27.9999 54.4024 Z"></path></g></svg>`,
+      click: () => {
+        art.currentTime = Math.max(0, art.currentTime - 15);
+      },
+      style: {
+        padding: "5px",
+      },
+    });
+
+    // Add forward button (15s)
+    art.controls.add({
+      name: "forward",
+      position: "right",
+      html: `<svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M 27.9999 54.4024 C 41.0546 54.4024 51.9063 43.5742 51.9063 30.4961 C 51.9063 22.6211 47.9219 15.5430 41.8983 11.1602 C 40.8671 10.3633 39.5780 10.6211 38.9921 11.5820 C 38.4062 12.5664 38.7109 13.6680 39.6483 14.3945 C 44.6405 17.9570 47.8983 23.8398 47.9219 30.4961 C 47.9454 41.5586 39.0390 50.4180 27.9999 50.4180 C 16.9374 50.4180 8.1014 41.5586 8.1014 30.4961 C 8.1014 21.0039 14.6171 13.1055 23.4765 11.0898 L 23.4765 14.4649 C 23.4765 16.1289 24.6249 16.5742 25.8905 15.6602 L 33.3905 10.4102 C 34.4452 9.6836 34.4687 8.5586 33.3905 7.7851 L 25.9140 2.5351 C 24.6249 1.5976 23.4765 2.0430 23.4765 3.7305 L 23.4765 7.0351 C 12.5077 9.1680 4.0937 18.9649 4.0937 30.4961 C 4.0937 43.5742 14.9218 54.4024 27.9999 54.4024 Z"></path></g></svg>`,
+      click: () => {
+        art.currentTime = Math.min(art.duration, art.currentTime + 15);
+      },
+      style: {
+        padding: "5px",
+      },
+    });
+
     console.log("controls", art.controls);
     // If sandbox is detected, add a notice
     if (isSandboxed) {
