@@ -798,11 +798,17 @@ export default function Player({
       position: "left",
     });
     // Add event listeners to sync with control visibility
-    art.on('hover', (show: boolean) => {
+    art.on('controls:show', () => {
       const backward = document.querySelector('.art-control-backward') as HTMLElement | null;
       const forward = document.querySelector('.art-control-forward') as HTMLElement | null;
-      if (backward) backward.style.opacity = show ? '0.8' : '0';
-      if (forward) forward.style.opacity = show ? '0.8' : '0';
+      if (backward) backward.style.opacity = '0.8';
+      if (forward) forward.style.opacity = '0.8';
+    });
+    art.on('controls:hide', () => {
+      const backward = document.querySelector('.art-control-backward') as HTMLElement | null;
+      const forward = document.querySelector('.art-control-forward') as HTMLElement | null;
+      if (backward) backward.style.opacity = '0';
+      if (forward) forward.style.opacity = '0';
     });
 
     
