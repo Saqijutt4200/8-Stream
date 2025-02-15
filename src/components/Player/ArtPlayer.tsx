@@ -152,11 +152,11 @@ export default function Player({
       }
 
       .art-video-player .art-control-backward {
-        left: 20px !important;
+        left: 20% !important;
       }
 
       .art-video-player .art-control-forward {
-        right: 20px !important;
+        right: 20% !important;
       }
 
       .art-video-player:not(.art-hide-cursor) .art-control-backward,
