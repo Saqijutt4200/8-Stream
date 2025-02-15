@@ -151,7 +151,7 @@ export default function Player({
         position: absolute !important;
         top: 50% !important;
         transform: translateY(-50%) !important;
-        background-color: rgba(0, 0, 0, 0.5);
+        
         border-radius: 50%;
         padding: 10px;
         z-index: 100;
@@ -184,7 +184,7 @@ export default function Player({
       .art-video-player:not(.art-hide-cursor) .art-control-backward:hover,
       .art-video-player:not(.art-hide-cursor) .art-control-forward:hover {
         opacity: 1;
-        background-color: rgba(0, 0, 0, 0.7);
+        
         transform: translateY(-50%) !important;
       }
 
