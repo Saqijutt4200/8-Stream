@@ -172,7 +172,7 @@ export default function Player({
       .art-video-player .art-control-forward {
         right: 20% !important;
         height: 100vh !important; 
-        padding-top: 2rem !important;
+        padding-top: 2.5rem !important;
       }
 
       .art-video-player:not(.art-hide-cursor) .art-control-backward,
