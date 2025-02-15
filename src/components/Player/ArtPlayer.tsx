@@ -799,8 +799,8 @@ export default function Player({
     });
     // Add event listeners to sync with control visibility
     art.on('hover', (show: boolean) => {
-      const backward = document.querySelector('.art-control-backward');
-      const forward = document.querySelector('.art-control-forward');
+      const backward = document.querySelector('.art-control-backward') as HTMLElement | null;
+      const forward = document.querySelector('.art-control-forward') as HTMLElement | null;
       if (backward) backward.style.opacity = show ? '0.8' : '0';
       if (forward) forward.style.opacity = show ? '0.8' : '0';
     });
