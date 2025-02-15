@@ -141,7 +141,7 @@ export default function Player({
         opacity: 0;
         transition: all 0.3s ease;
         position: absolute !important;
-        top: -500% !important;
+        top: -700% !important;
         transform: translateY(-50%) !important;
         background-color: rgba(0, 0, 0, 0.5);
         border-radius: 50%;
@@ -181,7 +181,7 @@ export default function Player({
       /* Additional control for mobile or touch devices */
       .art-video-player.art-mobile .art-control-backward,
       .art-video-player.art-mobile .art-control-forward {
-        opacity: 0.8;
+        
         pointer-events: auto;
       }
         .art-video-player .art-progress .art-progress-bar {
@@ -797,6 +797,10 @@ export default function Player({
       name: "volume",
       position: "left",
     });
+   
+ 
+
+ 
     
     console.log("controls", art.controls);
     // If sandbox is detected, add a notice
