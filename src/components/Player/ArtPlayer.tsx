@@ -141,7 +141,7 @@ export default function Player({
         opacity: 0;
         transition: all 0.3s ease;
         position: absolute !important;
-        top: -900% !important;
+        top: -1000% !important;
         transform: translateY(-50%) !important;
         background-color: rgba(0, 0, 0, 0.5);
         border-radius: 50%;
