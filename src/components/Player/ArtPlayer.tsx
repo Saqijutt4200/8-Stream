@@ -166,13 +166,13 @@ export default function Player({
       .art-video-player .art-control-backward {
         left: 20% !important;
         height: 100vh !important;
-        padding-top: 4rem !important;
+        padding-top: 5rem !important;
       }
 
       .art-video-player .art-control-forward {
         right: 20% !important;
         height: 100vh !important; 
-        padding-top: 4rem !important;
+        padding-top: 5rem !important;
       }
 
       .art-video-player:not(.art-hide-cursor) .art-control-backward,
