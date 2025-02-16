@@ -146,7 +146,7 @@ export default function Player({
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 99;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -451,6 +451,7 @@ export default function Player({
                   max-height: 100px;
                   overflow-y: auto;
                   border: 1px solid white;
+                  z-index: 100;
                 ">
                   ${availableLang
                     .map(
