@@ -136,7 +136,8 @@ export default function Player({
     const style = document.createElement("style");
     style.textContent = `
         .my-style{
-          height: 100vh;
+          height: 100%;
+          
           pointer-events: none; /* Make the container non-interactive */
           top: 0;
         }
@@ -161,18 +162,19 @@ export default function Player({
           transform-origin: center center;
           will-change: opacity;
           backface-visibility: hidden;
+          height: auto !important;
       }
 
       .art-video-player .art-control-backward {
         left: 20% !important;
         height: 100vh !important;
-        padding-top: 5rem !important;
+        padding-top: 0rem !important;
       }
 
       .art-video-player .art-control-forward {
         right: 20% !important;
         height: 100vh !important; 
-        padding-top: 5rem !important;
+        padding-top: 0rem !important;
       }
 
       .art-video-player:not(.art-hide-cursor) .art-control-backward,
