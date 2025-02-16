@@ -144,7 +144,7 @@ export default function Player({
           .my-style svg {
           pointer-events: auto; /* Make only the SVG clickable */
           cursor: pointer;
-          margin-top: 10px;
+          margin-top: 20px;
         }
         .art-video-player .art-control-backward,
       .art-video-player .art-control-forward {
