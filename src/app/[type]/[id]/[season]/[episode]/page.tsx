@@ -28,7 +28,7 @@ const EpisodePage = async ({ params }: { params: { id: string; season: string; e
   const filteredImages = data?.images?.backdrops?.filter((image: any) => image.height >= 1000)
 
   return (
-    <div className="overflow-hidden relative h-screen w-screen">
+    <div className="overflow-hidden relative">
       <Image
         unoptimized={true}
         priority={true}
@@ -39,12 +39,12 @@ const EpisodePage = async ({ params }: { params: { id: string; season: string; e
         alt={data.episodeInfo?.name || "Episode Image"}
         width={1920}
         height={1080}
-        className="object-cover w-full h-500px lg:h-[700px] absolute top-0 left-0"
+        className="object-cover w-full h-[500px] lg:h-[700px] absolute top-0 left-0"
       />
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black to-transparent"></div>
+      <div className="absolute top-0 left-0 w-full h-[500px] lg:h-[700px] bg-gradient-to-t from-black to-transparent"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black to-transparent"></div>
-      <div className="flex flex-row max-sm:gap-7 max-sm:flex-col justify-end items-center w-full h-full lg:h-full ">
-        <div className="top-0 flex flex-col justify-end items-start gap-10 z-20 lg:mb-4 ml-8 h-full">
+      <div className="flex flex-row max-sm:gap-7 max-sm:flex-col justify-start items-center w-full lg:h-full max-sm:h-[800px]">
+        <div className="top-0 flex flex-col justify-start gap-10 z-20 ml-8 h-full">
           <h1 className="text-white text-4xl lg:text-6xl font-semibold mt-[250px]">{data.episodeInfo?.name}</h1>
           <div className="flex gap-4 mt-4 justify-start items-center">
             <div className="flex justify-start items-center">
@@ -64,7 +64,7 @@ const EpisodePage = async ({ params }: { params: { id: string; season: string; e
               : data.episodeInfo?.overview}
           </p>
         </div>
-        <div className="flex flex-col justify-end items-end flex-1 lg:mb-4 h-[500px] z-20 mr-5">
+        <div className="flex flex-col justify-end items-end flex-1 h-[500px] z-20 mr-5">
           <PlayButton
             getSeasonList={getSeasonList}
             imdbId={data.episodeInfo?.imdbId}
