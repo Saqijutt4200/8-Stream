@@ -36,10 +36,10 @@ const Seasons = ({
       setEpisodes(data?.filter((item: any) => item?.still_path !== null));
     }
     getSeasons();
-  }, [id, season]);
+  }, [id, season, getEpisodes]);
 
   const handleEpisodeClick = (episodeNumber: number, seasonNumber: number) => {
-    router.push(`/tv/stream/${id.imdb}/${seasonNumber}-${episodeNumber}`);
+    router.push(`/tv/${id.tmdb}/${seasonNumber}/${episodeNumber}`);
     dispatch(toggleEpModal(false));
   };
 

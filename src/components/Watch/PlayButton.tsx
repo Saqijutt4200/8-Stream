@@ -14,11 +14,15 @@ const PlayButton = ({
   imdbId,
   tmdbId,
   type,
+  seasonNumber,
+  episodeNumber,
 }: {
   getSeasonList: (imdbId: string) => Promise<any>;
   imdbId: string;
   tmdbId: string;
   type: string;
+  seasonNumber?: string;
+  episodeNumber?: string;
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -68,9 +72,12 @@ const PlayButton = ({
     if (type === "movie") {
       // Direct movie route
       router.push(`/movie/stream/${imdbId}`);
+    } else if (type === "episode") {
+      // Direct streaming for specific episode
+      router.push(`/tv/stream/${imdbId}/${seasonNumber}-${episodeNumber}`);
     } else {
       // For TV shows, show episode selection modal
-      dispatch(toggleEpModal(true)); 
+      dispatch(toggleEpModal(true));
     }
   };
 

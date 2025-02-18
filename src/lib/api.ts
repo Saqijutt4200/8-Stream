@@ -167,3 +167,49 @@ export async function getSeasonList(id: string) {
     console.log(error);
   }
 }
+
+//Add this function to your existing API file
+
+export async function getEpisodeInfo(tmdbId: string, seasonNumber: number, episodeNumber: number) {
+  try {
+    // Fetch episode details from TMDB
+    const response = await fetch(
+      `https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonNumber}/episode/${episodeNumber}?api_key=${process.env.NEXT_PUBLIC_TMDB_KEY}`
+    );
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch episode info');
+    }
+    
+    const episodeData = await response.json();
+    
+    // Get the TV show details to extract the IMDB ID
+    const showResponse = await fetch(
+      `https://api.themoviedb.org/3/tv/${tmdbId}/external_ids?api_key=${process.env.NEXT_PUBLIC_TMDB_KEY}`
+    );
+    
+    if (!showResponse.ok) {
+      throw new Error('Failed to fetch show external IDs');
+    }
+    
+    const externalIds = await showResponse.json();
+    
+    // Return combined data
+    return {
+      ...episodeData,
+      imdbId: externalIds.imdb_id
+    };
+  } catch (error) {
+    console.error('Error fetching episode info:', error);
+    return {
+      name: 'Episode not found',
+      overview: 'Unable to load episode information',
+      still_path: '',
+      air_date: '',
+      vote_average: 0,
+      season_number: seasonNumber,
+      episode_number: episodeNumber,
+      imdbId: ''
+    };
+  }
+}
