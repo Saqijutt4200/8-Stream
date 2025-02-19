@@ -19,7 +19,7 @@ interface PosterData {
   backdropPath?: string;
 }
 
-
+let artInstance: any = null
 
 const Stream = ({
   params,
@@ -107,8 +107,11 @@ const Stream = ({
         const data = await playMovie(params.imdb, currentLang);
         // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
-          art?.switchUrl(data?.data?.link);
-          setUrl(data?.data?.link);
+          // Only update URL and switch player if the URL has changed
+          if (url !== data?.data?.link) {
+            setUrl(data?.data?.link)
+            artInstance?.switchUrl(data?.data?.link)
+          }
           setAvailableLang(data?.availableLang);
         } else {
           setError(true);
@@ -123,9 +126,13 @@ const Stream = ({
         );
         // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
-          setUrl(data?.data?.link);
+          // Only update URL and switch player if the URL has changed
+          if (url !== data?.data?.link) {
+            setUrl(data?.data?.link)
+            artInstance?.switchUrl(data?.data?.link)
+          }
           setAvailableLang(data?.availableLang);
-          art?.switchUrl(data?.data?.link);
+         
         } else {
           setError(true);
             //toast.error("No link found");
@@ -163,12 +170,15 @@ const Stream = ({
       setLoading(false);
     }
     }
-    if (provider === "8stream") {
-      get8Stream();
-    } else {
-      getConsumet();
+    // Only fetch new URL if we don't have one or if it's empty
+    if (!url || url.length === 0) {
+      if (provider === "8stream") {
+        get8Stream()
+      } else {
+        getConsumet()
+      }
     }
-  }, [currentLang, season, episode]);
+  }, [currentLang, season, episode, params.id, params.imdb, params.type, art]);
 
   const getPosterUrl = () => {
     if (posterData.backdropPath) {
@@ -179,6 +189,9 @@ const Stream = ({
     }
     return ''; // Fallback empty string if no poster available
   };
+  const setArtInstance = (art: any) => {
+    artInstance = art
+  }
 
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
@@ -240,7 +253,7 @@ const Stream = ({
               },
             }}
             getInstance={(art: any) => {
-              setArt(art);
+              setArtInstance(art)
             }}
           />
         ) : (
