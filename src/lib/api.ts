@@ -159,12 +159,40 @@ export async function playEpisode(
 export async function getSeasonList(id: string) {
   try {
     const response = await fetch(
-      `${process.env.STREAM_API}/getSeasonList?id=${id}`
+      `${process.env.STREAM_API}/getSeasonList?id=${id}`,
+      {
+        cache: "no-cache",
+        headers: {
+          'Accept': 'application/json'
+        }
+      }
     );
+
+    // Check if response is ok
+    if (!response.ok) {
+      console.error(`HTTP error! status: ${response.status}`);
+      return { success: false, error: `HTTP error! status: ${response.status}` };
+    }
+
+    // Check content type
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      console.error("Received non-JSON response:", contentType);
+      return { success: false, error: "Invalid response format" };
+    }
+
     const data = await response.json();
+    
+    // Validate data structure
+    if (!data || !Array.isArray(data?.data?.seasons)) {
+      console.error("Invalid data structure received:", data);
+      return { success: false, error: "Invalid data structure" };
+    }
+
     return data;
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching season list:", error);
+    return { success: false, error: "Failed to fetch season list" };
   }
 }
 

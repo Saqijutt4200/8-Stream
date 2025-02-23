@@ -61,8 +61,8 @@ const page = async ({ params }: { params: { id: string; type: string } }) => {
       {/* left right and bottom to top  */}
       <div className="absolute top-0 left-0 w-full h-[500px] lg:h-[700px] bg-gradient-to-t from-black to-transparent"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black to-transparent"></div>
-      <div className=" flex flex-row max-sm:gap-7 max-sm:flex-col justify-start items-center w-full lg:h-full max-sm:h-[800px]">
-        <div className=" top-0 flex flex-col justify-start gap-10 z-20 ml-8 h-full">
+      <div className=" flex flex-row max-sm:gap-7 max-sm:flex-col justify-center items-center w-full lg:h-full max-sm:h-[800px]">
+        <div className="absolute top-0 flex flex-col justify-start gap-10 z-20 ml-8 h-full">
           {data?.images?.logos?.length > 0 ? (
             <Image
               unoptimized={true}
@@ -77,7 +77,7 @@ const page = async ({ params }: { params: { id: string; type: string } }) => {
               {data.details?.title}
             </h1>
           )}
-          {/* rating */}
+          {/*rating 
           <div className="flex gap-4 mt-4 justify-start items-center">
             <div className="flex justify-start items-center">
               <p className="bg-[#F9CC0B] text-[#02040A] rounded-full px-2 py-1 text-base font-bold">
@@ -96,14 +96,14 @@ const page = async ({ params }: { params: { id: string; type: string } }) => {
                 ? data.details?.episode_run_time?.[0] + " min"
                 : ""}
             </p>
-          </div>
+          </div>*/}
 
-          <p className="text-white text-sm lg:text-sm font-medium max-w-[500px] ">
+          {/*<p className="text-white text-sm lg:text-sm font-medium max-w-[500px] ">
             {data.details?.overview?.length > 350
               ? data.details?.overview?.slice(0, 350) + "..."
               : data.details?.overview}
           </p>
-          {/* tags */}
+          //tags
           <div className="flex gap-2">
             {data.details?.genres?.map((genre: any) => {
               return (
@@ -115,10 +115,10 @@ const page = async ({ params }: { params: { id: string; type: string } }) => {
                 </p>
               );
             })}
-          </div>
+          </div>*/}
          
         </div>
-        <div className="flex flex-col justify-end items-end flex-1 h-[500px] z-20 mr-5">
+        <div className="flex  justify-center items-center h-[500px] z-20 mr-5">
           <PlayButton
             getSeasonList={getSeasonList}
             imdbId={data?.externalIds?.imdb_id}
