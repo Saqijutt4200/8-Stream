@@ -118,7 +118,7 @@ const page = async ({ params }: { params: { id: string; type: string } }) => {
           </div>*/}
          
         </div>
-        <div className="flex  justify-center items-center h-[500px] z-20 mr-5">
+        <div className="flex  justify-center items-center h-[500px] z-20 mr-5 lg:mt-20">
           <PlayButton
             getSeasonList={getSeasonList}
             imdbId={data?.externalIds?.imdb_id}
