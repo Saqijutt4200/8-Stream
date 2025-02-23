@@ -62,7 +62,7 @@ const page = async ({ params }: { params: { id: string; type: string } }) => {
       <div className="absolute top-0 left-0 w-full h-[500px] lg:h-[700px] bg-gradient-to-t from-black to-transparent"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black to-transparent"></div>
       <div className=" flex flex-row max-sm:gap-7 max-sm:flex-col justify-center items-center w-full lg:h-full max-sm:h-[800px]">
-        <div className="absolute top-0 flex flex-col justify-start gap-10 z-20 ml-8 h-full">
+        <div className="absolute top-0 flex flex-col justify-start gap-10 z-20 h-full">
           {data?.images?.logos?.length > 0 ? (
             <Image
               unoptimized={true}
