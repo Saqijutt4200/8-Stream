@@ -105,7 +105,7 @@ const Seasons = ({
                           alt={episode?.name}
                           width={100}
                           height={100}
-                          className="object-cover w-[180px] h-[100px] rounded-lg"
+                          className="object-cover w-[80px] h-[50px] rounded-lg"
                         />
                         <div className="absolute top-0 left-0 flex justify-center items-center w-full h-full bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200">
                           <IoPlay className="text-white text-4xl" />
