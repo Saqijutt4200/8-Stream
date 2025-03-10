@@ -51,18 +51,17 @@ const Seasons = ({
           animate={{ y: 0 }}
           exit={{ y: 1000 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0  flex justify-center items-end z-50"
+          className="fixed inset-0 flex justify-center items-end z-50"
           onClick={() => {
             dispatch(toggleEpModal(false));
           }}
         >
           <div
-            className="bg-white bg-opacity-10 backdrop-blur-sm p-5 max-md:h-[100%] h-[100%] w-[100%]
-      flex flex-col gap-3 rounded-t-lg"
+            className="bg-white bg-opacity-10 backdrop-blur-sm p-5 max-md:h-[100%] h-[100%] w-[100%] flex flex-col gap-3 rounded-t-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center gap-5">
-              {/* seasons */}
+              {/* Seasons */}
               <div className="flex gap-2 overflow-x-auto">
                 {seasonInfo?.map((item: any, i: number) => {
                   return (
@@ -73,6 +72,7 @@ const Seasons = ({
                           ? "bg-white/20 text-white"
                           : "bg-white/10 text-white/50"
                       }`}
+                      style={{ height: "50px" }} // Fixed height
                       onClick={() => dispatch(setSeason(i + 1))}
                     >
                       Season {i + 1}
@@ -80,7 +80,7 @@ const Seasons = ({
                   );
                 })}
               </div>
-              {/* close button */}
+              {/* Close button */}
               <div
                 className="flex justify-center items-center bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-3 py-2 cursor-pointer hover:bg-opacity-30"
                 onClick={() => {
