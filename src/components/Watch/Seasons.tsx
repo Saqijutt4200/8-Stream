@@ -72,7 +72,7 @@ const Seasons = ({
                           ? "bg-white/20 text-white"
                           : "bg-white/10 text-white/50"
                       }`}
-                      style={{ height: "50px" }} // Fixed height
+                      style={{ height: "30px" }} // Fixed height
                       onClick={() => dispatch(setSeason(i + 1))}
                     >
                       Season {i + 1}
