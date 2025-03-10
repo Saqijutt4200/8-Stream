@@ -36,42 +36,51 @@ const Seasons = ({
       setEpisodes(data?.filter((item: any) => item?.still_path !== null));
     }
     getSeasons();
-  }, [id, season]);
+  }, [id, season, getEpisodes]);
+
+  const handleEpisodeClick = (episodeNumber: number, seasonNumber: number) => {
+    router.push(`/tv/${id.tmdb}/${seasonNumber}/${episodeNumber}`);
+    dispatch(toggleEpModal(false));
+  };
 
   return (
     <AnimatePresence>
       {epModal && (
         <motion.div
+          // slide from bottom
           initial={{ y: 1000 }}
           animate={{ y: 0 }}
           exit={{ y: 1000 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 flex justify-center items-end z-50"
+          className="fixed inset-0  flex justify-center items-end z-50"
           onClick={() => {
             dispatch(toggleEpModal(false));
           }}
         >
           <div
-            className="bg-white bg-opacity-10 backdrop-blur-sm p-5 max-md:h-[100%] h-[100%] w-[100%] flex flex-col gap-3 rounded-t-lg"
+            className="bg-white bg-opacity-10 backdrop-blur-sm p-5 max-md:h-[500px] h-[700px] w-[700px]
+      flex flex-col gap-3 rounded-t-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center gap-5">
               {/* seasons */}
-              <div className="flex gap-2 overflow-x-auto">
-                {seasonInfo?.map((item: any, i: number) => (
-                  <button
-                    key={i}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                      season === i + 1
-                        ? "bg-white/20 text-white"
-                        : "bg-white/10 text-white/50"
-                    } hover:bg-white/20 transition-colors`}
-                    onClick={() => dispatch(setSeason(i + 1))}
-                  >
-                    Season {i + 1}
-                  </button>
-                ))}
-              </div>
+              <select
+                className="bg-white/20 backdrop-blur-lg rounded-lg px-2 py-1 text-sm text-white font-medium styled-select outline-none"
+                value={opt.season}
+                onChange={(e) => dispatch(setSeason(e.target.value))}
+              >
+                {seasonInfo?.map((item: any, i: number) => {
+                  return (
+                    <option
+                      key={i}
+                      className="px-1 bg-gray-900 text-center  hover:bg-gray-600 rounded-lg"
+                      value={i + 1}
+                    >
+                      Season {i + 1}
+                    </option>
+                  );
+                })}
+              </select>
               {/* close button */}
               <div
                 className="flex justify-center items-center bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-3 py-2 cursor-pointer hover:bg-opacity-30"
@@ -90,22 +99,16 @@ const Seasons = ({
                     <div
                       key={episode?.id}
                       className="flex bg-white bg-opacity-10 backdrop-blur-md rounded-lg justify-start items-center gap-3 p-2 cursor-pointer hover:bg-opacity-20 bg group"
-                      onClick={() => {
-                        router.push(
-                          `/watch/${type}/${id.tmdb}/${id.imdb}?episode=${
-                            i + 1
-                          }&season=${season}`
-                        );
-                      }}
+                      onClick={() => handleEpisodeClick(i + 1, season)}
                     >
                       <div className="relative">
                         <Image
                           unoptimized={true}
                           src={`https://image.tmdb.org/t/p/original${episode?.still_path}`}
                           alt={episode?.name}
-                          width={100}
-                          height={100}
-                          className="object-cover w-[80px] h-[50px] rounded-lg"
+                          width={200}
+                          height={200}
+                          className="object-cover w-[180px] h-[100px] rounded-lg"
                         />
                         <div className="absolute top-0 left-0 flex justify-center items-center w-full h-full bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200">
                           <IoPlay className="text-white text-4xl" />
