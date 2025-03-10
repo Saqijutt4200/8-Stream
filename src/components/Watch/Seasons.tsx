@@ -103,8 +103,8 @@ const Seasons = ({
                           unoptimized={true}
                           src={`https://image.tmdb.org/t/p/original${episode?.still_path}`}
                           alt={episode?.name}
-                          width={200}
-                          height={200}
+                          width={100}
+                          height={100}
                           className="object-cover w-[180px] h-[100px] rounded-lg"
                         />
                         <div className="absolute top-0 left-0 flex justify-center items-center w-full h-full bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200">
