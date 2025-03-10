@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Artplayer from "artplayer";
 import { type Option } from "artplayer/types/option";
-import artplayerPluginHlsQuality from "artplayer-plugin-hls-quality";
 import Hls from "hls.js";
 
 // Define the level type
@@ -51,21 +50,22 @@ export default function Player({
   getInstance,
   artRef,
   sub,
-  posterUrl, // Add this prop
-  availableLang = [], // Add this prop with default empty array
-  onLanguageChange, // Add this prop
+  posterUrl,
+  availableLang = [],
+  onLanguageChange,
   ...rest
 }: {
   option: Option;
   getInstance?: (art: Artplayer) => void;
   artRef: any;
   sub?: any;
-  posterUrl?: string; // Add this prop
-  availableLang?: string[]; // Add this to the type
-  onLanguageChange?: (lang: string) => void; // Add this to the type
+  posterUrl?: string;
+  availableLang?: string[];
+  onLanguageChange?: (lang: string) => void;
   [key: string]: any;
 }) {
   useEffect(() => {
+    // Add custom styles
     const style = document.createElement("style");
     style.textContent = `
       .art-controls {
@@ -142,46 +142,9 @@ export default function Player({
     `;
     document.head.appendChild(style);
 
+    // Initialize Artplayer
     const art = new Artplayer({
       ...option,
-      settings: [
-        {
-          html: "Quality",
-          tooltip: "Auto",
-          name: "quality",
-          selector: [
-            {
-              html: "480P",
-              default: true,
-              value: "480p",
-            },
-            {
-              html: "720P",
-              value: "720p",
-            },
-            {
-              html: "1080P",
-              value: "1080p",
-            },
-          ],
-          onSelect: function (item) {
-            const levels = art.hls.levels;
-            if (!levels || levels.length === 0) return item.html;
-
-            const selectedLevel = levels.reduce(
-              (prev: HLSLevel, curr: HLSLevel, index: number) => {
-                const prevDiff = Math.abs(prev.height - item.value);
-                const currDiff = Math.abs(curr.height - item.value);
-                return currDiff < prevDiff ? { ...curr, index } : prev;
-              },
-              { ...levels[0], index: 0 }
-            );
-
-            art.hls.currentLevel = selectedLevel.index;
-            return item.html;
-          },
-        },
-      ],
       container: artRef.current!,
       layers: [
         {
@@ -201,15 +164,8 @@ export default function Player({
             webkitUserSelect: "none",
             webkitTouchCallout: "none",
           } as Partial<CSSStyleDeclaration>,
-          click: function (...args) {
-            console.info("click", args);
-          },
-          mounted: function (...args) {
-            console.info("mounted", args);
-          },
         },
       ],
-      plugins: [],
       customType: {
         m3u8: function playM3u8(video, url, art) {
           if (Hls.isSupported()) {
@@ -302,16 +258,7 @@ export default function Player({
       },
     });
 
-    art.on("ready", () => {
-      art.play();
-      art.forward = 10;
-      art.backward = 10;
-    });
-
-    if (getInstance && typeof getInstance === "function") {
-      getInstance(art);
-    }
-
+    // Add keyboard shortcuts
     art.events.proxy(document, "keypress", (event: any) => {
       const isInputFocused =
         document?.activeElement?.tagName === "INPUT" ||
@@ -335,6 +282,7 @@ export default function Player({
       }
     });
 
+    // Add playback speed control
     art.controls.add({
       name: "playback-speed",
       position: "right",
@@ -351,6 +299,7 @@ export default function Player({
       },
     });
 
+    // Add picture-in-picture control
     art.controls.add({
       name: "pip",
       position: "right",
@@ -360,6 +309,7 @@ export default function Player({
       },
     });
 
+    // Handle play/pause events
     art.on("play", () => {
       art.layers.update({
         name: "poster",
@@ -404,6 +354,7 @@ export default function Player({
       });
     });
 
+    // Add subtitles if available
     if (sub?.length > 0) {
       art.controls.add({
         name: "subtitle",
@@ -429,11 +380,13 @@ export default function Player({
       });
     }
 
+    // Update volume control position
     art.controls.update({
       name: "volume",
       position: "left",
     });
 
+    // Cleanup on unmount
     return () => {
       if (art && art.destroy) {
         art.destroy(false);
