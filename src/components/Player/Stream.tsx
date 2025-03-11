@@ -22,7 +22,7 @@ const Stream = ({
   const ref = React.useRef<any>();
   const [art, setArt] = useState<any>();
   const [availableLang, setAvailableLang] = useState<any>([""]);
-  const [currentLang, setCurrentLang] = useState<any>("");
+  const [currentLang, setCurrentLang] = useState<any>("English"); // Set English as default
   const [sub, setSub] = useState<any>([]);
 
   const provider = useAppSelector((state) => state.options.api);
@@ -31,7 +31,6 @@ const Stream = ({
     async function get8Stream() {
       if (params.type === "movie") {
         const data = await playMovie(params.imdb, currentLang);
-        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
@@ -55,7 +54,6 @@ const Stream = ({
           parseInt(episode as string),
           currentLang
         );
-        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
           setAvailableLang(data?.availableLang);
@@ -81,7 +79,6 @@ const Stream = ({
         parseInt(episode as string),
         parseInt(season as string)
       );
-      console.log(data);
       if (data?.success && data?.data?.sources?.length > 0) {
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
@@ -104,6 +101,7 @@ const Stream = ({
       getConsumet();
     }
   }, [currentLang]);
+
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
@@ -122,18 +120,17 @@ const Stream = ({
                   name: "Lang",
                   position: "right",
                   index: 10,
-                  html: `<p >${availableLang[0]}</p>`,
+                  html: `<p>${availableLang[0]}</p>`,
                   selector: [
                     ...availableLang.map((item: any, i: number) => {
                       return {
                         default: i === 0,
-                        html: `<p ">${item}</p>`,
+                        html: `<p>${item}</p>`,
                         value: item,
                       };
                     }),
                   ],
                   onSelect: function (item, $dom) {
-                    // @ts-ignore
                     setCurrentLang(item.value);
                     return item.html;
                   },
@@ -147,7 +144,6 @@ const Stream = ({
                 escape: false,
                 style: {
                   color: "#fff",
-                  // @ts-ignore
                   "font-size": "35px",
                   "font-family": "sans-serif",
                   "text-shadow":
@@ -162,7 +158,6 @@ const Stream = ({
                 "--art-bottom-gap": "25px",
                 "--art-control-icon-scale": 1.7,
                 "--art-padding": "10px 30px",
-                // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
               },
@@ -172,8 +167,7 @@ const Stream = ({
             }}
           />
         ) : (
-          <div className="flex 
-justify-center items-center h-full">
+          <div className="flex justify-center items-center h-full">
             <span className="loader"></span>
           </div>
         )}
