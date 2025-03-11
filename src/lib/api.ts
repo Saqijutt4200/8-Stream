@@ -2,29 +2,35 @@
 
 // ----------------- TMDB -----------------//
 
-// episodes list by season
+// Episodes list by season (filtered for English)
 export async function getEpisodes(id: string, season: number) {
   try {
     const response = await fetch(
       `https://api.themoviedb.org/3/tv/${id}/season/${season}?api_key=${process.env.TMDB_KEY}`
     );
     const data = await response.json();
-    return data.episodes;
+    // Filter episodes for English language
+    const englishEpisodes = data.episodes.filter(
+      (episode: any) => episode.original_language === "en"
+    );
+    return englishEpisodes;
   } catch (error) {
     console.log(error);
   }
 }
 
-// search
+// Search (filtered for English)
 export async function search(query: string) {
   try {
     const response = await fetch(
       `https://api.themoviedb.org/3/search/multi?api_key=${process.env.TMDB_KEY}&query=${query}&include_adult=true&language=en-US&page=1`
     );
     const data = await response.json();
-    // media_type: "tv" | "movie"
+    // Filter results for English language and media type
     const filteredData = data.results.filter(
-      (item: any) => item.media_type === "tv" || item.media_type === "movie"
+      (item: any) =>
+        (item.media_type === "tv" || item.media_type === "movie") &&
+        item.original_language === "en"
     );
     return filteredData;
   } catch (error) {
@@ -34,11 +40,9 @@ export async function search(query: string) {
 
 // ----------------- 8stream -----------------//
 
-// get stream url
+// Get stream URL (no changes needed here)
 export async function getStreamUrl(file: string, key: string) {
   try {
-    // console.log("file", file);
-    // console.log("key", key);
     const response = await fetch(`${process.env.STREAM_API}/getStream`, {
       cache: "no-cache",
       method: "POST",
@@ -57,7 +61,7 @@ export async function getStreamUrl(file: string, key: string) {
   }
 }
 
-// get Media info
+// Get media info (no changes needed here)
 export async function getMediaInfo(id: string) {
   try {
     const response = await fetch(
@@ -65,25 +69,25 @@ export async function getMediaInfo(id: string) {
       { cache: "no-cache" }
     );
     const data = await response.json();
-    // console.log("data", data);
     return data;
   } catch (error) {
     console.log(error);
   }
 }
 
-// play movie
-export async function playMovie(id: string, lang: string) {
+// Play movie (filtered for English)
+export async function playMovie(id: string, lang: string = "en") {
   try {
     const mediaInfo = await getMediaInfo(id);
     if (mediaInfo?.success) {
       const playlist = mediaInfo?.data?.playlist;
+      // Find English language file
       let file = playlist.find((item: any) => item?.title === lang);
       if (!file) {
-        file = playlist?.[0];
+        file = playlist.find((item: any) => item?.title === "en"); // Fallback to English
       }
       if (!file) {
-        return { success: false, error: "No file found" };
+        return { success: false, error: "No English file found" };
       }
       const availableLang = playlist.map((item: any) => item?.title);
       const key = mediaInfo?.data?.key;
@@ -91,7 +95,7 @@ export async function playMovie(id: string, lang: string) {
       if (streamUrl?.success) {
         return { success: true, data: streamUrl?.data, availableLang };
       } else {
-        return { success: false, error: "No stream url found" };
+        return { success: false, error: "No stream URL found" };
       }
     } else {
       return { success: false, error: "No media info found" };
@@ -102,12 +106,12 @@ export async function playMovie(id: string, lang: string) {
   }
 }
 
-// play episode
+// Play episode (filtered for English)
 export async function playEpisode(
   id: string,
   season: number,
   episode: number,
-  lang: string
+  lang: string = "en"
 ) {
   try {
     const mediaInfo = await getMediaInfo(id);
@@ -127,16 +131,15 @@ export async function playEpisode(
     if (!getEpisode) {
       return { success: false, error: "No episode found" };
     }
+    // Find English language file
     let file = getEpisode?.folder.find((item: any) => item?.title === lang);
     if (!file) {
-      file = getEpisode?.folder?.[0];
+      file = getEpisode?.folder.find((item: any) => item?.title === "en"); // Fallback to English
     }
     if (!file) {
-      return { success: false, error: "No file found" };
+      return { success: false, error: "No English file found" };
     }
-    const availableLang = getEpisode?.folder.map((item: any) => {
-      return item?.title;
-    });
+    const availableLang = getEpisode?.folder.map((item: any) => item?.title);
     const filterLang = availableLang.filter((item: any) => item?.length > 0);
     const key = mediaInfo?.data?.key;
     const streamUrl = await getStreamUrl(file?.file, key);
@@ -147,7 +150,7 @@ export async function playEpisode(
         availableLang: filterLang,
       };
     } else {
-      return { success: false, error: "No stream url found" };
+      return { success: false, error: "No stream URL found" };
     }
   } catch (error) {
     console.log(error);
@@ -155,7 +158,7 @@ export async function playEpisode(
   }
 }
 
-// get season and episode and lang list
+// Get season and episode list (no changes needed here)
 export async function getSeasonList(id: string) {
   try {
     const response = await fetch(
@@ -166,4 +169,4 @@ export async function getSeasonList(id: string) {
   } catch (error) {
     console.log(error);
   }
-}
+                               }
