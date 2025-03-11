@@ -21,8 +21,8 @@ const Stream = ({
   const [url, setUrl] = useState<string>("");
   const ref = React.useRef<any>();
   const [art, setArt] = useState<any>();
-  const [availableLang, setAvailableLang] = useState<any>([""]);
-  const [currentLang, setCurrentLang] = useState<any>("English"); // Set English as default
+  const [availableLang, setAvailableLang] = useState<any>([]);
+  const [currentLang, setCurrentLang] = useState<any>("");
   const [sub, setSub] = useState<any>([]);
 
   const provider = useAppSelector((state) => state.options.api);
@@ -34,7 +34,20 @@ const Stream = ({
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
-          setAvailableLang(data?.availableLang);
+
+          // Ensure "English" is included in available languages
+          const languages = data?.availableLang || [];
+          if (!languages.includes("English")) {
+            languages.unshift("English"); // Add English as the first option
+          }
+          setAvailableLang(languages);
+
+          // Set currentLang to English if available
+          if (languages.includes("English")) {
+            setCurrentLang("English");
+          } else {
+            setCurrentLang(languages[0]); // Fallback to the first available language
+          }
         } else {
           toast.error("No link found", {
             position: "top-right",
@@ -56,7 +69,21 @@ const Stream = ({
         );
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
-          setAvailableLang(data?.availableLang);
+
+          // Ensure "English" is included in available languages
+          const languages = data?.availableLang || [];
+          if (!languages.includes("English")) {
+            languages.unshift("English"); // Add English as the first option
+          }
+          setAvailableLang(languages);
+
+          // Set currentLang to English if available
+          if (languages.includes("English")) {
+            setCurrentLang("English");
+          } else {
+            setCurrentLang(languages[0]); // Fallback to the first available language
+          }
+
           art?.switchUrl(data?.data?.link);
         } else {
           toast.error("No link found", {
@@ -72,6 +99,7 @@ const Stream = ({
         }
       }
     }
+
     async function getConsumet() {
       const data = await consumetPlay(
         params.id,
@@ -82,6 +110,20 @@ const Stream = ({
       if (data?.success && data?.data?.sources?.length > 0) {
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
+
+        // Ensure "English" is included in available languages
+        const languages = data?.data?.subtitles?.map((sub: any) => sub.lang) || [];
+        if (!languages.includes("English")) {
+          languages.unshift("English"); // Add English as the first option
+        }
+        setAvailableLang(languages);
+
+        // Set currentLang to English if available
+        if (languages.includes("English")) {
+          setCurrentLang("English");
+        } else {
+          setCurrentLang(languages[0]); // Fallback to the first available language
+        }
       } else {
         toast.error("No link found", {
           position: "top-right",
@@ -95,6 +137,7 @@ const Stream = ({
         });
       }
     }
+
     if (provider === "8stream") {
       get8Stream();
     } else {
@@ -120,11 +163,11 @@ const Stream = ({
                   name: "Lang",
                   position: "right",
                   index: 10,
-                  html: `<p>${availableLang[0]}</p>`,
+                  html: `<p>${currentLang}</p>`,
                   selector: [
                     ...availableLang.map((item: any, i: number) => {
                       return {
-                        default: i === 0,
+                        default: item === currentLang,
                         html: `<p>${item}</p>`,
                         value: item,
                       };
