@@ -151,4 +151,4 @@ export default function Player({
   }, []);
 
   return <div ref={artRef} {...rest}></div>;
-                    }
+}
