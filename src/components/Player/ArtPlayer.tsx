@@ -18,6 +18,10 @@ export default function Player({
   [key: string]: any;
 }) {
   useEffect(() => {
+    // Parse the URL to extract the language parameter
+    const urlParams = new URLSearchParams(window.location.hash.substring(1)); // Extract after #
+    const language = urlParams.get("lang") || urlParams.get("language") || "en"; // Default to English if no language is specified
+
     const art = new Artplayer({
       ...option,
       settings: [
@@ -52,10 +56,7 @@ export default function Player({
       container: artRef.current!,
       plugins: [
         artplayerPluginHlsQuality({
-          // Show quality in control
           control: true,
-
-          // Get the resolution text from level
           getResolution: (level) => {
             if (level.height <= 240) {
               return "240P";
@@ -90,14 +91,16 @@ export default function Player({
         },
       },
     });
+
     art.on("ready", () => {
       art.play();
     });
+
     if (getInstance && typeof getInstance === "function") {
       getInstance(art);
     }
+
     art.events.proxy(document, "keypress", (event: any) => {
-      // Check if the focus is on an input field or textarea
       const isInputFocused =
         document?.activeElement?.tagName === "INPUT" ||
         document?.activeElement?.tagName === "TEXTAREA";
@@ -112,6 +115,7 @@ export default function Player({
     });
 
     art.controls.remove("playAndPause");
+
     if (sub?.length > 0) {
       art.controls.add({
         name: "subtitle",
@@ -136,12 +140,19 @@ export default function Player({
           return item.html;
         },
       });
+
+      // Automatically set the subtitle based on the URL parameter
+      const selectedSubtitle = sub.find((item: any) => item.lang.toLowerCase() === language.toLowerCase());
+      if (selectedSubtitle) {
+        art.subtitle.switch(selectedSubtitle.url);
+      }
     }
+
     art.controls.update({
       name: "volume",
       position: "right",
     });
-    console.log("controls", art.controls);
+
     return () => {
       if (art && art.destroy) {
         art.destroy(false);
@@ -151,4 +162,4 @@ export default function Player({
   }, []);
 
   return <div ref={artRef} {...rest}></div>;
-}
+        }
