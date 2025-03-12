@@ -21,7 +21,7 @@ const Stream = ({
   const [url, setUrl] = useState<string>("");
   const ref = React.useRef<any>();
   const [art, setArt] = useState<any>();
-  const [availableLang, setAvailableLang] = useState<any>([]);
+  const [availableLang, setAvailableLang] = useState<any>([""]);
   const [currentLang, setCurrentLang] = useState<any>("");
   const [sub, setSub] = useState<any>([]);
 
@@ -31,23 +31,11 @@ const Stream = ({
     async function get8Stream() {
       if (params.type === "movie") {
         const data = await playMovie(params.imdb, currentLang);
+        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
-
-          // Ensure "English" is included in available languages
-          const languages = data?.availableLang || [];
-          if (!languages.includes("English")) {
-            languages.unshift("English"); // Add English as the first option
-          }
-          setAvailableLang(languages);
-
-          // Set currentLang to English if available
-          if (languages.includes("English")) {
-            setCurrentLang("English");
-          } else {
-            setCurrentLang(languages[0]); // Fallback to the first available language
-          }
+          setAvailableLang(data?.availableLang);
         } else {
           toast.error("No link found", {
             position: "top-right",
@@ -67,23 +55,10 @@ const Stream = ({
           parseInt(episode as string),
           currentLang
         );
+        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
-
-          // Ensure "English" is included in available languages
-          const languages = data?.availableLang || [];
-          if (!languages.includes("English")) {
-            languages.unshift("English"); // Add English as the first option
-          }
-          setAvailableLang(languages);
-
-          // Set currentLang to English if available
-          if (languages.includes("English")) {
-            setCurrentLang("English");
-          } else {
-            setCurrentLang(languages[0]); // Fallback to the first available language
-          }
-
+          setAvailableLang(data?.availableLang);
           art?.switchUrl(data?.data?.link);
         } else {
           toast.error("No link found", {
@@ -99,7 +74,6 @@ const Stream = ({
         }
       }
     }
-
     async function getConsumet() {
       const data = await consumetPlay(
         params.id,
@@ -107,23 +81,10 @@ const Stream = ({
         parseInt(episode as string),
         parseInt(season as string)
       );
+      console.log(data);
       if (data?.success && data?.data?.sources?.length > 0) {
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
-
-        // Ensure "English" is included in available languages
-        const languages = data?.data?.subtitles?.map((sub: any) => sub.lang) || [];
-        if (!languages.includes("English")) {
-          languages.unshift("English"); // Add English as the first option
-        }
-        setAvailableLang(languages);
-
-        // Set currentLang to English if available
-        if (languages.includes("English")) {
-          setCurrentLang("English");
-        } else {
-          setCurrentLang(languages[0]); // Fallback to the first available language
-        }
       } else {
         toast.error("No link found", {
           position: "top-right",
@@ -137,14 +98,12 @@ const Stream = ({
         });
       }
     }
-
     if (provider === "8stream") {
       get8Stream();
     } else {
       getConsumet();
     }
   }, [currentLang]);
-
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
@@ -163,17 +122,18 @@ const Stream = ({
                   name: "Lang",
                   position: "right",
                   index: 10,
-                  html: `<p>${currentLang}</p>`,
+                  html: `<p >${availableLang[0]}</p>`,
                   selector: [
                     ...availableLang.map((item: any, i: number) => {
                       return {
-                        default: item === currentLang,
-                        html: `<p>${item}</p>`,
+                        default: i === 0,
+                        html: `<p ">${item}</p>`,
                         value: item,
                       };
                     }),
                   ],
                   onSelect: function (item, $dom) {
+                    // @ts-ignore
                     setCurrentLang(item.value);
                     return item.html;
                   },
@@ -187,6 +147,7 @@ const Stream = ({
                 escape: false,
                 style: {
                   color: "#fff",
+                  // @ts-ignore
                   "font-size": "35px",
                   "font-family": "sans-serif",
                   "text-shadow":
@@ -201,6 +162,7 @@ const Stream = ({
                 "--art-bottom-gap": "25px",
                 "--art-control-icon-scale": 1.7,
                 "--art-padding": "10px 30px",
+                // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
               },
@@ -214,6 +176,14 @@ const Stream = ({
             <span className="loader"></span>
           </div>
         )}
+      </div>
+      <div
+        className="absolute top-0 right-0 m-5 cursor-pointer z-50"
+        onClick={() => {
+          router.replace(`/watch/${params.type}/${params.id}}`);
+        }}
+      >
+        <CgClose className="text-white text-4xl" />
       </div>
     </div>
   );
