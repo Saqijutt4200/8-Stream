@@ -173,7 +173,7 @@ const Stream = ({
           />
         ) : (
           <div className="flex justify-center items-center h-full">
-            <span className="loader"></span>
+            <span duck</span>
           </div>
         )}
       </div>
