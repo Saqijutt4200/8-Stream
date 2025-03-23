@@ -1,38 +1,52 @@
-import Catalogue from "@/components/Home/Catalogue";
-import Hero from "@/components/Home/Hero";
-import type { Metadata } from "next";
-
 export default function Page() {
-  const hero = {
-    title: "Welcome to the Movie Catalogue",
-    description: "This is a static page with no API connections.",
-    backdrop_path: "/static_image.jpg", // Replace with a static image URL if needed
-  };
-
-  const data = {
-    tendingMovies: { results: [] },
-    tendingTV: { results: [] },
-    DiscoverBollywoodMovies: { results: [] },
-    DiscoverTv: { results: [] },
-  };
-
   return (
     <main>
-      <Hero hero={hero} />
-      <Catalogue data={data} />
-      <section>
-        <h2>API Documentation</h2>
-        <p>
-          This page does not fetch any data from external sources. All content here is static.
-        </p>
-      </section>
+      <h1>Welcome to the Movie Database</h1>
+      <p>This is a simple text-based page without any API connections.</p>
     </main>
-  );
-}
+     <section class="endpoint">
+            <h3>Movie Embed URL</h3>
+            <div class="details">
+                <p><strong>Endpoint</strong></p>
+                <code>/movie/{id}</code>
+                <p><strong><i class="fa-solid fa-circle-check"></i> Valid parameters:</strong></p>
+                <ul>
+                    <li><code>{id}</code>
+                    <i class="fa-solid fa-circle-exclamation"></i> 
+<span style="color: red;">required</span> - from 
+<strong style="color: #fcba03;">imdb.com</strong> or 
+<strong style="color: #5f9afa;">themoviedb.com</strong>, 
+imdb id must have <strong style="color: #fcba03;">tt </strong>prefix
+.</li>
+                </ul>
+                <p><strong>Examples</strong></p>
+                <code>https://embed.vidsrc.pk/movie/tt12037194</code><br>
+                <code>https://embed.vidsrc.pk/movie/1294203</code>
+            </div>
+        </section>
 
-export function generateMetadata(): Metadata {
-  return {
-    title: "Movie Catalogue - API Documentation",
-    description: "A static page displaying movie categories without any API calls.",
-  };
+        <!-- TV Shows Episode Embed URL Section -->
+        <section class="endpoint">
+            <h3>TV Shows Episode Embed URL</h3>
+            <div class="details">
+                <p><strong>Endpoint</strong></p>
+                <code>/tv/{id}/{season}-{episode}</code>
+                <p><strong> <i class="fa-solid fa-circle-check"></i>Valid parameters:</strong></p>
+                <ul>
+                    <li><code>{id}</code> 
+                    <i class="fa-solid fa-circle-exclamation"></i> 
+<span style="color: red;">required</span> - from 
+<strong style="color: #fcba03;">imdb.com</strong> or 
+<strong style="color: #5f9afa;">themoviedb.com</strong>, 
+imdb id must have <strong style="color: #fcba03;">tt </strong>prefix
+.</li>
+                    <li><code>{season}</code> <i class="fa-solid fa-circle-exclamation"></i> <span style="color: red;">required</span> - the season number.</li>
+                    <li><code>{episode}</code> <i class="fa-solid fa-circle-exclamation"></i> <span style="color: red;">required</span> - the episode number.</li>
+                </ul>
+                <p><strong>Examples</strong></p>
+                <code>https://embed.vidsrc.pk/tv/tt3581920/1-5</code><br>
+                <code>https://embed.vidsrc.pk/tv/202555/1-5</code>
+            </div>
+        </section>
+  );
 }
