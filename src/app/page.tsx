@@ -1,3 +1,6 @@
+export default function Page() {
+  return (
+
 <div class="api-docs">
     <h2>API Documentation</h2>
     <p>Detailed representation of the API endpoints for Vidsrc includes comprehensive information regarding the available methods, request formats, required parameters and optional parameters.</p>
@@ -111,4 +114,5 @@ document.querySelectorAll('.endpoint h3').forEach(header => {
     });
 });
 </script>
-  
+);
+        }  
