@@ -4,7 +4,6 @@ export default function Page() {
       <h1>Welcome to the Movie Database</h1>
       <p>This is a simple text-based page without any API connections.</p>
             <h3>Movie Embed URL</h3>
-            <div class="details">
                 <p><strong>Endpoint</strong></p>
                 <code>/movie/{id}</code>
                 <p><strong><i class="fa-solid fa-circle-check"></i> Valid parameters:</strong></p>
@@ -44,7 +43,6 @@ imdb id must have <strong style="color: #fcba03;">tt </strong>prefix
                 <p><strong>Examples</strong></p>
                 <code>https://embed.vidsrc.pk/tv/tt3581920/1-5</code><br>
                 <code>https://embed.vidsrc.pk/tv/202555/1-5</code>
-            </div>
         </main>
   );
 }
