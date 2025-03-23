@@ -3,8 +3,6 @@ export default function Page() {
     <main>
       <h1>Welcome to the Movie Database</h1>
       <p>This is a simple text-based page without any API connections.</p>
-    </main>
-     <section class="endpoint">
             <h3>Movie Embed URL</h3>
             <div class="details">
                 <p><strong>Endpoint</strong></p>
@@ -47,6 +45,6 @@ imdb id must have <strong style="color: #fcba03;">tt </strong>prefix
                 <code>https://embed.vidsrc.pk/tv/tt3581920/1-5</code><br>
                 <code>https://embed.vidsrc.pk/tv/202555/1-5</code>
             </div>
-        </section>
+        </main>
   );
 }
