@@ -4,12 +4,12 @@ import React, { useState } from "react";
 export default function Page() {
   return (
     <main style={containerStyle}>
-      <h1 style={titleStyle}>Movie & TV Show API Documentation</h1>
+      <h1 style={headingStyle}>Movie & TV Show API Documentation</h1>
       <p style={descriptionStyle}>
         Easily embed movies and TV shows using our Vidsrc API. Follow the guide below for details.
       </p>
 
-      {/* API Sections */}
+      {/* Movie Embed API */}
       <APISection
         title="Movie Embed API"
         endpoint="/movie/{id}"
@@ -23,6 +23,7 @@ export default function Page() {
         ]}
       />
 
+      {/* TV Show Embed API */}
       <APISection
         title="TV Show Episode Embed API"
         endpoint="/tv/{id}/{season}-{episode}"
@@ -40,6 +41,9 @@ export default function Page() {
 
       {/* FAQ Section */}
       <FAQSection />
+
+      {/* Footer */}
+      <Footer />
     </main>
   );
 }
@@ -101,42 +105,40 @@ function APISection({
   );
 }
 
-// FAQ Section Component
+// FAQ Section
 function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const toggleFAQ = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
   const faqs = [
-    { question: "Are your links protected from DMCA?", answer: "Our links are secure and protected, ensuring that they are not subject to removal due to DMCA notices." },
-    { question: "Are subtitles available for all movies and TV shows?", answer: "We source subtitles from various websites, ensuring we have a wide selection available for almost every title." },
-    { question: "How do I utilize your API?", answer: "Using our API requires basic programming knowledge. However, if you require any assistance, feel free to contact our support team." },
-    { question: "What should I do if I come across incorrect movies or TV shows?", answer: "If you notice any inaccuracies, please use the report button on the player. Our team will promptly address and rectify the issue." },
-    { question: "Is it possible to change the video quality?", answer: "Yes! The player has a range of quality options." },
-    { question: "Do you offer movies and TV shows in languages other than English?", answer: "While our server primarily caters to English-speaking audiences, we host a vast collection of global movies in their original language. However, most of our videos have subtitles included." },
-    { question: "Can I use this API for anime?", answer: "Currently, we do not support anime, but we may do so in the future." },
+    { question: "How do I get a movie ID?", answer: "You can get movie IDs from IMDB or TMDB. IMDB IDs start with 'tt'." },
+    { question: "What format should I use for TV show episodes?", answer: "Use /tv/{id}/{season}-{episode}, replacing with actual values." },
+    { question: "Is this API free to use?", answer: "Yes, the API is free, but usage limits may apply." },
   ];
 
   return (
     <section style={faqSectionStyle}>
-      <h2 style={subheadingStyle}>Frequently Asked Questions</h2>
-      <p>Contact us if you have any more questions.</p>
-
+      <h2>Frequently Asked Questions</h2>
       {faqs.map((faq, index) => (
-        <div key={index} style={faqItemStyle}>
-          <button onClick={() => toggleFAQ(index)} style={faqButtonStyle}>
-            {faq.question}
-          </button>
-          {openIndex === index && <p style={faqAnswerStyle}>{faq.answer}</p>}
-        </div>
+        <details key={index} style={faqStyle}>
+          <summary>{faq.question}</summary>
+          <p>{faq.answer}</p>
+        </details>
       ))}
     </section>
   );
 }
 
-// SVG Icons
+// Footer
+function Footer() {
+  return (
+    <footer style={footerStyle}>
+      <p>© {new Date().getFullYear()} Vidsrc API. All Rights Reserved.</p>
+      <p>
+        <a href="#" style={footerLinkStyle}>Privacy Policy</a> | <a href="#" style={footerLinkStyle}>Terms of Service</a>
+      </p>
+    </footer>
+  );
+}
+
+// SVG Copy Icon
 const CopyIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -144,6 +146,7 @@ const CopyIcon = () => (
   </svg>
 );
 
+// SVG Check Icon
 const CheckIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="green" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 6L9 17l-5-5"></path>
@@ -151,8 +154,82 @@ const CheckIcon = () => (
 );
 
 // Styles
-const containerStyle: React.CSSProperties = { fontFamily: "Arial, sans-serif", maxWidth: "900px", margin: "auto", padding: "20px", backgroundColor: "#121212", color: "#e0e0e0" };
-const titleStyle: React.CSSProperties = { color: "#ff9800", fontSize: "28px", fontWeight: "bold", textAlign: "center", marginBottom: "15px" };
-const descriptionStyle: React.CSSProperties = { fontSize: "16px", textAlign: "center", color: "#bbb", marginBottom: "20px" };
-const faqSectionStyle: React.CSSProperties = { background: "#1e1e1e", padding: "20px", borderRadius: "8px", marginTop: "20px" };
+const containerStyle: React.CSSProperties = {
+  fontFamily: "'Arial', sans-serif",
+  maxWidth: "900px",
+  margin: "auto",
+  padding: "20px",
+  lineHeight: "1.6",
+  backgroundColor: "#121212",
+  color: "#e0e0e0",
+};
+
+const headingStyle: React.CSSProperties = {
+  textAlign: "center",
+  color: "#ff5733",
+};
+
+const descriptionStyle: React.CSSProperties = {
+  textAlign: "center",
+  fontSize: "18px",
+  color: "#bbb",
+};
+
+const sectionStyle: React.CSSProperties = {
+  background: "#1e1e1e",
+  padding: "20px",
+  margin: "20px 0",
+  borderRadius: "8px",
+  boxShadow: "0px 2px 5px rgba(255, 255, 255, 0.1)",
+};
+
+const subheadingStyle: React.CSSProperties = {
+  color: "#ff9800",
+};
+
+const apiBoxStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  background: "#333",
+  padding: "10px",
+  borderRadius: "5px",
+  justifyContent: "space-between",
+};
+
+const codeStyle: React.CSSProperties = {
+  fontFamily: "monospace",
+  fontSize: "16px",
+  color: "#eee",
+};
+
+const copyButtonStyle: React.CSSProperties = {
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+};
+
+const linkStyle: React.CSSProperties = {
+  color: "#64b5f6",
+  textDecoration: "none",
+};
+
+const faqSectionStyle = {
+  marginTop: "40px",
+};
+
+const faqStyle = {
+  marginBottom: "10px",
+};
+
+const footerStyle = {
+  marginTop: "40px",
+  padding: "20px",
+  background: "#000",
+  textAlign: "center",
+};
+
+const footerLinkStyle = {
+  color: "#64b5f6",
+  textDecoration: "none",
+};
 
