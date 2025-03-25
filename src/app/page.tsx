@@ -4,14 +4,14 @@ import React, { useState } from "react";
 export default function Page() {
   return (
     <main style={containerStyle}>
-      <h1 style={headingStyle}>📖 Movie & TV Show API Documentation</h1>
+      <h1 style={headingStyle}>Movie & TV Show API Documentation</h1>
       <p style={descriptionStyle}>
-        Easily embed movies and TV shows using our **Vidsrc API**. Follow the guide below for details.
+        Easily embed movies and TV shows using our Vidsrc API. Follow the guide below for details.
       </p>
 
       {/* Movie Embed API */}
       <APISection
-        title="🎥 Movie Embed API"
+        title="Movie Embed API"
         endpoint="/movie/{id}"
         description="Retrieve an embedded movie player by providing the movie ID from IMDB or TMDB."
         parameters={[
@@ -25,7 +25,7 @@ export default function Page() {
 
       {/* TV Show Embed API */}
       <APISection
-        title="📺 TV Show Episode Embed API"
+        title="TV Show Episode Embed API"
         endpoint="/tv/{id}/{season}-{episode}"
         description="Retrieve an embedded TV show player by providing the show ID, season, and episode."
         parameters={[
@@ -72,11 +72,15 @@ function APISection({
       <div style={apiBoxStyle}>
         <code style={codeStyle}>{endpoint}</code>
         <button onClick={handleCopy} style={copyButtonStyle}>
-          {copied ? "✔️ Copied" : "📋 Copy"}
+          {copied ? (
+            <CheckIcon />
+          ) : (
+            <CopyIcon />
+          )}
         </button>
       </div>
 
-      <h3>📌 Parameters:</h3>
+      <h3>Parameters:</h3>
       <ul>
         {parameters.map((param) => (
           <li key={param.name}>
@@ -85,11 +89,11 @@ function APISection({
         ))}
       </ul>
 
-      <h3>🔗 Example URLs:</h3>
+      <h3>Example URLs:</h3>
       <ul>
         {examples.map((example, index) => (
           <li key={index}>
-            <a href={example} target="_blank" rel="noopener noreferrer">
+            <a href={example} target="_blank" rel="noopener noreferrer" style={linkStyle}>
               {example}
             </a>
           </li>
@@ -99,6 +103,39 @@ function APISection({
   );
 }
 
+// SVG Copy Icon
+const CopyIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+  </svg>
+);
+
+// SVG Check Icon
+const CheckIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="green"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 6L9 17l-5-5"></path>
+  </svg>
+);
+
 // Styles
 const containerStyle: React.CSSProperties = {
   fontFamily: "'Arial', sans-serif",
@@ -106,6 +143,8 @@ const containerStyle: React.CSSProperties = {
   margin: "auto",
   padding: "20px",
   lineHeight: "1.6",
+  backgroundColor: "#121212",
+  color: "#e0e0e0",
 };
 
 const headingStyle: React.CSSProperties = {
@@ -116,25 +155,25 @@ const headingStyle: React.CSSProperties = {
 const descriptionStyle: React.CSSProperties = {
   textAlign: "center" as const,
   fontSize: "18px",
-  color: "#555",
+  color: "#bbb",
 };
 
 const sectionStyle: React.CSSProperties = {
-  background: "#f9f9f9",
+  background: "#1e1e1e",
   padding: "20px",
   margin: "20px 0",
   borderRadius: "8px",
-  boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
+  boxShadow: "0px 2px 5px rgba(255, 255, 255, 0.1)",
 };
 
 const subheadingStyle: React.CSSProperties = {
-  color: "#2c3e50",
+  color: "#ff9800",
 };
 
 const apiBoxStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  background: "#eee",
+  background: "#333",
   padding: "10px",
   borderRadius: "5px",
   justifyContent: "space-between",
@@ -143,13 +182,16 @@ const apiBoxStyle: React.CSSProperties = {
 const codeStyle: React.CSSProperties = {
   fontFamily: "monospace",
   fontSize: "16px",
+  color: "#eee",
 };
 
 const copyButtonStyle: React.CSSProperties = {
-  background: "#007bff",
-  color: "white",
+  background: "transparent",
   border: "none",
-  padding: "5px 10px",
-  borderRadius: "5px",
   cursor: "pointer",
+};
+
+const linkStyle: React.CSSProperties = {
+  color: "#64b5f6",
+  textDecoration: "none",
 };
