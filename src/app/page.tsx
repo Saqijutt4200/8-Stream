@@ -4,7 +4,7 @@ import React, { useState } from "react";
 export default function Page() {
   return (
     <main style={containerStyle}>
-      <h1 style={headingStyle}>Movie & TV Show API Documentation</h1>
+      <h1 style={titleStyle}>Movie & TV Show API Documentation</h1>
       <p style={descriptionStyle}>
         Easily embed movies and TV shows using our Vidsrc API. Follow the guide below for details.
       </p>
@@ -151,12 +151,8 @@ const CheckIcon = () => (
 );
 
 // Styles
-const faqSectionStyle: React.CSSProperties = { background: "#1e1e1e", padding: "20px", borderRadius: "8px", marginTop: "20px" };
-const faqItemStyle: React.CSSProperties = { borderBottom: "1px solid #444", padding: "10px 0" };
-const faqButtonStyle: React.CSSProperties = { background: "none", color: "#ff9800", border: "none", fontSize: "16px", cursor: "pointer" };
-const faqAnswerStyle: React.CSSProperties = { color: "#bbb", padding: "5px 0" };
-
 const containerStyle: React.CSSProperties = { fontFamily: "Arial, sans-serif", maxWidth: "900px", margin: "auto", padding: "20px", backgroundColor: "#121212", color: "#e0e0e0" };
+const titleStyle: React.CSSProperties = { color: "#ff9800", fontSize: "28px", fontWeight: "bold", textAlign: "center", marginBottom: "15px" };
+const descriptionStyle: React.CSSProperties = { fontSize: "16px", textAlign: "center", color: "#bbb", marginBottom: "20px" };
+const faqSectionStyle: React.CSSProperties = { background: "#1e1e1e", padding: "20px", borderRadius: "8px", marginTop: "20px" };
 
-const subheadingStyle: React.CSSProperties = { color: "#ff9800" };
-const linkStyle: React.CSSProperties = { color: "#64b5f6", textDecoration: "none" };
