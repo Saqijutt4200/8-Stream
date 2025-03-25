@@ -39,12 +39,62 @@ export default function Page() {
         ]}
       />
 
-      {/* FAQ Section */}
-      <FAQSection />
-
-      {/* Footer */}
-      <Footer />
+      {/* FAQs Section */}
+      <section style={sectionStyle}>
+        <h2 style={subheadingStyle}>Frequently Asked Questions</h2>
+        
+        <FAQItem 
+          question="How do I find the IMDB or TMDB ID for a movie/show?"
+          answer="You can find the ID in the URL of the movie/show page on IMDB or TMDB. For IMDB, it starts with 'tt' (e.g., tt1234567). For TMDB, it's a number (e.g., 1234567)."
+        />
+        
+        <FAQItem 
+          question="Why isn't my embedded player working?"
+          answer="Check that you're using the correct ID format and that the content exists in our database. Also ensure your URL follows the correct format."
+        />
+        
+        <FAQItem 
+          question="Can I embed content on my commercial website?"
+          answer="Yes, our API can be used for both personal and commercial projects, but please check our terms of service for any restrictions."
+        />
+        
+        <FAQItem 
+          question="Is there a rate limit for API requests?"
+          answer="We have fair usage limits in place to prevent abuse. Normal usage shouldn't hit these limits, but contact us if you need higher limits."
+        />
+        
+        <FAQItem 
+          question="How often is your content updated?"
+          answer="We update our database regularly, typically within 24 hours of new content being released on major platforms."
+        />
+        
+        <FAQItem 
+          question="Can I request specific movies or shows to be added?"
+          answer="Yes, you can contact our support team with requests, and we'll do our best to add them to our database."
+        />
+      </section>
     </main>
+  );
+}
+
+// FAQ Item Component
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={faqItemStyle}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)} 
+        style={faqQuestionStyle}
+        aria-expanded={isOpen}
+      >
+        {question}
+        <span style={faqIconStyle}>
+          {isOpen ? '−' : '+'}
+        </span>
+      </button>
+      {isOpen && <div style={faqAnswerStyle}>{answer}</div>}
+    </div>
   );
 }
 
@@ -78,7 +128,11 @@ function APISection({
       <div style={apiBoxStyle}>
         <code style={codeStyle}>{endpoint}</code>
         <button onClick={handleCopy} style={copyButtonStyle}>
-          {copied ? <CheckIcon /> : <CopyIcon />}
+          {copied ? (
+            <CheckIcon />
+          ) : (
+            <CopyIcon />
+          )}
         </button>
       </div>
 
@@ -105,42 +159,18 @@ function APISection({
   );
 }
 
-// FAQ Section
-function FAQSection() {
-  const faqs = [
-    { question: "How do I get a movie ID?", answer: "You can get movie IDs from IMDB or TMDB. IMDB IDs start with 'tt'." },
-    { question: "What format should I use for TV show episodes?", answer: "Use /tv/{id}/{season}-{episode}, replacing with actual values." },
-    { question: "Is this API free to use?", answer: "Yes, the API is free, but usage limits may apply." },
-  ];
-
-  return (
-    <section style={faqSectionStyle}>
-      <h2>Frequently Asked Questions</h2>
-      {faqs.map((faq, index) => (
-        <details key={index} style={faqStyle}>
-          <summary>{faq.question}</summary>
-          <p>{faq.answer}</p>
-        </details>
-      ))}
-    </section>
-  );
-}
-
-// Footer
-function Footer() {
-  return (
-    <footer style={footerStyle}>
-      <p>© {new Date().getFullYear()} Vidsrc API. All Rights Reserved.</p>
-      <p>
-        <a href="#" style={footerLinkStyle}>Privacy Policy</a> | <a href="#" style={footerLinkStyle}>Terms of Service</a>
-      </p>
-    </footer>
-  );
-}
-
 // SVG Copy Icon
 const CopyIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
     <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
   </svg>
@@ -148,7 +178,16 @@ const CopyIcon = () => (
 
 // SVG Check Icon
 const CheckIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="green" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="green"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M20 6L9 17l-5-5"></path>
   </svg>
 );
@@ -165,12 +204,12 @@ const containerStyle: React.CSSProperties = {
 };
 
 const headingStyle: React.CSSProperties = {
-  textAlign: "center",
+  textAlign: "center" as const,
   color: "#ff5733",
 };
 
 const descriptionStyle: React.CSSProperties = {
-  textAlign: "center",
+  textAlign: "center" as const,
   fontSize: "18px",
   color: "#bbb",
 };
@@ -213,23 +252,33 @@ const linkStyle: React.CSSProperties = {
   textDecoration: "none",
 };
 
-const faqSectionStyle = {
-  marginTop: "40px",
+const faqItemStyle: React.CSSProperties = {
+  marginBottom: "15px",
+  borderBottom: "1px solid #333",
+  paddingBottom: "15px",
 };
 
-const faqStyle = {
-  marginBottom: "10px",
+const faqQuestionStyle: React.CSSProperties = {
+  background: "transparent",
+  border: "none",
+  color: "#e0e0e0",
+  fontSize: "16px",
+  fontWeight: "bold",
+  cursor: "pointer",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  width: "100%",
+  textAlign: "left",
+  padding: "10px 0",
 };
 
-const footerStyle = {
-  marginTop: "40px",
-  padding: "20px",
-  background: "#000",
-  textAlign: "center",
+const faqAnswerStyle: React.CSSProperties = {
+  padding: "10px 0",
+  color: "#bbb",
 };
 
-const footerLinkStyle = {
-  color: "#64b5f6",
-  textDecoration: "none",
+const faqIconStyle: React.CSSProperties = {
+  fontSize: "20px",
+  marginLeft: "10px",
 };
-
