@@ -28,7 +28,6 @@ const Stream = ({
 
   const provider = useAppSelector((state) => state.options.api);
 
-  // Get hash from URL when component mounts
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setHash(window.location.hash);
@@ -44,10 +43,9 @@ const Stream = ({
           setUrl(data?.data?.link);
           setAvailableLang(data?.availableLang);
           
-          // If there's a hash and available languages, set the language based on hash
           if (hash && data.availableLang?.length > 0) {
             const langIndex = parseInt(hash.replace('#', '')) - 1;
-            if (!isNaN(langIndex) {
+            if (!isNaN(langIndex)) {
               const selectedLang = data.availableLang[langIndex];
               if (selectedLang && selectedLang !== currentLang) {
                 setCurrentLang(selectedLang);
@@ -55,16 +53,7 @@ const Stream = ({
             }
           }
         } else {
-          toast.error("No link found", {
-            position: "top-right",
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          });
+          toast.error("No link found");
         }
       } else {
         const data = await playEpisode(
@@ -78,7 +67,6 @@ const Stream = ({
           setAvailableLang(data?.availableLang);
           art?.switchUrl(data?.data?.link);
           
-          // If there's a hash and available languages, set the language based on hash
           if (hash && data.availableLang?.length > 0) {
             const langIndex = parseInt(hash.replace('#', '')) - 1;
             if (!isNaN(langIndex)) {
@@ -89,16 +77,7 @@ const Stream = ({
             }
           }
         } else {
-          toast.error("No link found", {
-            position: "top-right",
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          });
+          toast.error("No link found");
         }
       }
     }
@@ -114,16 +93,7 @@ const Stream = ({
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
       } else {
-        toast.error("No link found", {
-          position: "top-right",
-          autoClose: 1000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.error("No link found");
       }
     }
     
