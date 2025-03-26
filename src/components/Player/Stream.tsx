@@ -24,18 +24,36 @@ const Stream = ({
   const [availableLang, setAvailableLang] = useState<any>([""]);
   const [currentLang, setCurrentLang] = useState<any>("");
   const [sub, setSub] = useState<any>([]);
+  const [hash, setHash] = useState<string>("");
 
   const provider = useAppSelector((state) => state.options.api);
+
+  // Get hash from URL when component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setHash(window.location.hash);
+    }
+  }, []);
 
   useEffect(() => {
     async function get8Stream() {
       if (params.type === "movie") {
         const data = await playMovie(params.imdb, currentLang);
-        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
           setAvailableLang(data?.availableLang);
+          
+          // If there's a hash and available languages, set the language based on hash
+          if (hash && data.availableLang?.length > 0) {
+            const langIndex = parseInt(hash.replace('#', '')) - 1;
+            if (!isNaN(langIndex) {
+              const selectedLang = data.availableLang[langIndex];
+              if (selectedLang && selectedLang !== currentLang) {
+                setCurrentLang(selectedLang);
+              }
+            }
+          }
         } else {
           toast.error("No link found", {
             position: "top-right",
@@ -55,11 +73,21 @@ const Stream = ({
           parseInt(episode as string),
           currentLang
         );
-        // console.log(data);
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
           setAvailableLang(data?.availableLang);
           art?.switchUrl(data?.data?.link);
+          
+          // If there's a hash and available languages, set the language based on hash
+          if (hash && data.availableLang?.length > 0) {
+            const langIndex = parseInt(hash.replace('#', '')) - 1;
+            if (!isNaN(langIndex)) {
+              const selectedLang = data.availableLang[langIndex];
+              if (selectedLang && selectedLang !== currentLang) {
+                setCurrentLang(selectedLang);
+              }
+            }
+          }
         } else {
           toast.error("No link found", {
             position: "top-right",
@@ -74,6 +102,7 @@ const Stream = ({
         }
       }
     }
+    
     async function getConsumet() {
       const data = await consumetPlay(
         params.id,
@@ -81,7 +110,6 @@ const Stream = ({
         parseInt(episode as string),
         parseInt(season as string)
       );
-      console.log(data);
       if (data?.success && data?.data?.sources?.length > 0) {
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
@@ -98,12 +126,14 @@ const Stream = ({
         });
       }
     }
+    
     if (provider === "8stream") {
       get8Stream();
     } else {
       getConsumet();
     }
-  }, [currentLang]);
+  }, [currentLang, hash]);
+
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
       <div className="w-[100%] h-[100%] rounded-lg" id="player-container">
@@ -122,18 +152,17 @@ const Stream = ({
                   name: "Lang",
                   position: "right",
                   index: 10,
-                  html: `<p >${availableLang[0]}</p>`,
+                  html: `<p>${currentLang || availableLang[0]}</p>`,
                   selector: [
                     ...availableLang.map((item: any, i: number) => {
                       return {
-                        default: i === 0,
-                        html: `<p ">${item}</p>`,
+                        default: i === 0 || item === currentLang,
+                        html: `<p>${item}</p>`,
                         value: item,
                       };
                     }),
                   ],
                   onSelect: function (item, $dom) {
-                    // @ts-ignore
                     setCurrentLang(item.value);
                     return item.html;
                   },
@@ -147,7 +176,6 @@ const Stream = ({
                 escape: false,
                 style: {
                   color: "#fff",
-                  // @ts-ignore
                   "font-size": "35px",
                   "font-family": "sans-serif",
                   "text-shadow":
@@ -162,7 +190,6 @@ const Stream = ({
                 "--art-bottom-gap": "25px",
                 "--art-control-icon-scale": 1.7,
                 "--art-padding": "10px 30px",
-                // "--art-control-icon-size": "60px",
                 "--art-volume-handle-size": "20px",
                 "--art-volume-height": "150px",
               },
@@ -173,14 +200,14 @@ const Stream = ({
           />
         ) : (
           <div className="flex justify-center items-center h-full">
-            
+            {/* Loading state */}
           </div>
         )}
       </div>
       <div
         className="absolute top-0 right-0 m-5 cursor-pointer z-50"
         onClick={() => {
-          router.replace(`/watch/${params.type}/${params.id}}`);
+          router.replace(`/watch/${params.type}/${params.id}`);
         }}
       >
         <CgClose className="text-white text-4xl" />
