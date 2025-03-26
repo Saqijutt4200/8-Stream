@@ -8,6 +8,12 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { consumetPlay } from "@/lib/consumetApi";
 import { toast } from "react-toastify";
 
+interface SelectorItem {
+  default?: boolean;
+  html: string;
+  value: string;
+}
+
 const Stream = ({
   params,
 }: {
@@ -21,8 +27,8 @@ const Stream = ({
   const [url, setUrl] = useState<string>("");
   const ref = React.useRef<any>();
   const [art, setArt] = useState<any>();
-  const [availableLang, setAvailableLang] = useState<any>([""]);
-  const [currentLang, setCurrentLang] = useState<any>("");
+  const [availableLang, setAvailableLang] = useState<string[]>([]);
+  const [currentLang, setCurrentLang] = useState<string>("");
   const [sub, setSub] = useState<any>([]);
   const [hash, setHash] = useState<string>("");
 
@@ -41,11 +47,11 @@ const Stream = ({
         if (data?.success && data?.data?.link?.length > 0) {
           art?.switchUrl(data?.data?.link);
           setUrl(data?.data?.link);
-          setAvailableLang(data?.availableLang);
+          setAvailableLang(data?.availableLang || []);
           
           if (hash && data.availableLang?.length > 0) {
             const langIndex = parseInt(hash.replace('#', '')) - 1;
-            if (!isNaN(langIndex)) {
+            if (!isNaN(langIndex) && langIndex >= 0 && langIndex < data.availableLang.length) {
               const selectedLang = data.availableLang[langIndex];
               if (selectedLang && selectedLang !== currentLang) {
                 setCurrentLang(selectedLang);
@@ -53,7 +59,16 @@ const Stream = ({
             }
           }
         } else {
-          toast.error("No link found");
+          toast.error("No link found", {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
         }
       } else {
         const data = await playEpisode(
@@ -64,12 +79,12 @@ const Stream = ({
         );
         if (data?.success && data?.data?.link?.length > 0) {
           setUrl(data?.data?.link);
-          setAvailableLang(data?.availableLang);
+          setAvailableLang(data?.availableLang || []);
           art?.switchUrl(data?.data?.link);
           
           if (hash && data.availableLang?.length > 0) {
             const langIndex = parseInt(hash.replace('#', '')) - 1;
-            if (!isNaN(langIndex)) {
+            if (!isNaN(langIndex) && langIndex >= 0 && langIndex < data.availableLang.length) {
               const selectedLang = data.availableLang[langIndex];
               if (selectedLang && selectedLang !== currentLang) {
                 setCurrentLang(selectedLang);
@@ -77,7 +92,16 @@ const Stream = ({
             }
           }
         } else {
-          toast.error("No link found");
+          toast.error("No link found", {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
         }
       }
     }
@@ -93,7 +117,16 @@ const Stream = ({
         setUrl(data?.data?.sources[data?.data?.sources.length - 1]?.url);
         setSub(data?.data?.subtitles);
       } else {
-        toast.error("No link found");
+        toast.error("No link found", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       }
     }
     
@@ -102,7 +135,7 @@ const Stream = ({
     } else {
       getConsumet();
     }
-  }, [currentLang, hash]);
+  }, [currentLang, hash, params, season, episode, art, provider]);
 
   return (
     <div className="fixed bg-black inset-0 flex justify-center items-end z-[200]">
@@ -122,17 +155,15 @@ const Stream = ({
                   name: "Lang",
                   position: "right",
                   index: 10,
-                  html: `<p>${currentLang || availableLang[0]}</p>`,
+                  html: `<p>${currentLang || availableLang[0] || ''}</p>`,
                   selector: [
-                    ...availableLang.map((item: any, i: number) => {
-                      return {
-                        default: i === 0 || item === currentLang,
-                        html: `<p>${item}</p>`,
-                        value: item,
-                      };
-                    }),
+                    ...availableLang.map((item: string, i: number) => ({
+                      default: i === 0 || item === currentLang,
+                      html: `<p>${item}</p>`,
+                      value: item,
+                    })),
                   ],
-                  onSelect: function (item, $dom) {
+                  onSelect: function (item: SelectorItem) {
                     setCurrentLang(item.value);
                     return item.html;
                   },
